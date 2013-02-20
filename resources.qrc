@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/Main.qml</file>
+        <file>qml/Key.qml</file>
+        <file>qml/Keyboard.qml</file>
+        <file>qml/Lineview.qml</file>
+        <file>qml/Button.qml</file>
+        <file>qml/Menu.qml</file>
+        <file>qml/NotifyWin.qml</file>
+        <file>icons/backspace.png</file>
+        <file>icons/down.png</file>
+        <file>icons/enter.png</file>
+        <file>icons/left.png</file>
+        <file>icons/menu.png</file>
+        <file>icons/right.png</file>
+        <file>icons/shift.png</file>
+        <file>icons/tab.png</file>
+        <file>icons/up.png</file>
+        <file>qml/UrlWindow.qml</file>
+        <file>data/menu.xml</file>
+        <file>icons/scroll-indicator.png</file>
+        <file>data/english.layout</file>
+        <file>data/finnish.layout</file>
+        <file>qml/LayoutWindow.qml</file>
+    </qresource>
+</RCC>

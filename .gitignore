@@ -1,0 +1,6 @@
+Makefile
+*.pro.user*
+*.o
+moc_*
+./fingerterm
+qrc_resources.cpp
