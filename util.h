@@ -67,6 +67,8 @@ public:
 
     Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
 
+    static bool charIsHexDigit(QChar ch);
+
 public slots:
     void onMainWinFocusChanged(bool in);
 

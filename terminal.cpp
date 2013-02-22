@@ -142,10 +142,11 @@ void Terminal::putString(QString str, bool unEscape)
         str.replace("\\b", "\b");
         str.replace("\\t", "\t");
 
+        //hex
         while(str.indexOf("\\x") != -1) {
             int i = str.indexOf("\\x")+2;
             QString num;
-            while(num.length() < 2 && str.length()>i && str.at(i).isNumber() ) {
+            while(num.length() < 2 && str.length()>i && Util::charIsHexDigit(str.at(i))) {
                 num.append(str.at(i));
                 i++;
             }
@@ -153,10 +154,12 @@ void Terminal::putString(QString str, bool unEscape)
             bool ok;
             str.insert(i-2-num.length(), QChar(num.toInt(&ok,16)));
         }
+        //octal
         while(str.indexOf("\\0") != -1) {
             int i = str.indexOf("\\0")+2;
             QString num;
-            while(num.length() < 3 && str.length()>i && str.at(i).isNumber() ) {
+            while(num.length() < 3 && str.length()>i &&
+                  (str.at(i).toAscii() >= 48 && str.at(i).toAscii() <= 55)) { //accept only 0-7
                 num.append(str.at(i));
                 i++;
             }

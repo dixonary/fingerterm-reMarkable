@@ -392,3 +392,16 @@ void Util::selectionFinished()
     emit clipboardOrSelectionChanged();
 }
 
+//static
+bool Util::charIsHexDigit(QChar ch)
+{
+    if (ch.isDigit()) // 0-9
+        return true;
+    else if (ch.toAscii() >= 65 && ch.toAscii() <= 70) // A-F
+        return true;
+    else if (ch.toAscii() >= 97 && ch.toAscii() <= 102) // a-f
+        return true;
+
+    return false;
+}
+
