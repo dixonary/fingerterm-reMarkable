@@ -70,6 +70,9 @@ contains(MEEGO_EDITION,harmattan) {
     INSTALLS += icon
 }
 
-
-
-
+contains(MEEGO_EDITION,nemo) {
+    desktopfile.extra = cp $${TARGET}fingerterm.desktop.nemo fingerterm.desktop
+    desktopfile.path = /usr/share/applications
+    desktopfile.files = fingerterm.desktop
+    INSTALLS += desktopfile
+}
