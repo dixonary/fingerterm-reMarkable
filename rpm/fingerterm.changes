@@ -1,0 +1,5 @@
+* Sun Mar 03 2013 Bernd Wachter <bernd.wachter@jollamobile.com> - 1.0.3
+- Move to Nemo specific target
+
+* Mon Jul 09 2012 Bernd Wachter <bernd.wachter@jollamobile.com> - 1.0.2
+- Initial package for Nemo
