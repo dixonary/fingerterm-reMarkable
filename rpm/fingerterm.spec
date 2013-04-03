@@ -8,6 +8,8 @@ Source0: %{name}-%{version}.tar.gz
 URL: https://github.com/nemomobile/fingerterm
 BuildRequires: pkgconfig(QtCore)
 BuildRequires: pkgconfig(QtOpenGL)
+Obsoletes: meego-terminal <= 0.2.2
+Provides: meego-terminal > 0.2.2
 
 %description
 %{summary}.
