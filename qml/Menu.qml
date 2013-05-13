@@ -362,7 +362,6 @@ Rectangle {
                             }
                         }
                         Button {
-                            visible: util.isHarmattan()
                             text: "New window"
                             onClicked: {
                                 hideMenu();

@@ -105,7 +105,8 @@ void Util::openNewWindow()
         params.append("new");
         iface.call("launch", params);
     }
-
+#else
+    QProcess::startDetached("/usr/bin/fingerterm");
 #endif //MEEGO_EDITION_HARMATTAN
 }
 
