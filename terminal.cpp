@@ -159,7 +159,7 @@ void Terminal::putString(QString str, bool unEscape)
             int i = str.indexOf("\\0")+2;
             QString num;
             while(num.length() < 3 && str.length()>i &&
-                  (str.at(i).toAscii() >= 48 && str.at(i).toAscii() <= 55)) { //accept only 0-7
+                  (str.at(i).toLatin1() >= 48 && str.at(i).toLatin1() <= 55)) { //accept only 0-7
                 num.append(str.at(i));
                 i++;
             }
@@ -188,7 +188,7 @@ void Terminal::keyPress(int key, int modifiers)
     QString toWrite;
 
     if( key <= 0xFF ) {
-        char asciiVal = c.toAscii();
+        char asciiVal = c.toLatin1();
 
         if(modifiers & Qt::AltModifier)
             toWrite.append(ch_ESC);
@@ -209,13 +209,13 @@ void Terminal::keyPress(int key, int modifiers)
         cursorModif = 'O';
 
     if( key==Qt::Key_Up )
-        toWrite += QString("%1%2A").arg(ch_ESC).arg(cursorModif).toAscii();
+        toWrite += QString("%1%2A").arg(ch_ESC).arg(cursorModif).toLatin1();
     if( key==Qt::Key_Down )
-        toWrite += QString("%1%2B").arg(ch_ESC).arg(cursorModif).toAscii();
+        toWrite += QString("%1%2B").arg(ch_ESC).arg(cursorModif).toLatin1();
     if( key==Qt::Key_Right )
-        toWrite += QString("%1%2C").arg(ch_ESC).arg(cursorModif).toAscii();
+        toWrite += QString("%1%2C").arg(ch_ESC).arg(cursorModif).toLatin1();
     if( key==Qt::Key_Left )
-        toWrite += QString("%1%2D").arg(ch_ESC).arg(cursorModif).toAscii();
+        toWrite += QString("%1%2D").arg(ch_ESC).arg(cursorModif).toLatin1();
 
     if( key==Qt::Key_Enter || key==Qt::Key_Return ) {
         if(iNewLineMode)
@@ -229,15 +229,15 @@ void Terminal::keyPress(int key, int modifiers)
         toWrite = "\t";
 
     if( key==Qt::Key_PageUp )
-        toWrite += QString("%1[5~").arg(ch_ESC).toAscii();
+        toWrite += QString("%1[5~").arg(ch_ESC).toLatin1();
     if( key==Qt::Key_PageDown )
-        toWrite += QString("%1[6~").arg(ch_ESC).toAscii();
+        toWrite += QString("%1[6~").arg(ch_ESC).toLatin1();
     if( key==Qt::Key_Home )
-        toWrite += QString("%1OH").arg(ch_ESC).toAscii();
+        toWrite += QString("%1OH").arg(ch_ESC).toLatin1();
     if( key==Qt::Key_End )
-        toWrite += QString("%1OF").arg(ch_ESC).toAscii();
+        toWrite += QString("%1OF").arg(ch_ESC).toLatin1();
     if( key==Qt::Key_Delete )
-        toWrite += QString("%1[3~").arg(ch_ESC).toAscii();
+        toWrite += QString("%1[3~").arg(ch_ESC).toLatin1();
 
     if( key==Qt::Key_Escape ) {
         toWrite += QString(1,ch_ESC);
@@ -258,7 +258,7 @@ void Terminal::insertInBuffer(const QString& chars)
 
     for(int i=0; i<chars.size(); i++) {
         QChar ch = chars.at(i);
-        if(ch.toAscii()=='\n' || ch.toAscii()==11 || ch.toAscii()==12) {  // line feed, vertical tab or form feed
+        if(ch.toLatin1()=='\n' || ch.toLatin1()==11 || ch.toLatin1()==12) {  // line feed, vertical tab or form feed
             if(cursorPos().y()==iMarginBottom) {
                 scrollFwd(1);
                 if(iNewLineMode)
@@ -272,13 +272,13 @@ void Terminal::insertInBuffer(const QString& chars)
                     setCursorPos(QPoint(cursorPos().x(), cursorPos().y()+1));
             }
         }
-        else if(ch.toAscii()=='\r') {  // carriage return
+        else if(ch.toLatin1()=='\r') {  // carriage return
             setCursorPos(QPoint(1,cursorPos().y()));
         }
-        else if(ch.toAscii()=='\b' || ch.toAscii()==127) {  //backspace & del (only move cursor, don't erase)
+        else if(ch.toLatin1()=='\b' || ch.toLatin1()==127) {  //backspace & del (only move cursor, don't erase)
             setCursorPos(QPoint(cursorPos().x()-1,cursorPos().y()));
         }
-        else if(ch.toAscii()=='\a') {  // BEL
+        else if(ch.toLatin1()=='\a') {  // BEL
             if(escape==']') {  // BEL also ends OSC sequence
                 escape=-1;
                 oscSequence(oscSeq);
@@ -287,7 +287,7 @@ void Terminal::insertInBuffer(const QString& chars)
                 iUtil->bellAlert();
             }
         }
-        else if(ch.toAscii()=='\t') {  //tab
+        else if(ch.toLatin1()=='\t') {  //tab
             if(cursorPos().y() <= iTabStops.size()) {
                 for(int i=0; i<iTabStops[cursorPos().y()-1].count(); i++) {
                     if(iTabStops[cursorPos().y()-1][i] > cursorPos().x()) {
@@ -297,28 +297,28 @@ void Terminal::insertInBuffer(const QString& chars)
                 }
             }
         }
-        else if(ch.toAscii()==14 || ch.toAscii()==15) {  //SI and SO, related to character set... ignore
+        else if(ch.toLatin1()==14 || ch.toLatin1()==15) {  //SI and SO, related to character set... ignore
         }
         else {
             if( escape>=0 ) {
-                if( escape==0 && (ch.toAscii()=='[') ) {
+                if( escape==0 && (ch.toLatin1()=='[') ) {
                     escape='['; //ansi sequence
                     escSeq += ch;
                 }
-                else if( escape==0 && (ch.toAscii()==']') ) {
+                else if( escape==0 && (ch.toLatin1()==']') ) {
                     escape=']'; //osc sequence
                     oscSeq += ch;
                 }
-                else if( escape==0 && multiCharEscapes.contains(ch.toAscii())) {
-                    escape = ch.toAscii();
+                else if( escape==0 && multiCharEscapes.contains(ch.toLatin1())) {
+                    escape = ch.toLatin1();
                     escSeq += ch;
                 }
-                else if( escape==0 && ch.toAscii()=='\\' ) {  // ESC\ also ends OSC sequence
+                else if( escape==0 && ch.toLatin1()=='\\' ) {  // ESC\ also ends OSC sequence
                     escape=-1;
                     oscSequence(oscSeq);
                     oscSeq.clear();
                 }
-                else if (ch.toAscii()==ch_ESC) {
+                else if (ch.toLatin1()==ch_ESC) {
                     escape = 0;
                 }
                 else if( escape=='[' || multiCharEscapes.contains(escape) ) {
@@ -331,11 +331,11 @@ void Terminal::insertInBuffer(const QString& chars)
                     escSeq += ch;
                 }
                 else {
-                    escControlChar(QByteArray(1,ch.toAscii()));
+                    escControlChar(QByteArray(1,ch.toLatin1()));
                     escape=-1;
                 }
 
-                if( escape=='[' && ch.toAscii() >= 64 && ch.toAscii() <= 126 && ch.toAscii() != '[' ) {
+                if( escape=='[' && ch.toLatin1() >= 64 && ch.toLatin1() <= 126 && ch.toLatin1() != '[' ) {
                     ansiSequence(escSeq);
                     escape=-1;
                     escSeq.clear();
@@ -348,10 +348,10 @@ void Terminal::insertInBuffer(const QString& chars)
             } else {
                 if (ch.isPrint())
                     insertAtCursor(ch, !iReplaceMode);
-                else if (ch.toAscii()==ch_ESC)
+                else if (ch.toLatin1()==ch_ESC)
                     escape=0;
                 else
-                    qDebug() << "unprintable char" << int(ch.toAscii());
+                    qDebug() << "unprintable char" << int(ch.toLatin1());
             }
         }
     }
@@ -475,7 +475,7 @@ void Terminal::ansiSequence(const QString& seq)
 
     bool unhandled = false;
 
-    switch(cmdChar.toAscii())
+    switch(cmdChar.toLatin1())
     {
     case 'A': //cursor up
         if(!extra.isEmpty()) {
@@ -679,7 +679,7 @@ void Terminal::ansiSequence(const QString& seq)
         if(params.count()==0)
             params.append(0);
         if(params.count()==1 && params.at(0)==0) {
-            QString toWrite = QString("%1[?1;2c").arg(ch_ESC).toAscii();
+            QString toWrite = QString("%1[?1;2c").arg(ch_ESC).toLatin1();
             if(iPtyIFace)
                 iPtyIFace->writeTerm(toWrite);
         } else unhandled=true;
@@ -714,7 +714,7 @@ void Terminal::ansiSequence(const QString& seq)
 
     case 'n':
         if(params.count()>=1 && params.at(0)==6 && extra=="") {  // write cursor pos
-            QString toWrite = QString("%1[%2;%3R").arg(ch_ESC).arg(cursorPos().y()).arg(cursorPos().x()).toAscii();
+            QString toWrite = QString("%1[%2;%3R").arg(ch_ESC).arg(cursorPos().y()).arg(cursorPos().x()).toLatin1();
             if(iPtyIFace)
                 iPtyIFace->writeTerm(toWrite);
         } else unhandled=true;
@@ -950,30 +950,30 @@ void Terminal::escControlChar(const QString& seq)
         }
     }
 
-    if(ch.toAscii()=='7') { //save cursor
+    if(ch.toLatin1()=='7') { //save cursor
         iTermAttribs_saved = iTermAttribs;
     }
-    else if(ch.toAscii()=='8') { //restore cursor
+    else if(ch.toLatin1()=='8') { //restore cursor
         iTermAttribs = iTermAttribs_saved;
     }
-    else if(ch.toAscii()=='>' || ch.toAscii()=='=') { //app keypad/normal keypad - ignore these for now...
+    else if(ch.toLatin1()=='>' || ch.toLatin1()=='=') { //app keypad/normal keypad - ignore these for now...
     }
 
-    else if(ch.toAscii()=='H') {  // set a tab stop at cursor position
+    else if(ch.toLatin1()=='H') {  // set a tab stop at cursor position
         while(iTabStops.size() < cursorPos().y())
             iTabStops.append(QList<int>());
 
         iTabStops[cursorPos().y()-1].append(cursorPos().x());
         qSort(iTabStops[cursorPos().y()-1]);
     }
-    else if(ch.toAscii()=='D') {  // cursor down/scroll down one line
+    else if(ch.toLatin1()=='D') {  // cursor down/scroll down one line
         scrollFwd(1, cursorPos().y());
     }
-    else if(ch.toAscii()=='M') {  // cursor up/scroll up one line
+    else if(ch.toLatin1()=='M') {  // cursor up/scroll up one line
         scrollBack(1, cursorPos().y());
     }
 
-    else if(ch.toAscii()=='E') {  // new line
+    else if(ch.toLatin1()=='E') {  // new line
         if(cursorPos().y()==iMarginBottom) {
             scrollFwd(1);
             setCursorPos(QPoint(1,cursorPos().y()));
@@ -981,10 +981,10 @@ void Terminal::escControlChar(const QString& seq)
             setCursorPos(QPoint(1,cursorPos().y()+1));
         }
     }
-    else if(ch.toAscii()=='c') {  // full reset
+    else if(ch.toLatin1()=='c') {  // full reset
         resetTerminal();
     }
-    else if(ch.toAscii()=='g') {  // visual bell
+    else if(ch.toLatin1()=='g') {  // visual bell
         iUtil->bellAlert();
     }
     else {

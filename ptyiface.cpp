@@ -78,7 +78,7 @@ PtyIFace::PtyIFace(int pid, int masterFd, Terminal *term, QString charset, QObje
     fcntl(iMasterFd, F_SETFL, O_NONBLOCK); // reads from the descriptor should be non-blocking
 
     if (!charset.isEmpty())
-        iTextCodec = QTextCodec::codecForName(charset.toAscii());
+        iTextCodec = QTextCodec::codecForName(charset.toLatin1());
     if (!iTextCodec)
         iTextCodec = QTextCodec::codecForName("UTF-8");
     if (!iTextCodec)

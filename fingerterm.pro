@@ -5,7 +5,7 @@ contains(MEEGO_EDITION,harmattan): {
 }
 
 TEMPLATE = app
-TARGET =
+TARGET = fingerterm
 DEPENDPATH += .
 INCLUDEPATH += .
 LIBS += -lutil
@@ -49,17 +49,17 @@ RESOURCES += \
     resources.qrc
 
 unix:!symbian:!maemo5 {
-    target.path = /opt/fingerterm/bin
+    target.path = /usr/bin
     INSTALLS += target
 }
 
 maemo5 {
-    target.path = /opt/fingerterm/bin
+    target.path = /usr/bin
     INSTALLS += target
 }
 
 contains(MEEGO_EDITION,harmattan) {
-    desktopfile.files = $${TARGET}fingerterm.desktop
+    desktopfile.files = $${TARGET}.desktop
     desktopfile.path = /usr/share/applications
     INSTALLS += desktopfile
 }
@@ -71,8 +71,8 @@ contains(MEEGO_EDITION,harmattan) {
 }
 
 contains(MEEGO_EDITION,nemo) {
-    desktopfile.extra = cp $${TARGET}fingerterm.desktop.nemo fingerterm.desktop
+    desktopfile.extra = cp $${TARGET}.desktop.nemo $${TARGET}.desktop
     desktopfile.path = /usr/share/applications
-    desktopfile.files = fingerterm.desktop
+    desktopfile.files = $${TARGET}.desktop
     INSTALLS += desktopfile
 }

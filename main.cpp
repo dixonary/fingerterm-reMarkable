@@ -84,13 +84,13 @@ int main(int argc, char *argv[])
             exit(0);
         char *ptrs[execParts.length()+1];
         for(int i=0; i<execParts.length(); i++) {
-            ptrs[i] = new char[execParts.at(i).toAscii().length()+1];
-            memcpy(ptrs[i], execParts.at(i).toAscii().data(), execParts.at(i).toAscii().length());
-            ptrs[i][execParts.at(i).toAscii().length()] = 0;
+            ptrs[i] = new char[execParts.at(i).toLatin1().length()+1];
+            memcpy(ptrs[i], execParts.at(i).toLatin1().data(), execParts.at(i).toLatin1().length());
+            ptrs[i][execParts.at(i).toLatin1().length()] = 0;
         }
         ptrs[execParts.length()] = 0;
 
-        execvp(execParts.first().toAscii(), ptrs);
+        execvp(execParts.first().toLatin1(), ptrs);
         exit(0);
     }
 
