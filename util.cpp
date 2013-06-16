@@ -22,6 +22,7 @@
 #include <QtCore>
 #include <QtGui>
 #include <QDBusInterface>
+#include <QApplication>
 
 #include "mainwindow.h"
 #include "terminal.h"
@@ -398,11 +399,10 @@ bool Util::charIsHexDigit(QChar ch)
 {
     if (ch.isDigit()) // 0-9
         return true;
-    else if (ch.toAscii() >= 65 && ch.toAscii() <= 70) // A-F
+    else if (ch.toLatin1() >= 65 && ch.toLatin1() <= 70) // A-F
         return true;
-    else if (ch.toAscii() >= 97 && ch.toAscii() <= 102) // a-f
+    else if (ch.toLatin1() >= 97 && ch.toLatin1() <= 102) // a-f
         return true;
 
     return false;
 }
-

@@ -5,7 +5,7 @@ contains(MEEGO_EDITION,harmattan): {
 }
 
 TEMPLATE = app
-TARGET =
+TARGET = fingerterm
 DEPENDPATH += .
 INCLUDEPATH += .
 LIBS += -lutil
