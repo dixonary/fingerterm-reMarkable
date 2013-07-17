@@ -22,15 +22,15 @@
 #include "terminal.h"
 #include "util.h"
 
-TextRender::TextRender(QDeclarativeItem *parent) :
-    QDeclarativeItem(parent),
+TextRender::TextRender(QQuickItem *parent) :
+    QQuickPaintedItem(parent),
     iTerm(0),
     iUtil(0)
 {
-    setFlag(QGraphicsItem::ItemHasNoContents, false);
+    setFlag(ItemHasContents);
 
-    connect(this,SIGNAL(widthChanged(int)),this,SLOT(updateTermSize()));
-    connect(this,SIGNAL(heightChanged(int)),this,SLOT(updateTermSize()));
+    connect(this,SIGNAL(myWidthChanged(int)),this,SLOT(updateTermSize()));
+    connect(this,SIGNAL(myHeightChanged(int)),this,SLOT(updateTermSize()));
     connect(this,SIGNAL(fontSizeChanged()),this,SLOT(updateTermSize()));
 
     //normal
@@ -56,16 +56,13 @@ TextRender::TextRender(QDeclarativeItem *parent) :
         qFatal("invalid color table");
 
     iShowBufferScrollIndicator = false;
-
-    // caching results in considerably faster redrawing during animations
-    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
 TextRender::~TextRender()
 {
 }
 
-void TextRender::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+void TextRender::paint(QPainter* painter)
 {
     if (!iTerm)
         return;
@@ -252,7 +249,7 @@ void TextRender::drawTextFragment(QPainter* painter, int x, int y, QString text,
 
 void TextRender::redraw()
 {
-    update(boundingRect());
+    update();
 }
 
 void TextRender::setTerminal(Terminal *term)

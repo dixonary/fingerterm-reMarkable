@@ -21,7 +21,6 @@
 #define KEYLOADER_H
 
 #include <QtCore>
-#include <QtDeclarative>
 
 class Util;
 

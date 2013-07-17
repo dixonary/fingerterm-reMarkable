@@ -17,8 +17,7 @@
     along with FingerTerm.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QApplication>
-#include <QWidget>
+#include <QGuiApplication>
 #include "dbusadaptor.h"
 #include "mainwindow.h"
 

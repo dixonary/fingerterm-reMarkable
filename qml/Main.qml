@@ -17,7 +17,7 @@
     along with FingerTerm.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 1.1
+import QtQuick 2.0
 import TextRender 1.0
 
 Rectangle {
@@ -32,8 +32,6 @@ Rectangle {
 
     id: window
     objectName: "window"
-    width: 854
-    height: 480
     color: bgcolor
 
     NotifyWin {

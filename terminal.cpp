@@ -17,7 +17,7 @@
     along with FingerTerm.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QApplication>
+#include <QGuiApplication>
 #include <QClipboard>
 
 #include "terminal.h"
@@ -1142,7 +1142,7 @@ void Terminal::resetTabs()
 
 void Terminal::pasteFromClipboard()
 {
-    QClipboard *cb = QApplication::clipboard();
+    QClipboard *cb = QGuiApplication::clipboard();
     if(cb->mimeData()->hasText() && !cb->mimeData()->text().isEmpty()) {
         if(iPtyIFace) {
             resetBackBufferScrollPos();
@@ -1275,7 +1275,7 @@ void Terminal::copySelectionToClipboard()
     if (selection().isNull())
         return;
 
-    QClipboard *cb = QApplication::clipboard();
+    QClipboard *cb = QGuiApplication::clipboard();
     cb->clear();
 
     QString text;
