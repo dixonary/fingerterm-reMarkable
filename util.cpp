@@ -24,6 +24,7 @@
 #include <QDBusInterface>
 #include <QGuiApplication>
 #include <QQuickView>
+#include <QDebug>
 
 #include "mainwindow.h"
 #include "terminal.h"
@@ -373,8 +374,15 @@ void Util::notifyText(QString text)
 void Util::copyTextToClipboard(QString str)
 {
     QClipboard *cb = QGuiApplication::clipboard();
-    cb->clear();
-    cb->setText(str);
+    //mimeData() could be null when the clipboard QPA plugin of the platform doesn't support QClipboard::Clipboard, or
+    //the plugin is bugged.
+    //In those cases, disable clipboard features.
+    if(!cb->mimeData())
+        qDebug() << "FIXME: QClipboard::mimeData() returned NULL, the clipboard functionality will not be used";
+    else {
+        cb->clear();
+        cb->setText(str);
+    }
 }
 
 bool Util::terminalHasSelection()
@@ -384,9 +392,20 @@ bool Util::terminalHasSelection()
 
 bool Util::canPaste()
 {
+
     QClipboard *cb = QGuiApplication::clipboard();
-    if(cb->mimeData()->hasText() && !cb->mimeData()->text().isEmpty())
-        return true;
+
+    //mimeData() could be null when the clipboard QPA plugin of the platform doesn't support QClipboard::Clipboard, or
+    //the plugin is bugged.
+    //In those cases, disable clipboard features.
+    if(!cb->mimeData()) {
+        qDebug() << "FIXME: QClipboard::mimeData() returned NULL, the clipboard functionality will not be used";
+        return false;
+    }
+    else {
+        if(cb->mimeData()->hasText() && !cb->mimeData()->text().isEmpty())
+            return true;
+    }
 
     return false;
 }

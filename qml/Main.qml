@@ -19,6 +19,7 @@
 
 import QtQuick 2.0
 import TextRender 1.0
+import QtQuick.Window 2.0
 
 Rectangle {
     property string fgcolor: "black"
@@ -29,6 +30,9 @@ Rectangle {
     property int fadeInTime: 350
 
     property string windowTitle: util.currentWindowTitle();
+
+    width: Screen.width
+    height: Screen.height
 
     id: window
     objectName: "window"
@@ -75,39 +79,6 @@ Rectangle {
     LayoutWindow {
         id: layoutWindow
         z: 1000
-    }
-
-    TextRender {
-        id: textrender
-        objectName: "textrender"
-        x: 0
-        y: 0
-        height: parent.height
-        width: parent.width
-        myWidth: width
-        myHeight: height
-        opacity: 1.0
-        property int duration: 0;
-        property int cutAfter: height
-
-        Behavior on opacity {
-            NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
-        }
-        Behavior on y {
-            NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
-        }
-
-        onFontSizeChanged: {
-            lineView.fontPointSize = textrender.fontPointSize;
-        }
-
-        onCutAfterChanged: {
-            // this property is used in the paint function, so make sure that the element gets
-            // painted with the updated value (might not otherwise happen because of caching)
-            textrender.redraw();
-        }
-
-        z: 10
     }
 
 
@@ -187,6 +158,39 @@ Rectangle {
     focus: true
     Keys.onPressed: {
         vkbKeypress(event.key,event.modifiers);
+    }
+
+    TextRender {
+        id: textrender
+        objectName: "textrender"
+        x: 0
+        y: 0
+        height: parent.height
+        width: parent.width
+        myWidth: width
+        myHeight: height
+        opacity: 1.0
+        property int duration: 0;
+        property int cutAfter: height
+
+        Behavior on opacity {
+            NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
+        }
+        Behavior on y {
+            NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
+        }
+
+        onFontSizeChanged: {
+            lineView.fontPointSize = textrender.fontPointSize;
+        }
+
+        onCutAfterChanged: {
+            // this property is used in the paint function, so make sure that the element gets
+            // painted with the updated value (might not otherwise happen because of caching)
+            textrender.redraw();
+        }
+
+        z: 10
     }
 
     Timer {

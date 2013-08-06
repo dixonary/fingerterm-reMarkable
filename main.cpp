@@ -159,8 +159,6 @@ int main(int argc, char *argv[])
     view.showFullScreen();
 #else
     QSize screenSize = QGuiApplication::primaryScreen()->size();
-    view.rootObject()->setWidth(screenSize.width());
-    view.rootObject()->setHeight(screenSize.height());
     if ((screenSize.width() < 1024 || screenSize.height() < 768 || app.arguments().contains("-fs"))
             && !app.arguments().contains("-nofs"))
     {

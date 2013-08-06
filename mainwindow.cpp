@@ -32,7 +32,6 @@
 
 MainWindow::MainWindow()
 {
-//    setResizeMode(SizeRootObjectToView);
 }
 
 MainWindow::~MainWindow()
