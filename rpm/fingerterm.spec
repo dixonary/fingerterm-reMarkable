@@ -9,8 +9,10 @@ URL: https://github.com/nemomobile/fingerterm
 BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: pkgconfig(Qt5DBus)
 BuildRequires: pkgconfig(Qt5Gui)
-BuildRequires: pkgconfig(Qt5OpenGL)
-BuildRequires: pkgconfig(Qt5Declarative)
+BuildRequires: pkgconfig(Qt5Qml)
+BuildRequires: pkgconfig(Qt5Quick)
+Requires: qt5-qtdeclarative-import-xmllistmodel
+Requires: qt5-qtdeclarative-import-window2
 Obsoletes: meego-terminal <= 0.2.2
 Provides: meego-terminal > 0.2.2
 

@@ -20,8 +20,7 @@
 #include "qplatformdefs.h"
 
 #include <QtGui>
-#include <QtDeclarative>
-#include <QtOpenGL>
+#include <QtQml>
 
 extern "C" {
 #include <pty.h>
@@ -52,7 +51,7 @@ int main(int argc, char *argv[])
     QSettings *settings = new QSettings(QDir::homePath()+"/.config/FingerTerm/settings.ini", QSettings::IniFormat);
     defaultSettings(settings);
 
-    // fork the child process before creating QApplication
+    // fork the child process before creating QGuiApplication
     int socketM;
     int pid = forkpty(&socketM,NULL,NULL,NULL);
     if( pid==-1 ) {
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
 
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
     MainWindow view;
@@ -106,14 +105,6 @@ int main(int argc, char *argv[])
     // needed for MFeedback, also creates the dbus interface
     MComponentData::createInstance(argc, argv, "fingerterm", dba);
 #endif
-
-#ifdef MEEGO_EDITION_HARMATTAN
-    if(!app.arguments().contains("-nogl")) {
-        view.setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer)));
-        view.setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    }
-#endif
-    view.setResizeMode(QDeclarativeView::SizeRootObjectToView);
 
     Terminal term;
     Util util(settings);
@@ -137,7 +128,7 @@ int main(int argc, char *argv[])
             qFatal("failure loading keyboard layout");
     }
 
-    QDeclarativeContext* context = view.rootContext();
+    QQmlContext *context = view.rootContext();
     context->setContextProperty( "term", &term );
     context->setContextProperty( "util", &util );
     context->setContextProperty( "keyLoader", &keyLoader );
@@ -159,7 +150,7 @@ int main(int argc, char *argv[])
     util.setWindow(&view);
     util.setTerm(&term);
     util.setRenderer(tr);
-    view.scene()->installEventFilter(&util); //for grabbing mouse drags
+    view.installEventFilter(&util); //for grabbing mouse drags
 
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
@@ -167,10 +158,12 @@ int main(int argc, char *argv[])
 #ifdef MEEGO_EDITION_HARMATTAN
     view.showFullScreen();
 #else
-    if ((QApplication::desktop()->width() < 1024 || QApplication::desktop()->height() < 768 || app.arguments().contains("-fs"))
+    QSize screenSize = QGuiApplication::primaryScreen()->size();
+    if ((screenSize.width() < 1024 || screenSize.height() < 768 || app.arguments().contains("-fs"))
             && !app.arguments().contains("-nofs"))
+    {
         view.showFullScreen();
-    else
+    } else
         view.show();
 #endif
 

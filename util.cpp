@@ -22,7 +22,9 @@
 #include <QtCore>
 #include <QtGui>
 #include <QDBusInterface>
-#include <QApplication>
+#include <QGuiApplication>
+#include <QQuickView>
+#include <QDebug>
 
 #include "mainwindow.h"
 #include "terminal.h"
@@ -48,7 +50,7 @@ Util::Util(QSettings *settings, QObject *parent) :
     swipeModeSet = false;
     swipeAllowed = true;
 
-    connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SIGNAL(clipboardOrSelectionChanged()));
+    connect(QGuiApplication::clipboard(), SIGNAL(dataChanged()), this, SIGNAL(clipboardOrSelectionChanged()));
 }
 
 Util::~Util()
@@ -57,7 +59,7 @@ Util::~Util()
     clearNotifications();
 }
 
-void Util::setWindow(QWidget* win)
+void Util::setWindow(QQuickView* win)
 {
     iWindow = dynamic_cast<MainWindow*>(win);
     if(!iWindow)
@@ -68,7 +70,7 @@ void Util::setWindow(QWidget* win)
 void Util::setWindowTitle(QString title)
 {
     iCurrentWinTitle = title;
-    iWindow->setWindowTitle(title);
+    iWindow->setTitle(title);
     emit windowTitleChanged();
 }
 
@@ -271,39 +273,40 @@ bool Util::eventFilter(QObject *, QEvent *ev)
     if(!iAllowGestures)
         return false;
 
-    if(ev->type()==QEvent::GraphicsSceneMousePress) {
-        QGraphicsSceneMouseEvent *mev = static_cast<QGraphicsSceneMouseEvent*>(ev);
-        dragOrigin = mev->scenePos();
+    if(ev->type()==QEvent::MouseButtonPress) {
+        QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
+        dragOrigin = mev->pos();
         newSelection = true;
     }
-    else if(ev->type()==QEvent::GraphicsSceneMouseMove) {
-        QGraphicsSceneMouseEvent *mev = static_cast<QGraphicsSceneMouseEvent*>(ev);
+    else if(ev->type()==QEvent::MouseMove) {
+        QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
         if(settingsValue("ui/dragMode")=="scroll") {
-            scrollBackBuffer(mev->scenePos(), mev->lastScenePos());
+            scrollBackBuffer(mev->pos(), dragOrigin);
+            dragOrigin = mev->pos();
         }
         else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
-            selectionHelper(mev->scenePos());
+            selectionHelper(mev->pos());
         }
     }
-    else if(ev->type()==QEvent::GraphicsSceneMouseRelease) {
-        QGraphicsSceneMouseEvent *mev = static_cast<QGraphicsSceneMouseEvent*>(ev);
-        if(settingsValue("ui/dragMode")=="gestures" && mev->lastScenePos() != dragOrigin) {
-            int xdist = qAbs(mev->scenePos().x() - dragOrigin.x());
-            int ydist = qAbs(mev->scenePos().y() - dragOrigin.y());
-            if(mev->scenePos().x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
+    else if(ev->type()==QEvent::MouseButtonRelease) {
+        QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
+        if(settingsValue("ui/dragMode")=="gestures") {
+            int xdist = qAbs(mev->pos().x() - dragOrigin.x());
+            int ydist = qAbs(mev->pos().y() - dragOrigin.y());
+            if(mev->pos().x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
                 doGesture(PanLeft);
-            else if(mev->scenePos().x() > dragOrigin.x()+reqDragLength && xdist > ydist*2)
+            else if(mev->pos().x() > dragOrigin.x()+reqDragLength && xdist > ydist*2)
                 doGesture(PanRight);
-            else if(mev->scenePos().y() > dragOrigin.y()+reqDragLength && ydist > xdist*2)
+            else if(mev->pos().y() > dragOrigin.y()+reqDragLength && ydist > xdist*2)
                 doGesture(PanDown);
-            else if(mev->scenePos().y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
+            else if(mev->pos().y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
                 doGesture(PanUp);
         }
         else if(settingsValue("ui/dragMode")=="scroll") {
-            scrollBackBuffer(mev->scenePos(), mev->lastScenePos());
+            scrollBackBuffer(mev->pos(), dragOrigin);
         }
         else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
-            selectionHelper(mev->scenePos());
+            selectionHelper(mev->pos());
             selectionFinished();
         }
     }
@@ -370,9 +373,16 @@ void Util::notifyText(QString text)
 
 void Util::copyTextToClipboard(QString str)
 {
-    QClipboard *cb = QApplication::clipboard();
-    cb->clear();
-    cb->setText(str);
+    QClipboard *cb = QGuiApplication::clipboard();
+    //mimeData() could be null when the clipboard QPA plugin of the platform doesn't support QClipboard::Clipboard, or
+    //the plugin is bugged.
+    //In those cases, disable clipboard features.
+    if(!cb->mimeData())
+        qDebug() << "FIXME: QClipboard::mimeData() returned NULL, the clipboard functionality will not be used";
+    else {
+        cb->clear();
+        cb->setText(str);
+    }
 }
 
 bool Util::terminalHasSelection()
@@ -382,9 +392,20 @@ bool Util::terminalHasSelection()
 
 bool Util::canPaste()
 {
-    QClipboard *cb = QApplication::clipboard();
-    if(cb->mimeData()->hasText() && !cb->mimeData()->text().isEmpty())
-        return true;
+
+    QClipboard *cb = QGuiApplication::clipboard();
+
+    //mimeData() could be null when the clipboard QPA plugin of the platform doesn't support QClipboard::Clipboard, or
+    //the plugin is bugged.
+    //In those cases, disable clipboard features.
+    if(!cb->mimeData()) {
+        qDebug() << "FIXME: QClipboard::mimeData() returned NULL, the clipboard functionality will not be used";
+        return false;
+    }
+    else {
+        if(cb->mimeData()->hasText() && !cb->mimeData()->text().isEmpty())
+            return true;
+    }
 
     return false;
 }

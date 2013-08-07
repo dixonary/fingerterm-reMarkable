@@ -21,11 +21,11 @@
 #define UTIL_H
 
 #include <QtCore>
-#include <QWidget>
 
 class Terminal;
 class MainWindow;
 class TextRender;
+class QQuickView;
 
 class Util : public QObject
 {
@@ -33,7 +33,7 @@ class Util : public QObject
 public:
     explicit Util(QSettings* settings, QObject *parent = 0);
     virtual ~Util();
-    void setWindow(QWidget* win);
+    void setWindow(QQuickView* win);
     void setWindowTitle(QString title);
     Q_INVOKABLE QString currentWindowTitle();
     void setTerm(Terminal* term) { iTerm = term; }

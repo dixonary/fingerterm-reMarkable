@@ -30,7 +30,7 @@
 #include <X11/Xatom.h>
 #endif //MEEGO_EDITION_HARMATTAN
 
-MainWindow::MainWindow(QWidget* parent): QDeclarativeView(parent)
+MainWindow::MainWindow()
 {
 }
 
@@ -40,19 +40,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::focusInEvent(QFocusEvent *event)
 {
-    QDeclarativeView::focusInEvent(event);
+    QQuickView::focusInEvent(event);
     emit focusChanged(true);
 }
 
 void MainWindow::focusOutEvent(QFocusEvent *event)
 {
-    QDeclarativeView::focusOutEvent(event);
+    QQuickView::focusOutEvent(event);
     emit focusChanged(false);
 }
 
 void MainWindow::minimize()
 {
-    setWindowState(windowState() | Qt::WindowMinimized);
+    setWindowState(Qt::WindowMinimized);
 }
 
 void MainWindow::disableSwipe()

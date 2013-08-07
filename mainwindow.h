@@ -20,13 +20,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QDeclarativeView>
+#include <QQuickView>
 
-class MainWindow : public QDeclarativeView
+class MainWindow : public QQuickView
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget* parent=0);
+    explicit MainWindow();
     virtual ~MainWindow();
 
     void minimize();

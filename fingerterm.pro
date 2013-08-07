@@ -1,4 +1,4 @@
-QT = core gui declarative opengl dbus
+QT = core gui qml quick dbus
 
 contains(MEEGO_EDITION,harmattan): {
     CONFIG += meegotouch

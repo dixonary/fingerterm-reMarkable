@@ -20,18 +20,17 @@
 #ifndef TEXTRENDER_H
 #define TEXTRENDER_H
 
-#include <QDeclarativeItem>
+#include <QQuickPaintedItem>
 #include <QPainter>
-#include <QGraphicsScene>
 
 #include "terminal.h"
 
 class Util;
 
-class TextRender : public QDeclarativeItem
+class TextRender : public QQuickPaintedItem
 {
-    Q_PROPERTY(int myWidth READ width WRITE setWidth NOTIFY widthChanged)
-    Q_PROPERTY(int myHeight READ height WRITE setHeight NOTIFY heightChanged)
+    Q_PROPERTY(int myWidth READ myWidth WRITE setMyWidth NOTIFY myWidthChanged)
+    Q_PROPERTY(int myHeight READ myHeight WRITE setMyHeight NOTIFY myHeightChanged)
     Q_PROPERTY(int fontWidth READ fontWidth NOTIFY fontSizeChanged)
     Q_PROPERTY(int fontHeight READ fontHeight NOTIFY fontSizeChanged)
     Q_PROPERTY(int fontPointSize READ fontPointSize WRITE setFontPointSize NOTIFY fontSizeChanged)
@@ -39,17 +38,17 @@ class TextRender : public QDeclarativeItem
 
     Q_OBJECT
 public:
-    explicit TextRender(QDeclarativeItem *parent = 0);
+    explicit TextRender(QQuickItem *parent = 0);
     virtual ~TextRender();
-    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+    void paint(QPainter*);
 
     void setTerminal(Terminal* term);
     void setUtil(Util* util) { iUtil = util; }
 
-    int width() { return iWidth; }
-    int height() { return iHeight; }
-    void setWidth(int w) { if(iWidth!=w) { iWidth=w; emit widthChanged(w); } }
-    void setHeight(int h) { if(iHeight!=h) { iHeight=h; emit heightChanged(h); } }
+    int myWidth() { return iWidth; }
+    int myHeight() { return iHeight; }
+    void setMyWidth(int w) { if(iWidth!=w) { iWidth=w; emit myWidthChanged(w); } }
+    void setMyHeight(int h) { if(iHeight!=h) { iHeight=h; emit myHeightChanged(h); } }
     int fontWidth() { return iFontWidth; }
     int fontHeight() { return iFontHeight; }
     int fontDescent() { return iFontDescent; }
@@ -62,8 +61,8 @@ public:
     Q_INVOKABLE QSize cursorPixelSize();
 
 signals:
-    void widthChanged(int newWidth);
-    void heightChanged(int newHeight);
+    void myWidthChanged(int newWidth);
+    void myHeightChanged(int newHeight);
     void fontSizeChanged();
     void showBufferScrollIndicatorChanged();
 
@@ -92,7 +91,5 @@ private:
 
     QList<QColor> iColorTable;
 };
-
-QML_DECLARE_TYPE(TextRender)
 
 #endif // TEXTRENDER_H

@@ -21,11 +21,11 @@
 #define TERMINAL_H
 
 #include <QtCore>
-#include <QWidget>
 
 class TextRender;
 class PtyIFace;
 class Util;
+class QQuickView;
 
 struct TermChar {
     QChar c;
@@ -62,7 +62,7 @@ public:
     virtual ~Terminal() {}
     void setRenderer(TextRender* tr);
     void setPtyIFace(PtyIFace* pty);
-    void setWindow(QWidget* win) { iWindow=win; }
+    void setWindow(QQuickView* win) { iWindow=win; }
     void setUtil(Util* util) { iUtil = util; }
 
     void insertInBuffer(const QString& chars);
@@ -128,7 +128,7 @@ private:
 
     TextRender* iRenderer;
     PtyIFace* iPtyIFace;
-    QWidget* iWindow;
+    QQuickView* iWindow;
     Util* iUtil;
 
     QList<QList<TermChar> > iBuffer;
