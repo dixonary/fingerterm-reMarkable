@@ -33,6 +33,7 @@ Rectangle {
     property string currentSwipeLocking: util.settingsValue("ui/allowSwipe")
     property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
     property string currentDragMode: util.settingsValue("ui/dragMode")
+    property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
     Rectangle {
@@ -216,6 +217,56 @@ Rectangle {
                                     height: 20
                                     color: "#ffffff"
                                     font.pointSize: util.uiFontSize()-1;
+                                    text: "UI Orientation"
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                                Row {
+                                    Button {
+                                        text: "<font size=\"-1\">Auto</font>"
+                                        highlighted: currentOrientationLockMode=="auto"
+                                        onClicked: {
+                                            currentOrientationLockMode = "auto";
+                                            window.setOrientationLockMode("auto");
+                                        }
+                                        width: 60
+                                        height: 48
+                                    }
+                                    Button {
+                                        text: "<font size=\"-1\">L<font>"
+                                        highlighted: currentOrientationLockMode=="landscape"
+                                        onClicked: {
+                                            currentOrientationLockMode = "landscape";
+                                            window.setOrientationLockMode("landscape");
+                                        }
+                                        width: 60
+                                        height: 48
+                                    }
+                                    Button {
+                                        text: "<font size=\"-1\">P</font>"
+                                        highlighted: currentOrientationLockMode=="portrait"
+                                        onClicked: {
+                                            currentOrientationLockMode = "portrait";
+                                            window.setOrientationLockMode("portrait");
+                                        }
+                                        width: 60
+                                        height: 48
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle {
+                            width: 180
+                            height: 68
+                            radius: 5
+                            color: "#606060"
+                            border.color: "#000000"
+                            border.width: 1
+                            Column {
+                                Text {
+                                    width: 180
+                                    height: 20
+                                    color: "#ffffff"
+                                    font.pointSize: util.uiFontSize()-1;
                                     text: "Drag mode"
                                     horizontalAlignment: Text.AlignHCenter
                                 }
@@ -281,7 +332,7 @@ Rectangle {
                                         onClicked: {
                                             util.setSettingsValue("ui/vkbShowMethod", "off");
                                             currentShowMethod = "off";
-                                            setTextRenderAttributes();
+                                            window.setTextRenderAttributes();
                                             hideMenu();
                                         }
                                         width: 60
@@ -293,7 +344,7 @@ Rectangle {
                                         onClicked: {
                                             util.setSettingsValue("ui/vkbShowMethod", "fade");
                                             currentShowMethod = "fade";
-                                            setTextRenderAttributes();
+                                            window.setTextRenderAttributes();
                                             hideMenu();
                                         }
                                         width: 60
@@ -305,7 +356,7 @@ Rectangle {
                                         onClicked: {
                                             util.setSettingsValue("ui/vkbShowMethod", "move");
                                             currentShowMethod = "move";
-                                            setTextRenderAttributes();
+                                            window.setTextRenderAttributes();
                                             hideMenu();
                                         }
                                         width: 60
@@ -486,7 +537,7 @@ Rectangle {
         visible = true;
         fader.opacity = 0.5;
         rect.x = menuWin.width-rect.width;
-        updateGesturesAllowed();
+        window.updateGesturesAllowed();
         enableCopy = util.terminalHasSelection();
         enablePaste = util.canPaste();
     }
@@ -496,7 +547,7 @@ Rectangle {
         showing = false;
         fader.opacity = 0;
         rect.x = menuWin.width+1;
-        updateGesturesAllowed();
+        window.updateGesturesAllowed();
     }
 
     function changeSwipeLocking(state)

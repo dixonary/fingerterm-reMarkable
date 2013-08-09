@@ -125,7 +125,7 @@ Rectangle {
                     key.color = keyboard.keyBgColor
 
                     setStickiness(-1)
-                    vkbKeypress(currentCode, keyboard.keyModifiers);
+                    window.vkbKeypress(currentCode, keyboard.keyModifiers);
 
                     if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
                         resetSticky.setStickiness(0);

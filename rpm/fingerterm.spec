@@ -13,6 +13,7 @@ BuildRequires: pkgconfig(Qt5Qml)
 BuildRequires: pkgconfig(Qt5Quick)
 Requires: qt5-qtdeclarative-import-xmllistmodel
 Requires: qt5-qtdeclarative-import-window2
+Requires: qt-components-qt5
 Obsoletes: meego-terminal <= 0.2.2
 Provides: meego-terminal > 0.2.2
 
