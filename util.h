@@ -71,9 +71,9 @@ public:
 
 public slots:
     void onMainWinFocusChanged(bool in);
-
-protected:
-    virtual bool eventFilter(QObject*, QEvent *ev);
+    void mousePress(float eventX, float eventY);
+    void mouseMove(float eventX, float eventY);
+    void mouseRelease(float eventX, float eventY);
 
 signals:
     void visualBell();

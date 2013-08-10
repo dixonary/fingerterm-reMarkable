@@ -152,7 +152,6 @@ int main(int argc, char *argv[])
     util.setWindow(&view);
     util.setTerm(&term);
     util.setRenderer(tr);
-    view.installEventFilter(&util); //for grabbing mouse drags
 
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));

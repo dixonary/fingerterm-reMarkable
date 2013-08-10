@@ -110,4 +110,25 @@ Rectangle {
         keyboardLoader.sourceComponent = undefined
         keyboardLoader.sourceComponent = keyboardContents
     }
+
+    //borrowed from nemo-keyboard
+    //Parameters: (x, y) in view coordinates
+    function keyAt(x, y) {
+        var item = keyboard
+        x -= keyboard.x
+        y -= keyboard.y
+
+        while ((item = item.childAt(x, y)) != null) {
+            //return the first "Key" element we find
+            if (typeof item.currentCode !== 'undefined') {
+                return item
+            }
+
+            // Cheaper mapToItem, assuming we're not using anything fancy.
+            x -= item.x
+            y -= item.y
+        }
+
+        return null
+    }
 }
