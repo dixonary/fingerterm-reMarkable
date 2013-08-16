@@ -264,54 +264,55 @@ void Util::clearNotifications()
 #endif //MEEGO_EDITION_HARMATTAN
 }
 
-bool Util::eventFilter(QObject *, QEvent *ev)
-{
-    // event filter used to check if a mouse drag/pan was performed on the scene
+void Util::mousePress(float eventX, float eventY) {
+    if(!iAllowGestures)
+        return;
 
+    dragOrigin = QPointF(eventX, eventY);
+    newSelection = true;
+}
+
+void Util::mouseMove(float eventX, float eventY) {
+    QPointF eventPos(eventX, eventY);
+
+    if(!iAllowGestures)
+        return;
+
+    if(settingsValue("ui/dragMode")=="scroll") {
+        scrollBackBuffer(eventPos, dragOrigin);
+        dragOrigin = eventPos;
+    }
+    else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
+        selectionHelper(eventPos);
+    }
+}
+
+void Util::mouseRelease(float eventX, float eventY) {
+    QPointF eventPos(eventX, eventY);
     const int reqDragLength = 140;
 
     if(!iAllowGestures)
-        return false;
+        return;
 
-    if(ev->type()==QEvent::MouseButtonPress) {
-        QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
-        dragOrigin = mev->pos();
-        newSelection = true;
+    if(settingsValue("ui/dragMode")=="gestures") {
+        int xdist = qAbs(eventPos.x() - dragOrigin.x());
+        int ydist = qAbs(eventPos.y() - dragOrigin.y());
+        if(eventPos.x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
+            doGesture(PanLeft);
+        else if(eventPos.x() > dragOrigin.x()+reqDragLength && xdist > ydist*2)
+            doGesture(PanRight);
+        else if(eventPos.y() > dragOrigin.y()+reqDragLength && ydist > xdist*2)
+            doGesture(PanDown);
+        else if(eventPos.y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
+            doGesture(PanUp);
     }
-    else if(ev->type()==QEvent::MouseMove) {
-        QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
-        if(settingsValue("ui/dragMode")=="scroll") {
-            scrollBackBuffer(mev->pos(), dragOrigin);
-            dragOrigin = mev->pos();
-        }
-        else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
-            selectionHelper(mev->pos());
-        }
+    else if(settingsValue("ui/dragMode")=="scroll") {
+        scrollBackBuffer(eventPos, dragOrigin);
     }
-    else if(ev->type()==QEvent::MouseButtonRelease) {
-        QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
-        if(settingsValue("ui/dragMode")=="gestures") {
-            int xdist = qAbs(mev->pos().x() - dragOrigin.x());
-            int ydist = qAbs(mev->pos().y() - dragOrigin.y());
-            if(mev->pos().x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
-                doGesture(PanLeft);
-            else if(mev->pos().x() > dragOrigin.x()+reqDragLength && xdist > ydist*2)
-                doGesture(PanRight);
-            else if(mev->pos().y() > dragOrigin.y()+reqDragLength && ydist > xdist*2)
-                doGesture(PanDown);
-            else if(mev->pos().y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
-                doGesture(PanUp);
-        }
-        else if(settingsValue("ui/dragMode")=="scroll") {
-            scrollBackBuffer(mev->pos(), dragOrigin);
-        }
-        else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
-            selectionHelper(mev->pos());
-            selectionFinished();
-        }
+    else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
+        selectionHelper(eventPos);
+        selectionFinished();
     }
-
-    return false;
 }
 
 void Util::selectionHelper(QPointF scenePos)

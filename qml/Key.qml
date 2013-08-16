@@ -94,45 +94,36 @@ Rectangle {
         anchors.topMargin: key.height/2
     }
 
-    MouseArea {
-        enabled: label!=""
-        id: keyMouseArea
-        anchors.fill: parent
-        anchors.margins: -3  // -(half of keyspacing)
-        onExited: {
-            keyRepeatStarter.stop();
-            keyRepeatTimer.stop();
+    function handlePress() {
+        key.color = keyboard.keyHilightBgColor
+        keyboard.currentKeyPressed = key;
+        util.keyPressFeedback();
 
-            key.color = keyboard.keyBgColor
-            keyboard.currentKeyPressed = 0;
+        keyRepeatStarter.start();
+    }
+
+    function handleRelease() {
+        util.keyReleaseFeedback();
+
+        keyRepeatStarter.stop();
+        keyRepeatTimer.stop();
+
+        key.color = keyboard.keyBgColor
+
+        setStickiness(-1)
+        window.vkbKeypress(currentCode, keyboard.keyModifiers);
+
+        if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
+            resetSticky.setStickiness(0);
         }
-        onPressedChanged: {
-            if(pressed) {
-                key.color = keyboard.keyHilightBgColor
-                keyboard.currentKeyPressed = key;
-                util.keyPressFeedback();
+    }
 
-                keyRepeatStarter.start();
-            } else {
-                keyboard.currentKeyPressed = 0;
-                if(containsMouse) {
+    function handleExit() {
+        keyRepeatStarter.stop();
+        keyRepeatTimer.stop();
 
-                    util.keyReleaseFeedback();
-
-                    keyRepeatStarter.stop();
-                    keyRepeatTimer.stop();
-
-                    key.color = keyboard.keyBgColor
-
-                    setStickiness(-1)
-                    vkbKeypress(currentCode, keyboard.keyModifiers);
-
-                    if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
-                        resetSticky.setStickiness(0);
-                    }
-                }
-            }
-        }
+        key.color = keyboard.keyBgColor
+        keyboard.currentKeyPressed = 0;
     }
 
     Timer {
@@ -153,7 +144,7 @@ Rectangle {
         triggeredOnStart: true
         interval: 80
         onTriggered: {
-            vkbKeypress(currentCode, keyboard.keyModifiers);
+            window.vkbKeypress(currentCode, keyboard.keyModifiers);
         }
     }
 

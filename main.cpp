@@ -135,14 +135,16 @@ int main(int argc, char *argv[])
 
     view.setSource(QUrl("qrc:/qml/Main.qml"));
 
-    QObject *win = view.rootObject();
-    if(!win)
+    QObject *root = view.rootObject();
+    if(!root)
         qFatal("no root object - qml error");
+
+    QObject* win = root->findChild<QObject*>("window");
 
     if(!startupErrorMsg.isEmpty())
         QMetaObject::invokeMethod(win, "showErrorMessage", Qt::QueuedConnection, Q_ARG(QVariant, startupErrorMsg));
 
-    TextRender *tr = win->findChild<TextRender*>("textrender");
+    TextRender *tr = root->findChild<TextRender*>("textrender");
     tr->setUtil(&util);
     tr->setTerminal(&term);
     term.setRenderer(tr);
@@ -150,7 +152,6 @@ int main(int argc, char *argv[])
     util.setWindow(&view);
     util.setTerm(&term);
     util.setRenderer(tr);
-    view.installEventFilter(&util); //for grabbing mouse drags
 
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
@@ -178,6 +179,8 @@ int main(int argc, char *argv[])
 
 void defaultSettings(QSettings* settings)
 {
+    if(!settings->contains("ui/orientationLockMode"))
+        settings->setValue("ui/orientationLockMode", "auto");
     if(!settings->contains("general/execCmd"))
         settings->setValue("general/execCmd", "");
     if(!settings->contains("general/visualBell"))

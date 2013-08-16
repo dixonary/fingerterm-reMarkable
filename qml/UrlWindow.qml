@@ -126,7 +126,7 @@ Rectangle {
             to: "*"
             SequentialAnimation {
                 PropertyAnimation { target: urlWindow; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-                ScriptAction { script: updateGesturesAllowed(); }
+                ScriptAction { script: window.updateGesturesAllowed(); }
             }
         }
     ]

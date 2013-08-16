@@ -5,7 +5,7 @@
         <file>qml/Keyboard.qml</file>
         <file>qml/Lineview.qml</file>
         <file>qml/Button.qml</file>
-        <file>qml/Menu.qml</file>
+        <file>qml/MenuFingerterm.qml</file>
         <file>qml/NotifyWin.qml</file>
         <file>icons/backspace.png</file>
         <file>icons/down.png</file>

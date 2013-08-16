@@ -177,7 +177,6 @@ void Terminal::putString(QString str, bool unEscape)
 void Terminal::keyPress(int key, int modifiers)
 {
     QChar c(key);
-    //qDebug() << key;
 
     resetBackBufferScrollPos();
 
