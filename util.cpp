@@ -32,12 +32,7 @@
 #include "textrender.h"
 #include "version.h"
 
-#ifdef MEEGO_EDITION_HARMATTAN
-#include <MFeedback>
-#include <MComponentData>
-#include <MNotification>
-#include <MRemoteAction>
-#endif //MEEGO_EDITION_HARMATTAN
+#include <QFeedbackEffect>
 
 Util::Util(QSettings *settings, QObject *parent) :
     QObject(parent),
@@ -212,9 +207,7 @@ void Util::keyPressFeedback()
     if( !settingsValue("ui/keyPressFeedback").toBool() )
         return;
 
-#ifdef MEEGO_EDITION_HARMATTAN
-    MFeedback::play("priority2_static_press");
-#endif
+    QFeedbackEffect::playThemeEffect(QFeedbackEffect::PressWeak);
 }
 
 void Util::keyReleaseFeedback()
@@ -222,9 +215,8 @@ void Util::keyReleaseFeedback()
     if( !settingsValue("ui/keyPressFeedback").toBool() )
         return;
 
-#ifdef MEEGO_EDITION_HARMATTAN
-    MFeedback::play("priority2_static_release");
-#endif
+    // TODO: check what's more comfortable, only press, or press and release
+    QFeedbackEffect::playThemeEffect(QFeedbackEffect::ReleaseWeak);
 }
 
 void Util::bellAlert()

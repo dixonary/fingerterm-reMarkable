@@ -1,4 +1,4 @@
-QT = core gui qml quick dbus
+QT = core gui qml quick dbus feedback
 
 contains(MEEGO_EDITION,harmattan): {
     CONFIG += meegotouch
