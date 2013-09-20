@@ -28,6 +28,7 @@ Rectangle {
     property int currentCode: code
     property string currentLabel: keyLabel.text
     property bool sticky: false     // can key be stickied?
+    property bool becomesSticky: false // will this become sticky after release?
     property int stickiness: 0      // current stickiness status
 
     // mouse input handling
@@ -110,6 +111,18 @@ Rectangle {
         util.keyPressFeedback();
 
         keyRepeatStarter.start();
+
+        if (sticky) {
+            keyboard.keyModifiers |= code;
+            key.becomesSticky = true;
+            keyboard.currentStickyPressed = key;
+        } else {
+            if (keyboard.currentStickyPressed != null) {
+                // Pressing a non-sticky key while a sticky key is pressed:
+                // the sticky key will not become sticky when released
+                keyboard.currentStickyPressed.becomesSticky = false;
+            }
+        }
     }
 
     function handleMove(touchArea, x, y) {
@@ -143,12 +156,21 @@ Rectangle {
                 window.wakeVKB();
         }
 
+        if (sticky) {
+            keyboard.keyModifiers &= ~code
+            keyboard.currentStickyPressed = null;
+        }
+
         if (vkb.keyAt(x, y) == key) {
             util.keyReleaseFeedback();
 
-            setStickiness(-1);
+            if (key.sticky && key.becomesSticky) {
+                setStickiness(-1);
+            }
+
             window.vkbKeypress(currentCode, keyboard.keyModifiers);
 
+            // first non-sticky press will cause the sticky to be released
             if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
                 resetSticky.setStickiness(0);
             }
@@ -188,6 +210,10 @@ Rectangle {
                 stickiness = (stickiness+1) % 3
             else
                 stickiness = val
+
+            // stickiness == 0 -> not pressed
+            // stickiness == 1 -> release after next keypress
+            // stickiness == 2 -> keep pressed
 
             if(stickiness>0) {
                 keyboard.keyModifiers |= code
