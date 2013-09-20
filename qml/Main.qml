@@ -110,8 +110,10 @@ PageStackWindow {
 
         Keyboard {
             id: vkb
+            property bool visibleSetting: true
             x: 0
             y: parent.height-vkb.height
+            visible: windowHasFocus && visibleSetting
         }
 
         //area that handles gestures/select/scroll modes and vkb-keypresses
@@ -334,7 +336,7 @@ PageStackWindow {
 
         function wakeVKB()
         {
-            if(!vkb.visible)
+            if(!vkb.visibleSetting)
                 return;
 
             lineView.duration = window.fadeOutTime;
@@ -364,7 +366,7 @@ PageStackWindow {
         {
             if(util.settingsValue("ui/vkbShowMethod")==="move")
             {
-                vkb.visible = true;
+                vkb.visibleSetting = true;
                 textrender.opacity = 1.0;
                 if(vkb.active) {
                     var move = textrender.cursorPixelPos().y + textrender.fontHeight/2 + textrender.fontHeight*util.settingsValue("ui/showExtraLinesFromCursor");
@@ -382,7 +384,7 @@ PageStackWindow {
             }
             else if(util.settingsValue("ui/vkbShowMethod")==="fade")
             {
-                vkb.visible = true;
+                vkb.visibleSetting = true;
                 textrender.cutAfter = textrender.height;
                 textrender.y = 0;
                 if(vkb.active)
@@ -392,7 +394,7 @@ PageStackWindow {
             }
             else // "off" (vkb disabled)
             {
-                vkb.visible = false;
+                vkb.visibleSetting = false;
                 textrender.cutAfter = textrender.height;
                 textrender.y = 0;
                 textrender.opacity = 1.0;
