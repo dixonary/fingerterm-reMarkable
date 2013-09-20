@@ -38,7 +38,7 @@ Rectangle {
 
     Rectangle {
         id: fader
-        color: "#ffffff"
+        color: "#000000"
         opacity: 0
         y: 0
         x: 0
