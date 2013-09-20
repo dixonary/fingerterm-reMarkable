@@ -125,7 +125,6 @@ PageStackWindow {
             property int pressMouseX: 0
             property int clickThreshold: 20
             property alias pressedKey: vkb.currentKeyPressed
-            property bool exitedPressedKeyArea: false
             //We define a click as a mouse-press followed by a mouse-release
             //Morover, we only consider it a click if the mouse hasn't moved too much
             //between press and release events
@@ -135,7 +134,6 @@ PageStackWindow {
                 pressMouseY = mouse.y
                 pressMouseX = mouse.x
                 var key = vkb.keyAt(mouse.x, mouse.y)
-                exitedPressedKeyArea = false
                 if (key != null) {
                     pressedKey = key
                     pressedKey.handlePress()
@@ -145,10 +143,9 @@ PageStackWindow {
             }
             onPositionChanged: {
                 //if the finger exits key's area
-                if (pressedKey != null && pressedKey != 0 && !exitedPressedKeyArea) {
+                if (pressedKey != null && pressedKey != 0) {
                     var mappedPoint = pressedKey.mapFromItem(touchArea, mouse.x, mouse.y)
                     if (!pressedKey.contains(Qt.point(mappedPoint.x, mappedPoint.y))) {
-                        exitedPressedKeyArea = true
                         pressedKey.handleExit()
                     }
                 }
@@ -162,11 +159,12 @@ PageStackWindow {
                 util.mouseMove(mouse.x, mouse.y)
             }
             onReleased: {
-                if (pressedKey != null && pressedKey != 0 &&
-                        vkb.keyAt(mouse.x, mouse.y) == pressedKey && !exitedPressedKeyArea) {
-                    pressedKey.handleRelease()
+                if (pressedKey != null && pressedKey != 0) {
+                    if (vkb.keyAt(mouse.x, mouse.y) == pressedKey) {
+                        pressedKey.handleRelease()
+                    }
+                    pressedKey.handleExit()
                 }
-                vkb.currentKeyPressed = 0;
 
                 //gestures c++ handler
                 util.mouseRelease(mouse.x, mouse.y)
