@@ -173,7 +173,7 @@ PageStackWindow {
 
                 // Wake up the keyboard if the user has tapped/clicked on it and we're not in select mode
                 //(or it would be hard to select text)
-                if (mouse.y < vkb.y && mouseY < vkb.y && isClick && util.settingsValue("ui/dragMode") !== "select") {
+                if (mouse.y < vkb.y && pressMouseY < vkb.y && isClick && util.settingsValue("ui/dragMode") !== "select") {
                     if (vkb.active)
                         window.sleepVKB();
                     else
