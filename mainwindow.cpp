@@ -20,6 +20,7 @@
 #include "qplatformdefs.h"
 
 #include <QtGui>
+#include <QQmlContext>
 #include "mainwindow.h"
 
 #ifdef MEEGO_EDITION_HARMATTAN
@@ -32,6 +33,7 @@
 
 MainWindow::MainWindow()
 {
+    rootContext()->setContextProperty("windowHasFocus", false);
 }
 
 MainWindow::~MainWindow()
@@ -40,12 +42,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::focusInEvent(QFocusEvent *event)
 {
+    rootContext()->setContextProperty("windowHasFocus", true);
     QQuickView::focusInEvent(event);
     emit focusChanged(true);
 }
 
 void MainWindow::focusOutEvent(QFocusEvent *event)
 {
+    rootContext()->setContextProperty("windowHasFocus", false);
     QQuickView::focusOutEvent(event);
     emit focusChanged(false);
 }

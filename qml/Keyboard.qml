@@ -28,6 +28,7 @@ Rectangle {
 
     property int keyModifiers: 0
     property variant resetSticky: 0
+    property variant currentStickyPressed: null
     property variant currentKeyPressed: 0
 
     property string keyFgColor: "#565656"

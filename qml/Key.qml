@@ -28,7 +28,14 @@ Rectangle {
     property int currentCode: code
     property string currentLabel: keyLabel.text
     property bool sticky: false     // can key be stickied?
+    property bool becomesSticky: false // will this become sticky after release?
     property int stickiness: 0      // current stickiness status
+
+    // mouse input handling
+    property int clickThreshold: 20
+    property bool isClick: false
+    property int pressMouseY: 0
+    property int pressMouseX: 0
 
     width: window.width/12   // some default
     height: window.height/8 < 55 ? window.height/8 : 55
@@ -94,36 +101,80 @@ Rectangle {
         anchors.topMargin: key.height/2
     }
 
-    function handlePress() {
+    function handlePress(touchArea, x, y) {
+        isClick = true;
+        pressMouseX = x;
+        pressMouseY = y;
+
         key.color = keyboard.keyHilightBgColor
         keyboard.currentKeyPressed = key;
         util.keyPressFeedback();
 
         keyRepeatStarter.start();
-    }
 
-    function handleRelease() {
-        util.keyReleaseFeedback();
-
-        keyRepeatStarter.stop();
-        keyRepeatTimer.stop();
-
-        key.color = keyboard.keyBgColor
-
-        setStickiness(-1)
-        window.vkbKeypress(currentCode, keyboard.keyModifiers);
-
-        if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
-            resetSticky.setStickiness(0);
+        if (sticky) {
+            keyboard.keyModifiers |= code;
+            key.becomesSticky = true;
+            keyboard.currentStickyPressed = key;
+        } else {
+            if (keyboard.currentStickyPressed != null) {
+                // Pressing a non-sticky key while a sticky key is pressed:
+                // the sticky key will not become sticky when released
+                keyboard.currentStickyPressed.becomesSticky = false;
+            }
         }
     }
 
-    function handleExit() {
+    function handleMove(touchArea, x, y) {
+        var mappedPoint = key.mapFromItem(touchArea, x, y)
+        if (!key.contains(Qt.point(mappedPoint.x, mappedPoint.y))) {
+            key.handleRelease(touchArea, x, y);
+            return false;
+        }
+
+        if (key.isClick) {
+            if (Math.abs(x - key.pressMouseX) > key.clickThreshold ||
+            Math.abs(y - key.pressMouseY) > key.clickThreshold )
+            key.isClick = false
+        }
+
+        return true;
+    }
+
+    function handleRelease(touchArea, x, y) {
         keyRepeatStarter.stop();
         keyRepeatTimer.stop();
-
-        key.color = keyboard.keyBgColor
+        key.color = keyboard.keyBgColor;
         keyboard.currentKeyPressed = 0;
+
+        // Wake up the keyboard if the user has tapped/clicked on it and we're not in select mode
+        //(or it would be hard to select text)
+        if (y < vkb.y && key.pressMouseY < vkb.y && util.settingsValue("ui/dragMode") !== "select") {
+            if (vkb.active)
+                window.sleepVKB();
+            else
+                window.wakeVKB();
+        }
+
+        if (sticky) {
+            keyboard.keyModifiers &= ~code
+            keyboard.currentStickyPressed = null;
+        }
+
+        if (vkb.keyAt(x, y) == key) {
+            util.keyReleaseFeedback();
+
+            if (key.sticky && key.becomesSticky) {
+                setStickiness(-1);
+            }
+
+            window.vkbKeypress(currentCode, keyboard.keyModifiers);
+
+            // first non-sticky press will cause the sticky to be released
+            if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
+                resetSticky.setStickiness(0);
+            }
+        }
     }
 
     Timer {
@@ -159,6 +210,10 @@ Rectangle {
                 stickiness = (stickiness+1) % 3
             else
                 stickiness = val
+
+            // stickiness == 0 -> not pressed
+            // stickiness == 1 -> release after next keypress
+            // stickiness == 2 -> keep pressed
 
             if(stickiness>0) {
                 keyboard.keyModifiers |= code

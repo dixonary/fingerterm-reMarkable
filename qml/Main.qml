@@ -110,76 +110,66 @@ PageStackWindow {
 
         Keyboard {
             id: vkb
+            property bool visibleSetting: true
             x: 0
             y: parent.height-vkb.height
+            visible: windowHasFocus && visibleSetting
         }
 
-        //area that handles gestures/select/scroll modes and vkb-keypresses
-        MouseArea {
-            id: touchArea
-            objectName: "touchArea"
+        // area that handles gestures/select/scroll modes and vkb-keypresses
+        MultiPointTouchArea {
+            id: multiTouchArea
             anchors.fill: parent
-            property int pressMouseY: 0
-            property int pressMouseX: 0
-            property int clickThreshold: 20
-            property alias pressedKey: vkb.currentKeyPressed
-            property bool exitedPressedKeyArea: false
-            //We define a click as a mouse-press followed by a mouse-release
-            //Morover, we only consider it a click if the mouse hasn't moved too much
-            //between press and release events
-            property bool isClick: false
-            onPressed: {
-                isClick = true
-                pressMouseY = mouse.y
-                pressMouseX = mouse.x
-                var key = vkb.keyAt(mouse.x, mouse.y)
-                exitedPressedKeyArea = false
-                if (key != null) {
-                    pressedKey = key
-                    pressedKey.handlePress()
-                }
-                //gestures c++ handler
-                util.mousePress(mouse.x, mouse.y)
-            }
-            onPositionChanged: {
-                //if the finger exits key's area
-                if (pressedKey != null && pressedKey != 0 && !exitedPressedKeyArea) {
-                    var mappedPoint = pressedKey.mapFromItem(touchArea, mouse.x, mouse.y)
-                    if (!pressedKey.contains(Qt.point(mappedPoint.x, mappedPoint.y))) {
-                        exitedPressedKeyArea = true
-                        pressedKey.handleExit()
-                    }
-                }
 
-                if (isClick) {
-                    if (Math.abs(mouse.x - pressMouseX) > clickThreshold ||
-                        Math.abs(mouse.y - pressMouseY) > clickThreshold )
-                        isClick = false
-                }
-                //gestures c++ handler
-                util.mouseMove(mouse.x, mouse.y)
+            property int firstTouchId: -1
+            property var pressedKeys: ({})
+
+            onPressed: {
+                touchPoints.forEach(function (touchPoint) {
+                    if (multiTouchArea.firstTouchId == -1) {
+                        multiTouchArea.firstTouchId = touchPoint.pointId;
+
+                        //gestures c++ handler
+                        util.mousePress(touchPoint.x, touchPoint.y);
+                    }
+
+                    var key = vkb.keyAt(touchPoint.x, touchPoint.y);
+                    if (key != null) {
+                        key.handlePress(multiTouchArea, touchPoint.x, touchPoint.y);
+                    }
+                    multiTouchArea.pressedKeys[touchPoint.pointId] = key;
+                });
+            }
+            onUpdated: {
+                touchPoints.forEach(function (touchPoint) {
+                    if (multiTouchArea.firstTouchId == touchPoint.pointId) {
+                        //gestures c++ handler
+                        util.mouseMove(touchPoint.x, touchPoint.y);
+                    }
+
+                    var key = multiTouchArea.pressedKeys[touchPoint.pointId];
+                    if (key != null) {
+                        if (!key.handleMove(multiTouchArea, touchPoint.x, touchPoint.y)) {
+                            delete multiTouchArea.pressedKeys[touchPoint.pointId];
+                        }
+                    }
+                });
             }
             onReleased: {
-                if (pressedKey != null && pressedKey != 0 &&
-                        vkb.keyAt(mouse.x, mouse.y) == pressedKey && !exitedPressedKeyArea) {
-                    pressedKey.handleRelease()
-                }
-                vkb.currentKeyPressed = 0;
+                touchPoints.forEach(function (touchPoint) {
+                    if (multiTouchArea.firstTouchId == touchPoint.pointId) {
+                        //gestures c++ handler
+                        util.mouseRelease(touchPoint.x, touchPoint.y);
+                        multiTouchArea.firstTouchId = -1;
+                    }
 
-                //gestures c++ handler
-                util.mouseRelease(mouse.x, mouse.y)
-
-                // Wake up the keyboard if the user has tapped/clicked on it and we're not in select mode
-                //(or it would be hard to select text)
-                if (mouse.y < vkb.y && mouseY < vkb.y && isClick && util.settingsValue("ui/dragMode") !== "select") {
-                    if (vkb.active)
-                        window.sleepVKB();
-                    else
-                        window.wakeVKB();
-                }
+                    var key = multiTouchArea.pressedKeys[touchPoint.pointId];
+                    if (key != null) {
+                        key.handleRelease(multiTouchArea, touchPoint.x, touchPoint.y);
+                    }
+                    delete multiTouchArea.pressedKeys[touchPoint.pointId];
+                });
             }
-
-
         }
 
         Rectangle {
@@ -334,7 +324,7 @@ PageStackWindow {
 
         function wakeVKB()
         {
-            if(!vkb.visible)
+            if(!vkb.visibleSetting)
                 return;
 
             lineView.duration = window.fadeOutTime;
@@ -364,7 +354,7 @@ PageStackWindow {
         {
             if(util.settingsValue("ui/vkbShowMethod")==="move")
             {
-                vkb.visible = true;
+                vkb.visibleSetting = true;
                 textrender.opacity = 1.0;
                 if(vkb.active) {
                     var move = textrender.cursorPixelPos().y + textrender.fontHeight/2 + textrender.fontHeight*util.settingsValue("ui/showExtraLinesFromCursor");
@@ -382,7 +372,7 @@ PageStackWindow {
             }
             else if(util.settingsValue("ui/vkbShowMethod")==="fade")
             {
-                vkb.visible = true;
+                vkb.visibleSetting = true;
                 textrender.cutAfter = textrender.height;
                 textrender.y = 0;
                 if(vkb.active)
@@ -392,7 +382,7 @@ PageStackWindow {
             }
             else // "off" (vkb disabled)
             {
-                vkb.visible = false;
+                vkb.visibleSetting = false;
                 textrender.cutAfter = textrender.height;
                 textrender.y = 0;
                 textrender.opacity = 1.0;
