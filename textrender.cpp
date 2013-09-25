@@ -92,11 +92,11 @@ void TextRender::paint(QPainter* painter)
 
     // cursor
     if (iTerm->showCursor()) {
-        painter->setOpacity(1.0);
+        painter->setOpacity(0.5);
         QPoint cursor = cursorPixelPos();
         QSize csize = cursorPixelSize();
-        painter->setPen( iColorTable[Terminal::defaultFgColor] );
-        painter->setBrush(Qt::transparent);
+        painter->setPen(Qt::transparent);
+        painter->setBrush(iColorTable[Terminal::defaultFgColor]);
         painter->drawRect(cursor.x(), cursor.y(), csize.width(), csize.height());
     }
 
@@ -295,10 +295,7 @@ void TextRender::setFontPointSize(int psize)
 
 QPoint TextRender::cursorPixelPos()
 {
-    QPoint ret = charsToPixels(iTerm->cursorPos());
-    ret.rx() += 2;
-    ret.ry() += iFontHeight/2;
-    return ret;
+    return charsToPixels(iTerm->cursorPos());
 }
 
 QPoint TextRender::charsToPixels(QPoint pos)
@@ -309,5 +306,5 @@ QPoint TextRender::charsToPixels(QPoint pos)
 
 QSize TextRender::cursorPixelSize()
 {
-    return (QSize(iFontWidth, iFontHeight/2));
+    return (QSize(iFontWidth, iFontHeight));
 }
