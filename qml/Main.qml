@@ -158,6 +158,19 @@ PageStackWindow {
             onReleased: {
                 touchPoints.forEach(function (touchPoint) {
                     if (multiTouchArea.firstTouchId == touchPoint.pointId) {
+                        // Toggle keyboard wake-up when tapping outside the keyboard, but:
+                        //   - only when not scrolling (y-diff < 20 pixels)
+                        //   - not in select mode, as it would be hard to select text
+                        if (touchPoint.y < vkb.y && touchPoint.startY < vkb.y &&
+                                Math.abs(touchPoint.y - touchPoint.startY) < 20 &&
+                                util.settingsValue("ui/dragMode") !== "select") {
+                            if (vkb.active) {
+                                window.sleepVKB();
+                            } else {
+                                window.wakeVKB();
+                            }
+                        }
+
                         //gestures c++ handler
                         util.mouseRelease(touchPoint.x, touchPoint.y);
                         multiTouchArea.firstTouchId = -1;

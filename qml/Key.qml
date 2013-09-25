@@ -147,15 +147,6 @@ Rectangle {
         key.color = keyboard.keyBgColor;
         keyboard.currentKeyPressed = 0;
 
-        // Wake up the keyboard if the user has tapped/clicked on it and we're not in select mode
-        //(or it would be hard to select text)
-        if (y < vkb.y && key.pressMouseY < vkb.y && util.settingsValue("ui/dragMode") !== "select") {
-            if (vkb.active)
-                window.sleepVKB();
-            else
-                window.wakeVKB();
-        }
-
         if (sticky) {
             keyboard.keyModifiers &= ~code
             keyboard.currentStickyPressed = null;
