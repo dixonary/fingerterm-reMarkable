@@ -342,7 +342,6 @@ PageStackWindow {
 
             lineView.duration = window.fadeOutTime;
             textrender.duration = window.fadeOutTime;
-            vkb.keyFgColor = "#cccccc";
             fadeTimer.restart();
             vkb.active = true;
             lineView.setPosition(vkb.active);
@@ -355,7 +354,6 @@ PageStackWindow {
         {
             textrender.duration = window.fadeInTime;
             lineView.duration = window.fadeInTime;
-            vkb.keyFgColor = "#565656";
             vkb.active = false;
             lineView.setPosition(vkb.active);
             util.updateSwipeLock(!vkb.active);

@@ -31,7 +31,7 @@ Rectangle {
     property variant currentStickyPressed: null
     property variant currentKeyPressed: 0
 
-    property string keyFgColor: "#565656"
+    property string keyFgColor: "#ffffff"
     property string keyBgColor: "#202020"
     property string keyHilightBgColor: "#ffffff"
     property string keyBorderColor: "#303030"
