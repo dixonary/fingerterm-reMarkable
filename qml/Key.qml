@@ -25,11 +25,12 @@ Rectangle {
     property string label_alt: ""
     property int code: 0
     property int code_alt: 0
-    property int currentCode: code
-    property string currentLabel: keyLabel.text
+    property int currentCode: (shiftActive && label_alt != '') ? code_alt : code
+    property string currentLabel: (shiftActive && label_alt != '') ? label_alt : label
     property bool sticky: false     // can key be stickied?
     property bool becomesSticky: false // will this become sticky after release?
     property int stickiness: 0      // current stickiness status
+    property real labelOpacity: keyboard.active ? 1.0 : 0.3
 
     // mouse input handling
     property int clickThreshold: 20
@@ -44,52 +45,64 @@ Rectangle {
     border.width: 1
     radius: 5
 
-    Connections {
-        target: keyboard
-        onKeyModifiersChanged: {
-            if( (keyboard.keyModifiers & Qt.ShiftModifier) && !sticky ) {
-                if(key.label_alt!="") {
-                    keyLabel.text = key.label_alt
-                    keyAltLabel.text = key.label
-                    key.currentCode = key.code_alt
-                } else if(key.label.length==1) {
-                    keyLabel.text = key.label.toUpperCase()
-                }
-            } else if(!sticky) {
-                if(key.label.length==1)
-                    keyLabel.text = key.label.toLowerCase()
-                else
-                    keyLabel.text = key.label
-
-                keyAltLabel.text = key.label_alt
-                key.currentCode = key.code
-            }
-        }
-    }
+    property bool shiftActive: (keyboard.keyModifiers & Qt.ShiftModifier) && !sticky
 
     Image {
         id: keyImage
         anchors.centerIn: parent
-        opacity: 0.4
+        opacity: key.labelOpacity
         source: { if(key.label.length>1 && key.label.charAt(0)==':') return "qrc:/icons/"+key.label.substring(1)+".png"; else return ""; }
     }
 
-    Text {
+    Column {
         visible: keyImage.source == ""
-        id: keyLabel
         anchors.centerIn: parent
-        text: key.label
-        color: keyboard.keyFgColor
-        font.pointSize: key.label.length>1 ? 18 : 26
+        spacing: -17
+
+        Text {
+            id: keyAltLabel
+            property bool highlighted: key.shiftActive
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            text: key.label_alt
+            color: keyboard.keyFgColor
+
+            opacity: key.labelOpacity * (highlighted ? 1.0 : 0.2)
+            Behavior on opacity { NumberAnimation { duration: 100 } }
+
+            font.pointSize: (highlighted ? 24 : 14) * (text.length > 1 ? 0.5 : 1.0)
+            Behavior on font.pointSize { NumberAnimation { duration: 100 } }
+        }
+
+        Text {
+            id: keyLabel
+            property bool highlighted: key.label_alt == '' || !key.shiftActive
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            text: {
+                if (key.label.length == 1 && key.label_alt == '') {
+                    if (key.shiftActive) {
+                        return key.label.toUpperCase();
+                    } else {
+                        return key.label.toLowerCase();
+                    }
+                }
+
+                return key.label;
+            }
+
+            color: keyboard.keyFgColor
+
+            opacity: key.labelOpacity * (highlighted ? 1.0 : 0.2)
+            Behavior on opacity { NumberAnimation { duration: 100 } }
+
+            font.pointSize: (highlighted ? 24 : 14) * (text.length > 1 ? 0.5 : 1.0)
+            Behavior on font.pointSize { NumberAnimation { duration: 100 } }
+        }
     }
-    Text {
-        id: keyAltLabel
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        text: key.label_alt
-        color: keyboard.keyFgColor
-        font.pointSize: key.label.length>1 ? 10 : 13
-    }
+
     Rectangle {
         id: stickIndicator
         visible: sticky && stickiness>0
@@ -147,7 +160,7 @@ Rectangle {
         key.color = keyboard.keyBgColor;
         keyboard.currentKeyPressed = 0;
 
-        if (sticky) {
+        if (sticky && !becomesSticky) {
             keyboard.keyModifiers &= ~code
             keyboard.currentStickyPressed = null;
         }
