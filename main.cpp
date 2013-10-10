@@ -95,6 +95,15 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
+    QScreen* sc = app.primaryScreen();
+    if(sc){
+    sc->setOrientationUpdateMask(Qt::PrimaryOrientation
+                                 | Qt::LandscapeOrientation
+                                 | Qt::PortraitOrientation
+                                 | Qt::InvertedLandscapeOrientation
+                                 | Qt::InvertedPortraitOrientation);
+    }
+
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
     MainWindow view;
 
