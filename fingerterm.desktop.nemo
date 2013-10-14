@@ -1,10 +1,5 @@
 [Desktop Entry]
-Encoding=UTF-8
-Version=1.0
-Name=FingerTerm
-GenericName=FingerTerm
-Comment=Terminal emulator
-Exec=/usr/bin/invoker --single-instance --type=e /usr/bin/fingerterm
-Terminal=false
 Type=Application
+Name=Terminal
+Exec=fingerterm
 Icon=icon-l-terminal
