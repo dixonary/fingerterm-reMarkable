@@ -215,15 +215,15 @@ void defaultSettings(QSettings* settings)
     if(!settings->contains("ui/allowSwipe"))
         settings->setValue("ui/allowSwipe", "auto");   // "true", "false", "auto"
     if(!settings->contains("ui/keyboardFadeOutDelay"))
-        settings->setValue("ui/keyboardFadeOutDelay", 2500);
+        settings->setValue("ui/keyboardFadeOutDelay", 4000);
     if(!settings->contains("ui/showExtraLinesFromCursor"))
         settings->setValue("ui/showExtraLinesFromCursor", 1);
     if(!settings->contains("ui/vkbShowMethod"))
-        settings->setValue("ui/vkbShowMethod", "fade");  // "fade", "move", "off"
+        settings->setValue("ui/vkbShowMethod", "move");  // "fade", "move", "off"
     if(!settings->contains("ui/keyPressFeedback"))
         settings->setValue("ui/keyPressFeedback", true);
     if(!settings->contains("ui/dragMode"))
-        settings->setValue("ui/dragMode", "gestures");  // "gestures, "scroll", "select" ("off" would also be ok)
+        settings->setValue("ui/dragMode", "scroll");  // "gestures, "scroll", "select" ("off" would also be ok)
 
     if(!settings->contains("state/showWelcomeScreen"))
         settings->setValue("state/showWelcomeScreen", true);
