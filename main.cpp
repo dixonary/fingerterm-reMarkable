@@ -124,6 +124,8 @@ int main(int argc, char *argv[])
     copyFileFromResources(":/data/menu.xml", util.configPath()+"/menu.xml");
     copyFileFromResources(":/data/english.layout", util.configPath()+"/english.layout");
     copyFileFromResources(":/data/finnish.layout", util.configPath()+"/finnish.layout");
+    copyFileFromResources(":/data/german.layout", util.configPath()+"/german.layout");
+    copyFileFromResources(":/data/qwertz.layout", util.configPath()+"/qwertz.layout");
 
     KeyLoader keyLoader;
     keyLoader.setUtil(&util);
