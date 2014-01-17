@@ -367,15 +367,9 @@ void Util::notifyText(QString text)
 void Util::copyTextToClipboard(QString str)
 {
     QClipboard *cb = QGuiApplication::clipboard();
-    //mimeData() could be null when the clipboard QPA plugin of the platform doesn't support QClipboard::Clipboard, or
-    //the plugin is bugged.
-    //In those cases, disable clipboard features.
-    if(!cb->mimeData())
-        qDebug() << "FIXME: QClipboard::mimeData() returned NULL, the clipboard functionality will not be used";
-    else {
-        cb->clear();
-        cb->setText(str);
-    }
+
+    cb->clear();
+    cb->setText(str);
 }
 
 bool Util::terminalHasSelection()
