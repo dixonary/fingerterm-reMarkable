@@ -1312,8 +1312,8 @@ void Terminal::copySelectionToClipboard()
         }
 
         // main buffer
-        int lineFrom = selection().top()-1-iBackBufferScrollPos;
-        int lineTo = selection().bottom()-1-iBackBufferScrollPos;
+        lineFrom = selection().top()-1-iBackBufferScrollPos;
+        lineTo = selection().bottom()-1-iBackBufferScrollPos;
         for (int i=lineFrom; i<=lineTo; i++) {
             if (i >= 0 && i < buffer().size()) {
                 line.clear();
