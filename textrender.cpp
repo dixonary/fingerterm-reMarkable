@@ -42,6 +42,7 @@ TextRender::TextRender(QQuickItem *parent) :
     iColorTable.append(QColor(210, 0, 210));
     iColorTable.append(QColor(0, 210, 210));
     iColorTable.append(QColor(235, 235, 235));
+
     //bright
     iColorTable.append(QColor(127, 127, 127));
     iColorTable.append(QColor(255, 0, 0));
@@ -52,7 +53,22 @@ TextRender::TextRender(QQuickItem *parent) :
     iColorTable.append(QColor(0, 255, 255));
     iColorTable.append(QColor(255, 255, 255));
 
-    if(iColorTable.size()!=16)
+    //colour cube
+    for (int r = 0x00; r < 0x100; r += 0x33)
+      for (int g = 0x00; g < 0x100; g += 0x33)
+        for (int b = 0x00; b < 0x100; b += 0x33) {
+          iColorTable.append(QColor(r, g, b));
+        }
+
+    //greyscale ramp
+    int ramp[] = {
+          0,  11,  22,  33,  44,  55,  66,  77,  88,  99, 110, 121,
+        133, 144, 155, 166, 177, 188, 199, 210, 221, 232, 243, 255
+    };
+    for (int i = 0; i < 24; i++)
+        iColorTable.append(QColor(ramp[i], ramp[i], ramp[i]));
+
+    if(iColorTable.size() != 256)
         qFatal("invalid color table");
 
     iShowBufferScrollIndicator = false;
