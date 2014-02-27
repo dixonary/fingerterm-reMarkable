@@ -55,10 +55,9 @@ TextRender::TextRender(QQuickItem *parent) :
 
     //colour cube
     for (int r = 0x00; r < 0x100; r += 0x33)
-      for (int g = 0x00; g < 0x100; g += 0x33)
-        for (int b = 0x00; b < 0x100; b += 0x33) {
-          iColorTable.append(QColor(r, g, b));
-        }
+        for (int g = 0x00; g < 0x100; g += 0x33)
+            for (int b = 0x00; b < 0x100; b += 0x33)
+                iColorTable.append(QColor(r, g, b));
 
     //greyscale ramp
     int ramp[] = {

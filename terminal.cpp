@@ -750,8 +750,8 @@ void Terminal::ansiSequence(const QString& seq)
             // xterm 256-colour support
             if(params.count() > 1 && (params[0] == 38 || params[0] == 48)) {
                 if(params.count() > 2 && params[1] == 5 &&
-                        params[2] >= 0 && params[2] <= 255) {
-                    if (params[0] == 38)
+                   params[2] >= 0 && params[2] <= 255) {
+                    if(params[0] == 38)
                         iTermAttribs.currentFgColor = params[2];
                     else
                         iTermAttribs.currentBgColor = params[2];
