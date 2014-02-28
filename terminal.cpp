@@ -788,6 +788,16 @@ void Terminal::ansiSequence(const QString& seq)
                 }
             }
 
+            // high-intensity regular-weight extension (nonstandard)
+            foreach(int p, params) {
+                if(p >= 90 && p<= 97) {
+                    iTermAttribs.currentFgColor = p-90+8;
+                }
+                if(p >= 100 && p<= 107) {
+                    iTermAttribs.currentBgColor = p-100+8;
+                }
+            }
+
             if(params.contains(39))
                 iTermAttribs.currentFgColor = defaultFgColor;
             if(params.contains(49))
