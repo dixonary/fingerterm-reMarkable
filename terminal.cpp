@@ -1310,31 +1310,31 @@ void Terminal::copySelectionToClipboard()
                 text += line.trimmed() + "\n";
             }
         }
-
-        // main buffer
-        lineFrom = selection().top()-1-iBackBufferScrollPos;
-        lineTo = selection().bottom()-1-iBackBufferScrollPos;
-        for (int i=lineFrom; i<=lineTo; i++) {
-            if (i >= 0 && i < buffer().size()) {
-                line.clear();
-                int start = 0;
-                int end = buffer()[i].size()-1;
-                if (i==lineFrom)
-                    start = selection().left()-1;
-                if (i==lineTo)
-                    end = selection().right()-1;
-                for (int j=start; j<=end; j++) {
-                    if (j >= 0 && j < buffer()[i].size() && buffer()[i][j].c.isPrint())
-                        line += buffer()[i][j].c;
-                }
-                text += line.trimmed() + "\n";
-            }
-        }
-
-        //qDebug() << text.trimmed();
-
-        cb->setText(text.trimmed());
     }
+
+    // main buffer
+    int lineFrom = selection().top()-1-iBackBufferScrollPos;
+    int lineTo = selection().bottom()-1-iBackBufferScrollPos;
+    for (int i=lineFrom; i<=lineTo; i++) {
+        if (i >= 0 && i < buffer().size()) {
+            line.clear();
+            int start = 0;
+            int end = buffer()[i].size()-1;
+            if (i==lineFrom)
+                start = selection().left()-1;
+            if (i==lineTo)
+                end = selection().right()-1;
+            for (int j=start; j<=end; j++) {
+                if (j >= 0 && j < buffer()[i].size() && buffer()[i][j].c.isPrint())
+                    line += buffer()[i][j].c;
+            }
+            text += line.trimmed() + "\n";
+        }
+    }
+
+    //qDebug() << text.trimmed();
+
+    cb->setText(text.trimmed());
 }
 
 void Terminal::adjustSelectionPosition(int lines)
