@@ -1144,11 +1144,9 @@ void Terminal::pasteFromClipboard()
 {
     QClipboard *cb = QGuiApplication::clipboard();
 
-    if(!cb->->text().isEmpty()) {
-        if(iPtyIFace) {
-            resetBackBufferScrollPos();
-            iPtyIFace->writeTerm(cb->text());
-        }
+    if(iPtyIFace && !cb->text().isEmpty()) {
+        resetBackBufferScrollPos();
+        iPtyIFace->writeTerm(cb->text());
     }
 }
 
