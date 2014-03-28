@@ -1290,10 +1290,12 @@ void Terminal::copySelectionToClipboard()
                 line.clear();
                 int start = 0;
                 int end = iBackBuffer[i].size()-1;
-                if (i==lineFrom)
+                if (i==lineFrom) {
                     start = selection().left()-1;
-                if (i==lineTo)
+                }
+                if (i==lineTo) {
                     end = selection().right()-1;
+                }
                 for (int j=start; j<=end; j++) {
                     if (j >= 0 && j < iBackBuffer[i].size() && iBackBuffer[i][j].c.isPrint())
                         line += iBackBuffer[i][j].c;
@@ -1311,10 +1313,12 @@ void Terminal::copySelectionToClipboard()
             line.clear();
             int start = 0;
             int end = buffer()[i].size()-1;
-            if (i==lineFrom)
+            if (i==lineFrom) {
                 start = selection().left()-1;
-            if (i==lineTo)
+            }
+            if (i==lineTo) {
                 end = selection().right()-1;
+            }
             for (int j=start; j<=end; j++) {
                 if (j >= 0 && j < buffer()[i].size() && buffer()[i][j].c.isPrint())
                     line += buffer()[i][j].c;
