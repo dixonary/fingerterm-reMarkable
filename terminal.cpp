@@ -1144,18 +1144,9 @@ void Terminal::pasteFromClipboard()
 {
     QClipboard *cb = QGuiApplication::clipboard();
 
-    //mimeData() could be null when the clipboard QPA plugin of the platform doesn't support QClipboard::Clipboard, or
-    //the plugin is bugged.
-    //In those cases, disable clipboard features.
-    if(!cb->mimeData())
-        qDebug() << "FIXME: QClipboard::mimeData() returned NULL, the clipboard functionality will not be used";
-    else {
-        if(cb->mimeData()->hasText() && !cb->mimeData()->text().isEmpty()) {
-            if(iPtyIFace) {
-                resetBackBufferScrollPos();
-                iPtyIFace->writeTerm(cb->mimeData()->text());
-            }
-        }
+    if(iPtyIFace && !cb->text().isEmpty()) {
+        resetBackBufferScrollPos();
+        iPtyIFace->writeTerm(cb->text());
     }
 }
 
@@ -1299,10 +1290,12 @@ void Terminal::copySelectionToClipboard()
                 line.clear();
                 int start = 0;
                 int end = iBackBuffer[i].size()-1;
-                if (i==lineFrom)
+                if (i==lineFrom) {
                     start = selection().left()-1;
-                if (i==lineTo)
+                }
+                if (i==lineTo) {
                     end = selection().right()-1;
+                }
                 for (int j=start; j<=end; j++) {
                     if (j >= 0 && j < iBackBuffer[i].size() && iBackBuffer[i][j].c.isPrint())
                         line += iBackBuffer[i][j].c;
@@ -1310,31 +1303,33 @@ void Terminal::copySelectionToClipboard()
                 text += line.trimmed() + "\n";
             }
         }
-
-        // main buffer
-        lineFrom = selection().top()-1-iBackBufferScrollPos;
-        lineTo = selection().bottom()-1-iBackBufferScrollPos;
-        for (int i=lineFrom; i<=lineTo; i++) {
-            if (i >= 0 && i < buffer().size()) {
-                line.clear();
-                int start = 0;
-                int end = buffer()[i].size()-1;
-                if (i==lineFrom)
-                    start = selection().left()-1;
-                if (i==lineTo)
-                    end = selection().right()-1;
-                for (int j=start; j<=end; j++) {
-                    if (j >= 0 && j < buffer()[i].size() && buffer()[i][j].c.isPrint())
-                        line += buffer()[i][j].c;
-                }
-                text += line.trimmed() + "\n";
-            }
-        }
-
-        //qDebug() << text.trimmed();
-
-        cb->setText(text.trimmed());
     }
+
+    // main buffer
+    int lineFrom = selection().top()-1-iBackBufferScrollPos;
+    int lineTo = selection().bottom()-1-iBackBufferScrollPos;
+    for (int i=lineFrom; i<=lineTo; i++) {
+        if (i >= 0 && i < buffer().size()) {
+            line.clear();
+            int start = 0;
+            int end = buffer()[i].size()-1;
+            if (i==lineFrom) {
+                start = selection().left()-1;
+            }
+            if (i==lineTo) {
+                end = selection().right()-1;
+            }
+            for (int j=start; j<=end; j++) {
+                if (j >= 0 && j < buffer()[i].size() && buffer()[i][j].c.isPrint())
+                    line += buffer()[i][j].c;
+            }
+            text += line.trimmed() + "\n";
+        }
+    }
+
+    //qDebug() << text.trimmed();
+
+    cb->setText(text.trimmed());
 }
 
 void Terminal::adjustSelectionPosition(int lines)
