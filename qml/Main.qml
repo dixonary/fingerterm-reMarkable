@@ -31,6 +31,8 @@ PageStackWindow {
         window.vkbKeypress(event.key,event.modifiers);
     }
 
+    property string windowTitle: util.currentWindowTitle();
+
     initialPage:Page {
         id: page
         anchors.fill: parent
@@ -44,8 +46,6 @@ PageStackWindow {
 
         property int fadeOutTime: 80
         property int fadeInTime: 350
-
-        property string windowTitle: util.currentWindowTitle();
 
         anchors.fill: parent
 

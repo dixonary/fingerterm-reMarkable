@@ -90,7 +90,7 @@ Rectangle {
             Button {
                 text: title
                 isShellCommand: true
-                enabled: disableOn.length === 0 || window.windowTitle.search(disableOn) === -1
+                enabled: disableOn.length === 0 || windowTitle.search(disableOn) === -1
                 onClicked: {
                     hideMenu();
                     term.putString(command, true);
