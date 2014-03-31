@@ -747,6 +747,19 @@ void Terminal::ansiSequence(const QString& seq)
             break;
         }
         if(params.count() > 0) {
+            // xterm 256-colour support
+            if(params.count() > 1 && (params[0] == 38 || params[0] == 48)) {
+                if(params.count() > 2 && params[1] == 5 &&
+                   params[2] >= 0 && params[2] <= 255) {
+                    if(params[0] == 38)
+                        iTermAttribs.currentFgColor = params[2];
+                    else
+                        iTermAttribs.currentBgColor = params[2];
+                }
+                // TODO: 2;r;g;b for 24-bit colour support (Konsole etc)
+                break;
+            }
+
             if(params.contains(0)) {
                 iTermAttribs.currentFgColor = defaultFgColor;
                 iTermAttribs.currentBgColor = defaultBgColor;
@@ -774,6 +787,17 @@ void Terminal::ansiSequence(const QString& seq)
                     iTermAttribs.currentBgColor = p-40;
                 }
             }
+
+            // high-intensity regular-weight extension (nonstandard)
+            foreach(int p, params) {
+                if(p >= 90 && p<= 97) {
+                    iTermAttribs.currentFgColor = p-90+8;
+                }
+                if(p >= 100 && p<= 107) {
+                    iTermAttribs.currentBgColor = p-100+8;
+                }
+            }
+
             if(params.contains(39))
                 iTermAttribs.currentFgColor = defaultFgColor;
             if(params.contains(49))
