@@ -21,6 +21,7 @@
         <file>icons/scroll-indicator.png</file>
         <file>data/english.layout</file>
         <file>data/finnish.layout</file>
+        <file>data/french.layout</file>
         <file>data/german.layout</file>
         <file>data/qwertz.layout</file>
         <file>qml/LayoutWindow.qml</file>
