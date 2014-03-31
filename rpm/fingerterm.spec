@@ -1,5 +1,5 @@
 Name: fingerterm
-Version: 1.0.3
+Version: 1.1.9
 Release: 1
 Summary: A terminal emulator with a custom virtual keyboard
 Group: System/Base
