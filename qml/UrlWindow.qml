@@ -31,7 +31,7 @@ Rectangle {
     y: -(height+1)
     border.color: "#c0c0c0"
     border.width: 1
-    radius: 10
+    radius: window.radiusMedium
 
     MouseArea {
         // event eater
@@ -43,19 +43,19 @@ Rectangle {
         Rectangle {
             color: "#909090"
             width: parent.width
-            height: openButton.height+4
+            height: openButton.height+(4*window.pixelRatio)
             border.width: 1
             border.color: "#ffffff"
-            radius: 5
+            radius: window.radiusSmall
             clip: true
 
             Text {
                 text: modelData
                 color: "#ffffff"
                 anchors.verticalCenter: parent.verticalCenter
-                x: 8
+                x: 8*window.pixelRatio
                 width: openButton.x - x
-                font.pointSize: util.uiFontSize();
+                font.pointSize: window.uiFontSize
                 elide: Text.ElideRight
             }
             Button {
@@ -63,8 +63,8 @@ Rectangle {
                 text: "Open"
                 anchors.right: copyButton.left
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: 5
-                width: 70
+                anchors.rightMargin: window.paddingSmall
+                width: 70*window.pixelRatio
                 onClicked: {
                     Qt.openUrlExternally(modelData);
                 }
@@ -74,8 +74,8 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Copy"
-                width: 70
-                anchors.rightMargin: 5
+                width: 70*window.pixelRatio
+                anchors.rightMargin: window.paddingSmall
                 onClicked: {
                     util.copyTextToClipboard(modelData);
                 }
@@ -88,22 +88,22 @@ Rectangle {
         anchors.centerIn: parent
         color: "#ffffff"
         text: "No URLs"
-        font.pointSize: util.uiFontSize() + 4;
+        font.pointSize: window.uiFontSize + 4*window.pixelRatio
     }
 
     ListView {
         anchors.fill: parent
         delegate: listDelegate
         model: urlWindow.urls
-        spacing: 5
-        anchors.margins: 5
+        spacing: window.paddingSmall
+        anchors.margins: window.paddingSmall
         clip: true
     }
 
     Button {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: window.paddingMedium
         text: "Back"
         onClicked: {
             urlWindow.state = ""

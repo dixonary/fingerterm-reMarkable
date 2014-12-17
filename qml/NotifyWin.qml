@@ -32,7 +32,7 @@ Rectangle {
     state: ""
     border.color: "#c0c0c0"
     border.width: 1
-    radius: 10
+    radius: window.radiusMedium
 
     signal dismissed();
 
@@ -52,7 +52,7 @@ Rectangle {
 
             color: "#ffffff"
             text: notifyWin.text
-            font.pointSize: util.uiFontSize();
+            font.pointSize: window.uiFontSize
 
             onLinkActivated: {
                 Qt.openUrlExternally(link)
@@ -64,7 +64,7 @@ Rectangle {
         id: okButton
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: window.paddingMedium
         text: "OK"
         onClicked: {
             notifyWin.state = ""

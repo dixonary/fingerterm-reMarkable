@@ -22,7 +22,7 @@ import QtQuick 2.0
 Rectangle {
     id: lineView
     property variant lines: [""]
-    property int fontPointSize: util.settingsValue("ui/fontSize");
+    property int fontPointSize: util.settingsValue("ui/fontSize")*window.pixelRatio;
     property int cursorX: 1
     property int cursorWidth: 10
     property int cursorHeight: 10
@@ -31,7 +31,7 @@ Rectangle {
     color: "#404040"
     border.width: 2
     border.color: "#909090"
-    radius: 5
+    radius: window.radiusSmall
     height: 0
     width: parent.width
 
@@ -59,8 +59,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.leftMargin: 2
-        anchors.rightMargin: 2
+        anchors.leftMargin: 2*window.pixelRatio
+        anchors.rightMargin: 2*window.pixelRatio
         Repeater {
             model: lines
             delegate:
@@ -82,7 +82,7 @@ Rectangle {
         }
         onHeightChanged: {
             if(lineView.visible)
-                lineView.height = height+8
+                lineView.height = height+8*window.pixelRatio
             setPosition(vkb.active)
         }
     }
@@ -102,7 +102,7 @@ Rectangle {
         if(vkbActive && util.settingsValue("ui/vkbShowMethod")!=="move") {
             y = 0;
         } else {
-            y = -(height+5)
+            y = -(height+window.paddingSmall)
         }
     }
 }

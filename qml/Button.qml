@@ -33,12 +33,12 @@ Rectangle {
     color: highlighted ? "#606060" : "#202020"
     border.color: "#303030"
     border.width: 1
-    radius: 5
+    radius: window.radiusSmall
     z: 0
     clip: true
 
-    width: 180
-    height: 68
+    width: window.buttonWidthLarge
+    height: window.buttonHeightLarge
 
     onHighlightedChanged: {
         if(highlighted)
@@ -51,7 +51,7 @@ Rectangle {
         // decoration for user-defined command buttons
         visible: isShellCommand
         anchors.fill: parent
-        font.pointSize: 46
+        font.pointSize: 46*window.pixelRatio
         text: "$"
         color: "#305030"
     }
@@ -60,7 +60,7 @@ Rectangle {
         text: button.text
         color: button.enabled ? button.textColor : "#606060"
         anchors.centerIn: parent
-        font.pointSize: util.uiFontSize();
+        font.pointSize: window.uiFontSize
     }
 
     MouseArea {
