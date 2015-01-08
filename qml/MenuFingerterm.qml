@@ -62,7 +62,7 @@ Rectangle {
         color: "#e0e0e0"
         y: 0
         x: menuWin.width+1;
-        width: flickableContent.width + 22;
+        width: flickableContent.width + 22*window.pixelRatio;
         height: menuWin.height
         z: 35
 
@@ -100,33 +100,33 @@ Rectangle {
 
         Rectangle {
             id: scrollIndicator
-            y: menuFlickArea.visibleArea.yPosition*menuFlickArea.height + 6
-            x: parent.width-10
-            width: 6
+            y: menuFlickArea.visibleArea.yPosition*menuFlickArea.height + window.scrollBarWidth
+            x: parent.width-window.paddingMedium
+            width: window.scrollBarWidth
             height: menuFlickArea.visibleArea.heightRatio*menuFlickArea.height
-            radius: 3
+            radius: 3*window.pixelRatio
             color: "#202020"
         }
 
         Flickable {
             id: menuFlickArea
             anchors.fill: parent
-            anchors.topMargin: 6
-            anchors.bottomMargin: 6
-            anchors.leftMargin: 6
-            anchors.rightMargin: 16
+            anchors.topMargin: window.scrollBarWidth
+            anchors.bottomMargin: window.scrollBarWidth
+            anchors.leftMargin: window.scrollBarWidth
+            anchors.rightMargin: 16*window.pixelRatio
             contentHeight: flickableContent.height
 
             Column {
                 id: flickableContent
-                spacing: 12
+                spacing: 12*window.pixelRatio
 
                 Row {
                     id: menuBlocksRow
-                    spacing: 8
+                    spacing: 8*window.pixelRatio
 
                     Column {
-                        spacing: 12
+                        spacing: 12*window.pixelRatio
                         Repeater {
                             model: xmlModel
                             delegate: xmlDelegate
@@ -134,7 +134,7 @@ Rectangle {
                     }
 
                     Column {
-                        spacing: 12
+                        spacing: 12*window.pixelRatio
 
                         Row {
                             Button {
@@ -143,7 +143,8 @@ Rectangle {
                                     hideMenu();
                                     term.copySelectionToClipboard();
                                 }
-                                width: 90
+                                width: window.buttonWidthHalf
+                                height: window.buttonHeightLarge
                                 enabled: menuWin.enableCopy
                             }
                             Button {
@@ -152,12 +153,15 @@ Rectangle {
                                     hideMenu();
                                     term.pasteFromClipboard();
                                 }
-                                width: 90
+                                width: window.buttonWidthHalf
+                                height: window.buttonHeightLarge
                                 enabled: menuWin.enablePaste
                             }
                         }
                         Button {
                             text: "URL grabber"
+                            width: window.buttonWidthLarge
+                            height: window.buttonHeightLarge
                             onClicked: {
                                 hideMenu();
                                 urlWindow.urls = term.grabURLsFromBuffer();
@@ -165,18 +169,18 @@ Rectangle {
                             }
                         }
                         Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
+                            width: window.buttonWidthLarge
+                            height: window.buttonHeightLarge
+                            radius: window.radiusSmall
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
                             Column {
                                 Text {
-                                    width: 180
-                                    height: 20
+                                    width: window.buttonWidthLarge
+                                    height: window.headerHeight
                                     color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
+                                    font.pointSize: window.uiFontSize-1
                                     text: "Font size"
                                     horizontalAlignment: Text.AlignHCenter
                                 }
@@ -184,39 +188,39 @@ Rectangle {
                                     Button {
                                         text: "<font size=\"+3\">+</font>"
                                         onClicked: {
-                                            textrender.fontPointSize = textrender.fontPointSize + 1;
+                                            textrender.fontPointSize = textrender.fontPointSize + window.pixelRatio;
                                             lineView.fontPointSize = textrender.fontPointSize;
                                             util.notifyText(term.termSize().width+"x"+term.termSize().height);
                                         }
-                                        width: 90
-                                        height: 48
+                                        width: window.buttonWidthHalf
+                                        height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "<font size=\"+3\">-</font>"
                                         onClicked: {
-                                            textrender.fontPointSize = textrender.fontPointSize - 1;
+                                            textrender.fontPointSize = textrender.fontPointSize - window.pixelRatio;
                                             lineView.fontPointSize = textrender.fontPointSize;
                                             util.notifyText(term.termSize().width+"x"+term.termSize().height);
                                         }
-                                        width: 90
-                                        height: 48
+                                        width: window.buttonWidthHalf
+                                        height: window.buttonHeightSmall
                                     }
                                 }
                             }
                         }
                         Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
+                            width: window.buttonWidthLarge
+                            height: window.buttonHeightLarge
+                            radius: window.radiusSmall
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
                             Column {
                                 Text {
-                                    width: 180
-                                    height: 20
+                                    width: window.buttonWidthLarge
+                                    height: window.headerHeight
                                     color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
+                                    font.pointSize: window.uiFontSize-1
                                     text: "UI Orientation"
                                     horizontalAlignment: Text.AlignHCenter
                                 }
@@ -228,8 +232,8 @@ Rectangle {
                                             currentOrientationLockMode = "auto";
                                             window.setOrientationLockMode("auto");
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "<font size=\"-1\">L<font>"
@@ -238,8 +242,8 @@ Rectangle {
                                             currentOrientationLockMode = "landscape";
                                             window.setOrientationLockMode("landscape");
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "<font size=\"-1\">P</font>"
@@ -248,25 +252,25 @@ Rectangle {
                                             currentOrientationLockMode = "portrait";
                                             window.setOrientationLockMode("portrait");
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                 }
                             }
                         }
                         Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
+                            width: window.buttonWidthLarge
+                            height: window.buttonHeightLarge
+                            radius: window.radiusSmall
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
                             Column {
                                 Text {
-                                    width: 180
-                                    height: 20
+                                    width: window.buttonWidthLarge
+                                    height: window.headerHeight
                                     color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
+                                    font.pointSize: window.uiFontSize-1
                                     text: "Drag mode"
                                     horizontalAlignment: Text.AlignHCenter
                                 }
@@ -280,8 +284,8 @@ Rectangle {
                                             currentDragMode = "gestures";
                                             hideMenu();
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "<font size=\"-1\">Scroll</font>"
@@ -292,8 +296,8 @@ Rectangle {
                                             term.clearSelection();
                                             hideMenu();
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "<font size=\"-1\">Select</font>"
@@ -303,25 +307,25 @@ Rectangle {
                                             currentDragMode = "select";
                                             hideMenu();
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                 }
                             }
                         }
                         Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
+                            width: window.buttonWidthLarge
+                            height: window.buttonHeightLarge
+                            radius: window.radiusSmall
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
                             Column {
                                 Text {
-                                    width: 180
-                                    height: 20
+                                    width: window.buttonWidthLarge
+                                    height: window.headerHeight
                                     color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
+                                    font.pointSize: window.uiFontSize-1
                                     text: "VKB behavior"
                                     horizontalAlignment: Text.AlignHCenter
                                 }
@@ -335,8 +339,8 @@ Rectangle {
                                             window.setTextRenderAttributes();
                                             hideMenu();
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "Fade"
@@ -347,8 +351,8 @@ Rectangle {
                                             window.setTextRenderAttributes();
                                             hideMenu();
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "Move"
@@ -359,34 +363,34 @@ Rectangle {
                                             window.setTextRenderAttributes();
                                             hideMenu();
                                         }
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                     }
                                 }
                             }
                         }
                         Rectangle {
                             visible: util.isHarmattan()
-                            width: 180
-                            height: 68
-                            radius: 5
+                            width: window.buttonWidthLarge
+                            height: window.buttonHeightLarge
+                            radius: window.radiusSmall
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
                             Column {
                                 Text {
-                                    width: 180
-                                    height: 20
+                                    width: window.buttonWidthLarge
+                                    height: window.headerHeight
                                     color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
+                                    font.pointSize: window.uiFontSize-1
                                     text: "Allow swiping"
                                     horizontalAlignment: Text.AlignHCenter
                                 }
                                 Row {
                                     Button {
                                         text: "No"
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                         highlighted: currentSwipeLocking=="false"
                                         onClicked: {
                                             changeSwipeLocking("false")
@@ -394,8 +398,8 @@ Rectangle {
                                     }
                                     Button {
                                         text: "Yes"
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                         highlighted: currentSwipeLocking=="true"
                                         onClicked: {
                                             changeSwipeLocking("true")
@@ -403,8 +407,8 @@ Rectangle {
                                     }
                                     Button {
                                         text: "Auto"
-                                        width: 60
-                                        height: 48
+                                        width: window.buttonWidthSmall
+                                        height: window.buttonHeightSmall
                                         highlighted: currentSwipeLocking=="auto"
                                         onClicked: {
                                             changeSwipeLocking("auto")
@@ -458,25 +462,25 @@ Rectangle {
                 Rectangle {
                     id: vkbDelaySliderArea
                     width: menuBlocksRow.width
-                    height: 68
-                    radius: 5
+                    height: window.buttonHeightLarge
+                    radius: window.radiusSmall
                     color: "#606060"
                     border.color: "#000000"
                     border.width: 1
                     Text {
                         width: parent.width
-                        height: 20
+                        height: window.headerHeight
                         color: "#ffffff"
-                        font.pointSize: util.uiFontSize()-1;
+                        font.pointSize: window.uiFontSize-1
                         text: "VKB delay: " + vkbDelaySlider.keyboardFadeOutDelayLabel + " ms"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Rectangle {
-                        x: 5
+                        x: window.paddingSmall
                         y: vkbDelaySlider.y + vkbDelaySlider.height/2 - height/2
-                        width: menuBlocksRow.width - 10
-                        height: 10
-                        radius: 5
+                        width: menuBlocksRow.width - window.paddingMedium
+                        height: window.paddingMedium
+                        radius: window.radiusSmall
                         z: 1
                         color: "#909090"
                     }
@@ -484,10 +488,10 @@ Rectangle {
                         id: vkbDelaySlider
                         property int keyboardFadeOutDelayLabel: keyboardFadeOutDelay
                         x: (keyboardFadeOutDelay-1000)/9000 * (vkbDelaySliderArea.width - vkbDelaySlider.width)
-                        y: 20
-                        width: 60
-                        radius: 15
-                        height: parent.height-20
+                        y: window.headerHeight
+                        width: window.buttonWidthSmall
+                        radius: window.radiusLarge
+                        height: parent.height-window.headerHeight
                         color: "#202020"
                         z: 2
                         onXChanged: {

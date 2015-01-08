@@ -32,7 +32,7 @@ Rectangle {
     y: -(height+1)
     border.color: "#c0c0c0"
     border.width: 1
-    radius: 10
+    radius: window.radiusMedium
 
     MouseArea {
         // event eater
@@ -44,19 +44,19 @@ Rectangle {
         Rectangle {
             color: currentLayout === modelData ? "#909090" : "#404040"
             width: parent.width
-            height: selectButton.height+4
+            height: selectButton.height+4*window.pixelRatio
             border.width: 1
             border.color: "#ffffff"
-            radius: 5
+            radius: window.radiusSmall
             clip: true
 
             Text {
                 text: modelData
                 color: "#ffffff"
                 anchors.verticalCenter: parent.verticalCenter
-                x: 8
+                x: 8*window.pixelRatio
                 width: selectButton.x - x
-                font.pointSize: util.uiFontSize();
+                font.pointSize: window.uiFontSize
                 elide: Text.ElideRight
             }
             Button {
@@ -64,8 +64,8 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Select"
-                width: 70
-                anchors.rightMargin: 5
+                width: 70*window.pixelRatio
+                anchors.rightMargin: window.paddingSmall
                 onClicked: {
                     util.setSettingsValue("ui/keyboardLayout", modelData);
                     vkb.reloadLayout();
@@ -82,23 +82,23 @@ Rectangle {
         anchors.top: parent.top
         color: "#ffffff"
         text: "Keyboard layout"
-        font.pointSize: util.uiFontSize() + 4;
+        font.pointSize: window.uiFontSize + 4*window.pixelRatio;
     }
 
     ListView {
         anchors.fill: parent
-        anchors.topMargin: titleText.height + 4
+        anchors.topMargin: titleText.height + 4*window.pixelRatio
         delegate: listDelegate
         model: layoutWindow.layouts
-        spacing: 5
-        anchors.margins: 5
+        spacing: window.paddingSmall
+        anchors.margins: window.paddingSmall
         clip: true
     }
 
     Button {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: window.paddingMedium
         text: "Back"
         onClicked: {
             layoutWindow.state = ""
