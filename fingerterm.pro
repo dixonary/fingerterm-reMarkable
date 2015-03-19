@@ -1,5 +1,8 @@
 QT = core gui qml quick dbus feedback
 
+CONFIG += link_pkgconfig
+PKGCONFIG += nemonotifications-qt5
+
 contains(MEEGO_EDITION,harmattan): {
     CONFIG += meegotouch
 }

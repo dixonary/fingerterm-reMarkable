@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
     QSettings *settings = new QSettings(QDir::homePath()+"/.config/FingerTerm/settings.ini", QSettings::IniFormat);
     defaultSettings(settings);
 
+    QCoreApplication::setApplicationName("Fingerterm");
+
     // fork the child process before creating QGuiApplication
     int socketM;
     int pid = forkpty(&socketM,NULL,NULL,NULL);

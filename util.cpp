@@ -34,6 +34,10 @@
 
 #include <QFeedbackEffect>
 
+#ifdef MEEGO_EDITION_HARMATTAN
+#include <notification.h>
+#endif
+
 Util::Util(QSettings *settings, QObject *parent) :
     QObject(parent),
     iAllowGestures(false),
@@ -228,30 +232,30 @@ void Util::bellAlert()
     if(settingsValue("general/backgroundBellNotify").toBool() &&
        !iWindow->hasFocus())
     {
-        MRemoteAction act(MComponentData::instance()->serviceName(),
-                          "/org/maemo/m",
-                          "com.nokia.MApplicationIf",
-                          "launch");
-        MNotification notif(MNotification::ImReceivedEvent, "FingerTerm", "Terminal alert was received");
-        notif.setImage("/usr/share/icons/hicolor/80x80/apps/fingerterm.png");
-        notif.setAction(act);
+        Notification notif;
+        notif.setAppIcon("icon-l-terminal");
+        notif.setUrgency(Notification::Normal);
+        notif.setExpireTimeout(0);
+        notif.setPreviewSummary(QCoreApplication::applicationName());
+        // TODO: should be translated
+        notif.setPreviewBody("Terminal alert was received");
+        notif.setRemoteAction(Notification::remoteAction("default", "", MComponentData::instance()->serviceName(), "/org/maemo/m", "com.nokia.MApplicationIf", "launch"));
         notif.publish();
-    } else if( settingsValue("general/visualBell").toBool() ) {
+    } else
+#endif //MEEGO_EDITION_HARMATTAN
+    if( settingsValue("general/visualBell").toBool() ) {
         emit visualBell();
     }
-#else
-    if( settingsValue("general/visualBell").toBool() )
-        emit visualBell();
-#endif
 }
 
 void Util::clearNotifications()
 {
 #ifdef MEEGO_EDITION_HARMATTAN
-    QList<MNotification*> notifs = MNotification::notifications();
-    foreach(MNotification* n, notifs) {
-        if( n->remove() )
-            delete n;
+    foreach( QObject *obj, Notification::notifications() ) {
+        if( Notification *notif = qobject_cast<Notification *>(obj) ) {
+            notif->close();
+        }
+        delete obj;
     }
 #endif //MEEGO_EDITION_HARMATTAN
 }
