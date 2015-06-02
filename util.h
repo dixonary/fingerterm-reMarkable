@@ -91,7 +91,14 @@ private:
     bool swipeModeSet;
     bool swipeAllowed;
 
-    void scrollBackBuffer(QPointF now, QPointF last);
+    /**
+     * Scroll the back buffer on drag.
+     *
+     * @param now The current position
+     * @param last The last position (or start position)
+     * @return The new value for last (modified by any consumed offset)
+     **/
+    QPointF scrollBackBuffer(QPointF now, QPointF last);
     void doGesture(PanGesture gesture);
     void clearNotifications();
     void selectionHelper(QPointF scenePos);

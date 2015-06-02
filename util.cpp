@@ -275,8 +275,7 @@ void Util::mouseMove(float eventX, float eventY) {
         return;
 
     if(settingsValue("ui/dragMode")=="scroll") {
-        scrollBackBuffer(eventPos, dragOrigin);
-        dragOrigin = eventPos;
+        dragOrigin = scrollBackBuffer(eventPos, dragOrigin);
     }
     else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
         selectionHelper(eventPos);
@@ -326,18 +325,26 @@ void Util::selectionHelper(QPointF scenePos)
     }
 }
 
-void Util::scrollBackBuffer(QPointF now, QPointF last)
+QPointF Util::scrollBackBuffer(QPointF now, QPointF last)
 {
     if(!iTerm)
-        return;
+        return last;
 
     int xdist = qAbs(now.x() - last.x());
     int ydist = qAbs(now.y() - last.y());
+    int fontSize = settingsValue("ui/fontSize").toInt();
 
-    if(now.y() < last.y() && xdist < ydist*2)
-        iTerm->scrollBackBufferFwd(1);
-    else if(now.y() > last.y() && xdist < ydist*2)
-        iTerm->scrollBackBufferBack(1);
+    int lines = ydist / fontSize;
+
+    if(lines > 0 && now.y() < last.y() && xdist < ydist*2) {
+        iTerm->scrollBackBufferFwd(lines);
+        last = QPointF(now.x(), last.y() - lines * fontSize);
+    } else if(lines > 0 && now.y() > last.y() && xdist < ydist*2) {
+        iTerm->scrollBackBufferBack(lines);
+        last = QPointF(now.x(), last.y() + lines * fontSize);
+    }
+
+    return last;
 }
 
 void Util::doGesture(Util::PanGesture gesture)
