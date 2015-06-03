@@ -180,27 +180,36 @@ void Terminal::keyPress(int key, int modifiers)
 
     resetBackBufferScrollPos();
 
-    if(c.isLetter() && (modifiers & Qt::ShiftModifier))
-        c = c.toUpper();
-    else if(c.isLetter())
-        c = c.toLower();
+    if (c.isLetter()) {
+        c = ((modifiers & Qt::ShiftModifier) != 0) ? c.toUpper() : c.toLower();
+    }
 
     QString toWrite;
 
-    if( key <= 0xFF ) {
-        char asciiVal = c.toLatin1();
-
-        if(modifiers & Qt::AltModifier)
+    if (key <= 0xFF) {
+        if((modifiers & Qt::AltModifier) != 0) {
             toWrite.append(ch_ESC);
+        }
 
-        if((modifiers & Qt::ControlModifier) && c.isLower())
-            asciiVal -= 0x60;
-        if((modifiers & Qt::ControlModifier) && c.isUpper())
-            asciiVal -= 0x40;
-        toWrite.append(asciiVal);
+        if ((modifiers & Qt::ControlModifier) != 0) {
+            char asciiVal = c.toLatin1();
 
-        if(iPtyIFace)
+            if (asciiVal >= 0x41 && asciiVal <= 0x5f) {
+                // Turn uppercase characters into their control code equivalent
+                toWrite.append(asciiVal - 0x40);
+            } else if (asciiVal >= 0x61 && asciiVal <= 0x7f) {
+                // Turn lowercase characters into their control code equivalent
+                toWrite.append(asciiVal - 0x60);
+            } else {
+                qWarning() << "Ctrl+" << c << " does not translate into a control code";
+            }
+        } else {
+            toWrite.append(c);
+        }
+
+        if (iPtyIFace) {
             iPtyIFace->writeTerm(toWrite);
+        }
         return;
     }
 
