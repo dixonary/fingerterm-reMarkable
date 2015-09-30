@@ -28,7 +28,7 @@ PageStackWindow {
     focus: true
 
     Keys.onPressed: {
-        window.vkbKeypress(event.key,event.modifiers);
+        term.keyPress(event.key,event.modifiers);
     }
 
     property string windowTitle: util.currentWindowTitle();
