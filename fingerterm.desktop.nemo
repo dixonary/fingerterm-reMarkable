@@ -3,3 +3,4 @@ Type=Application
 Name=Terminal
 Exec=fingerterm
 Icon=icon-l-terminal
+Categories=X-SailfishDeveloperMode;
