@@ -49,7 +49,6 @@ public:
     Q_INVOKABLE void setSettingsValue(QString key, QVariant value);
 
     Q_INVOKABLE int uiFontSize();
-    Q_INVOKABLE bool isHarmattan();
 
     Q_INVOKABLE void keyPressFeedback();
     Q_INVOKABLE void keyReleaseFeedback();
@@ -86,8 +85,6 @@ private:
     Q_DISABLE_COPY(Util)
     enum PanGesture { PanNone, PanLeft, PanRight, PanUp, PanDown };
 
-    void enableSwipe();
-    void disableSwipe();
     bool swipeModeSet;
     bool swipeAllowed;
 
