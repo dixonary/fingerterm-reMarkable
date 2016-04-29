@@ -20,24 +20,48 @@
 import QtQuick 2.0
 import TextRender 1.0
 import QtQuick.Window 2.0
-import com.nokia.meego 2.0
 
-PageStackWindow {
-    id: pageStackWindow
-
-    focus: true
-
-    Keys.onPressed: {
-        term.keyPress(event.key,event.modifiers,event.text);
-    }
+Item {
+    id: root
 
     property string windowTitle: util.currentWindowTitle();
 
-    initialPage:Page {
+    Item {
         id: page
-        anchors.fill: parent
 
-        orientationLock: window.getOrientationLockMode()
+        property bool forceOrientation
+        property int forcedOrientation
+        property bool portrait: rotation % 180 == 0
+
+        width: portrait ? root.width : root.height
+        height: portrait ? root.height : root.width
+        anchors.centerIn: parent
+        rotation: Screen.angleBetween((forceOrientation ? forcedOrientation : Screen.orientation),
+                                      Screen.primaryOrientation)
+        focus: true
+        Keys.onPressed: {
+            term.keyPress(event.key,event.modifiers,event.text);
+        }
+
+        Component.onCompleted: {
+            var stringMode = util.settingsValue("ui/orientationLockMode");
+            applyOrientationLock(stringMode)
+        }
+
+        function applyOrientationLock(stringMode) {
+            switch (stringMode) {
+            case "auto":
+                page.forceOrientation = false
+                break
+            case "landscape":
+                page.forceOrientation = true
+                page.forcedOrientation = Qt.LandscapeOrientation
+                break
+            case "portrait":
+                page.forceOrientation = true
+                page.forcedOrientation = Qt.PortraitOrientation
+            }
+        }
 
         Rectangle {
         property string fgcolor: "black"
@@ -46,7 +70,7 @@ PageStackWindow {
 
         property int fadeOutTime: 80
         property int fadeInTime: 350
-        property real pixelRatio: pageStackWindow.width / 540
+        property real pixelRatio: root.width / 540
 
         // layout constants
         property int buttonWidthSmall: 60*pixelRatio
@@ -463,27 +487,10 @@ PageStackWindow {
                 util.allowGestures = true;
         }
 
-        function lockModeStringToQtEnum(stringMode) {
-            switch (stringMode) {
-            case "auto":
-                return PageOrientation.Automatic
-            case "landscape":
-                return PageOrientation.LockLandscape
-            case "portrait":
-                return PageOrientation.LockPortrait
-            }
-        }
-
-        function getOrientationLockMode()
-        {
-            var stringMode = util.settingsValue("ui/orientationLockMode");
-            page.orientationLock = lockModeStringToQtEnum(stringMode)
-        }
-
         function setOrientationLockMode(stringMode)
         {
             util.setSettingsValue("ui/orientationLockMode", stringMode);
-            page.orientationLock = lockModeStringToQtEnum(stringMode)
+            page.applyOrientationLock(stringMode)
         }
     }
     }
