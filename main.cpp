@@ -166,9 +166,9 @@ int main(int argc, char *argv[])
     } else
         view.show();
 
-    #ifdef RESIZE_ROOT_QML_TO_VIEW
-        view.setResizeMode(QQuickView::SizeRootObjectToView);
-    #endif
+#ifdef RESIZE_ROOT_QML_TO_VIEW
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
+#endif
 
     PtyIFace ptyiface(pid, socketM, &term,
                        settings->value("terminal/charset").toString());
@@ -200,7 +200,7 @@ void defaultSettings(QSettings* settings)
     if(!settings->contains("ui/keyboardLayout"))
         settings->setValue("ui/keyboardLayout", "english");
     if(!settings->contains("ui/fontFamily"))
-        settings->setValue("ui/fontFamily", DEFAULT_FINGERTERM_FONTFAMILY);
+        settings->setValue("ui/fontFamily", DEFAULT_FONTFAMILY);
     if(!settings->contains("ui/fontSize"))
         settings->setValue("ui/fontSize", 11);
     if(!settings->contains("ui/keyboardMargins"))

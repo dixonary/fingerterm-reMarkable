@@ -2,6 +2,24 @@ QT = core gui qml quick dbus
 
 CONFIG += link_pkgconfig
 
+enable-feedback {
+    QT += feedback  
+    DEFINES += HAVE_FEEDBACK  
+}
+
+enable-nemonotifications {
+    PKGCONFIG += nemonotifications-qt5  
+}
+
+isEmpty(DEFAULT_FONT) {
+    DEFINES += DEFAULT_FONTFAMILY=\\\"monospace\\\"  
+}
+
+defined(DEFAULT_FONT)
+{
+	DEFINES += DEFAULT_FONTFAMILY=\\\"$$DEFAULT_FONT\\\"
+}
+
 TEMPLATE = app
 TARGET = fingerterm
 DEPENDPATH += .
@@ -40,10 +58,8 @@ OTHER_FILES += \
 RESOURCES += \
     resources.qrc
 
-unix {
-    target.path = /usr/bin
-    INSTALLS += target
-}
+target.path = /usr/bin
+INSTALLS += target
 
 contains(MEEGO_EDITION,nemo) {
     desktopfile.extra = cp $${TARGET}.desktop.nemo $${TARGET}.desktop

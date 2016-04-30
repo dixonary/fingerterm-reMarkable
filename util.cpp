@@ -140,9 +140,9 @@ void Util::keyPressFeedback()
     if( !settingsValue("ui/keyPressFeedback").toBool() )
         return;
 
-    #ifdef HAVE_FEEDBACK
+#ifdef HAVE_FEEDBACK
     QFeedbackEffect::playThemeEffect(QFeedbackEffect::PressWeak);
-    #endif
+#endif
 }
 
 void Util::keyReleaseFeedback()
@@ -151,9 +151,9 @@ void Util::keyReleaseFeedback()
         return;
 
     // TODO: check what's more comfortable, only press, or press and release
-    #ifdef HAVE_FEEDBACK
+#ifdef HAVE_FEEDBACK
     QFeedbackEffect::playThemeEffect(QFeedbackEffect::ReleaseWeak);
-    #endif
+#endif
 }
 
 void Util::bellAlert()
