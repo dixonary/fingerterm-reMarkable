@@ -148,6 +148,7 @@ int main(int argc, char *argv[])
     context->setContextProperty( "keyLoader", &keyLoader );
 
     view.setSource(QUrl("qrc:/qml/Main.qml"));
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
 
     QObject *root = view.rootObject();
     if(!root)
