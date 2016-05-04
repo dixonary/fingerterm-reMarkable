@@ -40,6 +40,7 @@ Util::Util(QSettings *settings, QObject *parent) :
     newSelection(true),
     iSettings(settings),
     iWindow(0),
+    iTerm(0),
     iRenderer(0)
 {
     connect(QGuiApplication::clipboard(), SIGNAL(dataChanged()), this, SIGNAL(clipboardOrSelectionChanged()));
