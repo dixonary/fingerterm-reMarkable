@@ -32,10 +32,8 @@
 #include "textrender.h"
 #include "version.h"
 
+#ifdef HAVE_FEEDBACK
 #include <QFeedbackEffect>
-
-#ifdef MEEGO_EDITION_HARMATTAN
-#include <notification.h>
 #endif
 
 Util::Util(QSettings *settings, QObject *parent) :
@@ -96,68 +94,12 @@ void Util::windowMinimize()
 
 void Util::openNewWindow()
 {
-#ifdef MEEGO_EDITION_HARMATTAN
-
-    QDBusInterface iface(MComponentData::instance()->serviceName(),
-                         "/org/maemo/m",
-                         "com.nokia.MApplicationIf");
-
-    if (iface.isValid()) {
-        QStringList params;
-        params.append("new");
-        iface.call("launch", params);
-    }
-#else
     QProcess::startDetached("/usr/bin/fingerterm");
-#endif //MEEGO_EDITION_HARMATTAN
 }
 
 void Util::updateSwipeLock(bool suggestedState)
 {
-#ifdef MEEGO_EDITION_HARMATTAN
-    if (settingsValue("ui/allowSwipe").toString()=="auto") {
-        if(suggestedState) {
-            enableSwipe();
-        } else {
-            disableSwipe();
-        }
-    } else if (settingsValue("ui/allowSwipe").toString()=="false") {
-        disableSwipe();
-    } else if (settingsValue("ui/allowSwipe").toString()=="true") {
-        enableSwipe();
-    }
-#else
     Q_UNUSED(suggestedState)
-#endif //MEEGO_EDITION_HARMATTAN
-}
-
-void Util::disableSwipe()
-{
-#ifdef MEEGO_EDITION_HARMATTAN
-    if(swipeModeSet && !swipeAllowed)
-        return;
-
-    if (iWindow) {
-        iWindow->disableSwipe();
-        swipeModeSet = true;
-        swipeAllowed = false;
-    }
-#endif //MEEGO_EDITION_HARMATTAN
-}
-
-void Util::enableSwipe()
-{
-#ifdef MEEGO_EDITION_HARMATTAN
-    if(swipeModeSet && swipeAllowed)
-        return;
-
-    if (iWindow)
-    {
-        iWindow->enableSwipe();
-        swipeModeSet = true;
-        swipeAllowed = true;
-    }
-#endif //MEEGO_EDITION_HARMATTAN
 }
 
 QString Util::configPath()
@@ -190,20 +132,7 @@ QString Util::versionString()
 
 int Util::uiFontSize()
 {
-#ifdef MEEGO_EDITION_HARMATTAN
-    return 14;
-#else
     return 12;
-#endif
-}
-
-bool Util::isHarmattan()
-{
-#ifdef MEEGO_EDITION_HARMATTAN
-    return true;
-#else
-    return false;
-#endif
 }
 
 void Util::keyPressFeedback()
@@ -211,7 +140,9 @@ void Util::keyPressFeedback()
     if( !settingsValue("ui/keyPressFeedback").toBool() )
         return;
 
+#ifdef HAVE_FEEDBACK
     QFeedbackEffect::playThemeEffect(QFeedbackEffect::PressWeak);
+#endif
 }
 
 void Util::keyReleaseFeedback()
@@ -220,7 +151,9 @@ void Util::keyReleaseFeedback()
         return;
 
     // TODO: check what's more comfortable, only press, or press and release
+#ifdef HAVE_FEEDBACK
     QFeedbackEffect::playThemeEffect(QFeedbackEffect::ReleaseWeak);
+#endif
 }
 
 void Util::bellAlert()
@@ -228,21 +161,6 @@ void Util::bellAlert()
     if(!iWindow)
         return;
 
-#ifdef MEEGO_EDITION_HARMATTAN
-    if(settingsValue("general/backgroundBellNotify").toBool() &&
-       !iWindow->hasFocus())
-    {
-        Notification notif;
-        notif.setAppIcon("icon-l-terminal");
-        notif.setUrgency(Notification::Normal);
-        notif.setExpireTimeout(0);
-        notif.setPreviewSummary(QCoreApplication::applicationName());
-        // TODO: should be translated
-        notif.setPreviewBody("Terminal alert was received");
-        notif.setRemoteAction(Notification::remoteAction("default", "", MComponentData::instance()->serviceName(), "/org/maemo/m", "com.nokia.MApplicationIf", "launch"));
-        notif.publish();
-    } else
-#endif //MEEGO_EDITION_HARMATTAN
     if( settingsValue("general/visualBell").toBool() ) {
         emit visualBell();
     }
@@ -250,14 +168,6 @@ void Util::bellAlert()
 
 void Util::clearNotifications()
 {
-#ifdef MEEGO_EDITION_HARMATTAN
-    foreach( QObject *obj, Notification::notifications() ) {
-        if( Notification *notif = qobject_cast<Notification *>(obj) ) {
-            notif->close();
-        }
-        delete obj;
-    }
-#endif //MEEGO_EDITION_HARMATTAN
 }
 
 void Util::mousePress(float eventX, float eventY) {

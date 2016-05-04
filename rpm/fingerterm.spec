@@ -33,7 +33,7 @@ Provides: meego-terminal > 0.2.2
 
 %build
 sed -i 's,/opt/fingerterm/,/usr/,' fingerterm.pro
-qmake -qt=5 MEEGO_EDITION=nemo
+qmake -qt=5 MEEGO_EDITION=nemo CONFIG+=enable-feedback CONFIG+=enable-nemonotifications
 # Inject version number from RPM into source
 sed -i -e 's/PROGRAM_VERSION="[^"]*"/PROGRAM_VERSION="%{version}"/g' version.h
 make %{?_smp_mflags}

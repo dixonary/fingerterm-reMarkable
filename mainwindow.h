@@ -30,8 +30,6 @@ public:
     virtual ~MainWindow();
 
     void minimize();
-    void enableSwipe();
-    void disableSwipe();
 
 protected:
     virtual void focusInEvent(QFocusEvent *event);

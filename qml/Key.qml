@@ -72,6 +72,7 @@ Rectangle {
             opacity: key.labelOpacity * (highlighted ? 1.0 : 0.2)
             Behavior on opacity { NumberAnimation { duration: 100 } }
 
+            font.family: util.settingsValue("ui/fontFamily");
             font.pointSize: (highlighted ? window.fontSizeLarge : window.fontSizeSmall) * (text.length > 1 ? 0.5 : 1.0)
             Behavior on font.pointSize { NumberAnimation { duration: 100 } }
         }
@@ -99,6 +100,7 @@ Rectangle {
             opacity: key.labelOpacity * (highlighted ? 1.0 : 0.2)
             Behavior on opacity { NumberAnimation { duration: 100 } }
 
+            font.family: util.settingsValue("ui/fontFamily");
             font.pointSize: (highlighted ? window.fontSizeLarge : window.fontSizeSmall) * (text.length > 1 ? 0.5 : 1.0)
             Behavior on font.pointSize { NumberAnimation { duration: 100 } }
         }

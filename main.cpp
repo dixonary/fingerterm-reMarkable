@@ -30,11 +30,6 @@ extern "C" {
 #include <sys/types.h>
 }
 
-#ifdef MEEGO_EDITION_HARMATTAN
-#include <MComponentData>
-#include "dbusadaptor.h"
-#endif
-
 #include "mainwindow.h"
 #include "ptyiface.h"
 #include "terminal.h"
@@ -109,14 +104,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
     MainWindow view;
 
-#ifdef MEEGO_EDITION_HARMATTAN
-    DbusAdaptor *dba = new DbusAdaptor();
-    dba->setAppWindow(&view);
-
-    // needed for MFeedback, also creates the dbus interface
-    MComponentData::createInstance(argc, argv, "fingerterm", dba);
-#endif
-
     Terminal term;
     Util util(settings);
     term.setUtil(&util);
@@ -171,9 +158,6 @@ int main(int argc, char *argv[])
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
-#ifdef MEEGO_EDITION_HARMATTAN
-    view.showFullScreen();
-#else
     QSize screenSize = QGuiApplication::primaryScreen()->size();
     if ((screenSize.width() < 1024 || screenSize.height() < 768 || app.arguments().contains("-fs"))
             && !app.arguments().contains("-nofs"))
@@ -181,7 +165,6 @@ int main(int argc, char *argv[])
         view.showFullScreen();
     } else
         view.show();
-#endif
 
     PtyIFace ptyiface(pid, socketM, &term,
                        settings->value("terminal/charset").toString());
@@ -213,7 +196,7 @@ void defaultSettings(QSettings* settings)
     if(!settings->contains("ui/keyboardLayout"))
         settings->setValue("ui/keyboardLayout", "english");
     if(!settings->contains("ui/fontFamily"))
-        settings->setValue("ui/fontFamily", "monospace");
+        settings->setValue("ui/fontFamily", DEFAULT_FONTFAMILY);
     if(!settings->contains("ui/fontSize"))
         settings->setValue("ui/fontSize", 11);
     if(!settings->contains("ui/keyboardMargins"))

@@ -23,14 +23,6 @@
 #include <QQmlContext>
 #include "mainwindow.h"
 
-#ifdef MEEGO_EDITION_HARMATTAN
-#include <MApplication>
-#include <MNotification>
-#include <QX11Info>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#endif //MEEGO_EDITION_HARMATTAN
-
 MainWindow::MainWindow()
 {
     rootContext()->setContextProperty("windowHasFocus", false);
@@ -57,39 +49,4 @@ void MainWindow::focusOutEvent(QFocusEvent *event)
 void MainWindow::minimize()
 {
     setWindowState(Qt::WindowMinimized);
-}
-
-void MainWindow::disableSwipe()
-{
-#ifdef MEEGO_EDITION_HARMATTAN
-    resize(MApplication::desktop()->screenGeometry().width(),
-           MApplication::desktop()->screenGeometry().height());
-    showFullScreen();
-
-    unsigned int customRegion[] =
-    {
-        rect().x(),
-        rect().y(),
-        rect().width(),
-        rect().height()
-    };
-
-    Display *dpy = QX11Info::display();
-    Atom customRegionAtom = XInternAtom(dpy, "_MEEGOTOUCH_CUSTOM_REGION", False);
-
-    XChangeProperty(dpy, effectiveWinId(), customRegionAtom,
-                    XA_CARDINAL, 32, PropModeReplace,
-                    reinterpret_cast<unsigned char*>(&customRegion[0]), 4);
-
-#endif //MEEGO_EDITION_HARMATTAN
-}
-
-void MainWindow::enableSwipe()
-{
-#ifdef MEEGO_EDITION_HARMATTAN
-    Display *dpy = QX11Info::display();
-    Atom customRegionAtom = XInternAtom(dpy, "_MEEGOTOUCH_CUSTOM_REGION", False);
-
-    XDeleteProperty(dpy, effectiveWinId(), customRegionAtom);
-#endif //MEEGO_EDITION_HARMATTAN
 }

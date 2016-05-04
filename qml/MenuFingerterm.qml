@@ -369,54 +369,6 @@ Rectangle {
                                 }
                             }
                         }
-                        Rectangle {
-                            visible: util.isHarmattan()
-                            width: window.buttonWidthLarge
-                            height: window.buttonHeightLarge
-                            radius: window.radiusSmall
-                            color: "#606060"
-                            border.color: "#000000"
-                            border.width: 1
-                            Column {
-                                Text {
-                                    width: window.buttonWidthLarge
-                                    height: window.headerHeight
-                                    color: "#ffffff"
-                                    font.pointSize: window.uiFontSize-1
-                                    text: "Allow swiping"
-                                    horizontalAlignment: Text.AlignHCenter
-                                }
-                                Row {
-                                    Button {
-                                        text: "No"
-                                        width: window.buttonWidthSmall
-                                        height: window.buttonHeightSmall
-                                        highlighted: currentSwipeLocking=="false"
-                                        onClicked: {
-                                            changeSwipeLocking("false")
-                                        }
-                                    }
-                                    Button {
-                                        text: "Yes"
-                                        width: window.buttonWidthSmall
-                                        height: window.buttonHeightSmall
-                                        highlighted: currentSwipeLocking=="true"
-                                        onClicked: {
-                                            changeSwipeLocking("true")
-                                        }
-                                    }
-                                    Button {
-                                        text: "Auto"
-                                        width: window.buttonWidthSmall
-                                        height: window.buttonHeightSmall
-                                        highlighted: currentSwipeLocking=="auto"
-                                        onClicked: {
-                                            changeSwipeLocking("auto")
-                                        }
-                                    }
-                                }
-                            }
-                        }
                         Button {
                             text: "New window"
                             onClicked: {
@@ -442,7 +394,7 @@ Rectangle {
                             }
                         }
                         Button {
-                            visible: (currentSwipeLocking=="false" && util.isHarmattan()) || !util.isHarmattan();
+                            visible: true;
                             text: "Minimize"
                             onClicked: {
                                 hideMenu();
