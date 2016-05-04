@@ -21,6 +21,7 @@
 
 #include <QtGui>
 #include <QtQml>
+#include <QQuickView>
 
 extern "C" {
 #include <pty.h>
@@ -30,7 +31,6 @@ extern "C" {
 #include <sys/types.h>
 }
 
-#include "mainwindow.h"
 #include "ptyiface.h"
 #include "terminal.h"
 #include "textrender.h"
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     }
 
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
-    MainWindow view;
+    QQuickView view;
 
     Terminal term;
     Util util(settings);

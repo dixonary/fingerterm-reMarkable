@@ -23,7 +23,6 @@
 #include <QtCore>
 
 class Terminal;
-class MainWindow;
 class TextRender;
 class QQuickView;
 
@@ -101,7 +100,7 @@ private:
     QString iCurrentWinTitle;
 
     QSettings* iSettings;
-    MainWindow* iWindow;
+    QQuickView* iWindow;
     Terminal* iTerm;
     TextRender* iRenderer;
 };

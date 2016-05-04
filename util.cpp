@@ -25,7 +25,6 @@
 #include <QQuickView>
 #include <QDebug>
 
-#include "mainwindow.h"
 #include "terminal.h"
 #include "util.h"
 #include "textrender.h"
@@ -52,7 +51,7 @@ Util::~Util()
 
 void Util::setWindow(QQuickView* win)
 {
-    iWindow = dynamic_cast<MainWindow*>(win);
+    iWindow = win;
     if(!iWindow)
         qFatal("invalid main window");
 }
