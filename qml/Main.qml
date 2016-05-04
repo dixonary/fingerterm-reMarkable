@@ -396,7 +396,6 @@ Item {
             fadeTimer.restart();
             vkb.active = true;
             lineView.setPosition(vkb.active);
-            util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
         }
@@ -407,7 +406,6 @@ Item {
             lineView.duration = window.fadeInTime;
             vkb.active = false;
             lineView.setPosition(vkb.active);
-            util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
         }
@@ -461,7 +459,6 @@ Item {
         }
 
         Component.onCompleted: {
-            util.updateSwipeLock(vkb.active)
             if( util.settingsValue("state/showWelcomeScreen") === true )
                 aboutDialog.state = "visible";
         }

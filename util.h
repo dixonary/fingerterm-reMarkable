@@ -41,7 +41,6 @@ public:
 
     Q_INVOKABLE void windowMinimize();
     Q_INVOKABLE void openNewWindow();
-    Q_INVOKABLE void updateSwipeLock(bool suggestedState);
 
     Q_INVOKABLE QString versionString();
     Q_INVOKABLE QString configPath();
@@ -83,9 +82,6 @@ signals:
 private:
     Q_DISABLE_COPY(Util)
     enum PanGesture { PanNone, PanLeft, PanRight, PanUp, PanDown };
-
-    bool swipeModeSet;
-    bool swipeAllowed;
 
     /**
      * Scroll the back buffer on drag.

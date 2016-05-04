@@ -30,7 +30,6 @@ Rectangle {
     property bool showing: false
     property bool enableCopy: false
     property bool enablePaste: false
-    property string currentSwipeLocking: util.settingsValue("ui/allowSwipe")
     property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
     property string currentDragMode: util.settingsValue("ui/dragMode")
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
@@ -504,12 +503,5 @@ Rectangle {
         fader.opacity = 0;
         rect.x = menuWin.width+1;
         window.updateGesturesAllowed();
-    }
-
-    function changeSwipeLocking(state)
-    {
-        currentSwipeLocking = state
-        util.setSettingsValue("ui/allowSwipe", state)
-        util.updateSwipeLock(!vkb.active);
     }
 }

@@ -201,8 +201,6 @@ void defaultSettings(QSettings* settings)
         settings->setValue("ui/fontSize", 11);
     if(!settings->contains("ui/keyboardMargins"))
         settings->setValue("ui/keyboardMargins", 10);
-    if(!settings->contains("ui/allowSwipe"))
-        settings->setValue("ui/allowSwipe", "auto");   // "true", "false", "auto"
     if(!settings->contains("ui/keyboardFadeOutDelay"))
         settings->setValue("ui/keyboardFadeOutDelay", 4000);
     if(!settings->contains("ui/showExtraLinesFromCursor"))

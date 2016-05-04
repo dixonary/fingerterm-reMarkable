@@ -43,9 +43,6 @@ Util::Util(QSettings *settings, QObject *parent) :
     iWindow(0),
     iRenderer(0)
 {
-    swipeModeSet = false;
-    swipeAllowed = true;
-
     connect(QGuiApplication::clipboard(), SIGNAL(dataChanged()), this, SIGNAL(clipboardOrSelectionChanged()));
 }
 
@@ -80,11 +77,6 @@ void Util::windowMinimize()
 void Util::openNewWindow()
 {
     QProcess::startDetached("/usr/bin/fingerterm");
-}
-
-void Util::updateSwipeLock(bool suggestedState)
-{
-    Q_UNUSED(suggestedState)
 }
 
 QString Util::configPath()
