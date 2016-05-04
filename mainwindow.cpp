@@ -45,8 +45,3 @@ void MainWindow::focusOutEvent(QFocusEvent *event)
     QQuickView::focusOutEvent(event);
     emit focusChanged(false);
 }
-
-void MainWindow::minimize()
-{
-    setWindowState(Qt::WindowMinimized);
-}

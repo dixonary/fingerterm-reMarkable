@@ -69,11 +69,6 @@ QString Util::currentWindowTitle()
     return iCurrentWinTitle;
 }
 
-void Util::windowMinimize()
-{
-    iWindow->minimize();
-}
-
 void Util::openNewWindow()
 {
     QProcess::startDetached("/usr/bin/fingerterm");

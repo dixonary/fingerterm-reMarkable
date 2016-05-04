@@ -39,7 +39,6 @@ public:
     void setTerm(Terminal* term) { iTerm = term; }
     void setRenderer(TextRender* r) { iRenderer = r; }
 
-    Q_INVOKABLE void windowMinimize();
     Q_INVOKABLE void openNewWindow();
 
     Q_INVOKABLE QString versionString();

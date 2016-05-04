@@ -393,14 +393,6 @@ Rectangle {
                             }
                         }
                         Button {
-                            visible: true;
-                            text: "Minimize"
-                            onClicked: {
-                                hideMenu();
-                                util.windowMinimize();
-                            }
-                        }
-                        Button {
                             text: "Quit"
                             onClicked: {
                                 hideMenu();

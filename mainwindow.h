@@ -29,8 +29,6 @@ public:
     explicit MainWindow();
     virtual ~MainWindow();
 
-    void minimize();
-
 protected:
     virtual void focusInEvent(QFocusEvent *event);
     virtual void focusOutEvent(QFocusEvent *event);
