@@ -51,8 +51,6 @@ Util::Util(QSettings *settings, QObject *parent) :
 
 Util::~Util()
 {
-    // clear the notifications on quit
-    clearNotifications();
 }
 
 void Util::setWindow(QQuickView* win)
@@ -60,7 +58,6 @@ void Util::setWindow(QQuickView* win)
     iWindow = dynamic_cast<MainWindow*>(win);
     if(!iWindow)
         qFatal("invalid main window");
-    connect(iWindow, SIGNAL(focusChanged(bool)), this, SLOT(onMainWinFocusChanged(bool)));
 }
 
 void Util::setWindowTitle(QString title)
@@ -73,17 +70,6 @@ void Util::setWindowTitle(QString title)
 QString Util::currentWindowTitle()
 {
     return iCurrentWinTitle;
-}
-
-void Util::onMainWinFocusChanged(bool in)
-{
-    if (in) {
-        clearNotifications();
-
-        //disable & re-enable swiping when window gains focus (workaround for an "auto mode" bug)
-        updateSwipeLock(false);
-        updateSwipeLock(true);
-    }
 }
 
 void Util::windowMinimize()
@@ -163,10 +149,6 @@ void Util::bellAlert()
     if( settingsValue("general/visualBell").toBool() ) {
         emit visualBell();
     }
-}
-
-void Util::clearNotifications()
-{
 }
 
 void Util::mousePress(float eventX, float eventY) {

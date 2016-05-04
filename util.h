@@ -69,7 +69,6 @@ public:
     static bool charIsHexDigit(QChar ch);
 
 public slots:
-    void onMainWinFocusChanged(bool in);
     void mousePress(float eventX, float eventY);
     void mouseMove(float eventX, float eventY);
     void mouseRelease(float eventX, float eventY);
@@ -97,7 +96,6 @@ private:
      **/
     QPointF scrollBackBuffer(QPointF now, QPointF last);
     void doGesture(PanGesture gesture);
-    void clearNotifications();
     void selectionHelper(QPointF scenePos);
 
     QPointF dragOrigin;
