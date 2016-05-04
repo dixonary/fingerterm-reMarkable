@@ -1,4 +1,4 @@
-QT = core gui qml quick dbus
+QT = core gui qml quick
 
 CONFIG += link_pkgconfig
 

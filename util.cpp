@@ -21,7 +21,6 @@
 
 #include <QtCore>
 #include <QtGui>
-#include <QDBusInterface>
 #include <QGuiApplication>
 #include <QQuickView>
 #include <QDebug>
