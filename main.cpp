@@ -157,13 +157,14 @@ int main(int argc, char *argv[])
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
-    QSize screenSize = QGuiApplication::primaryScreen()->size();
-    if ((screenSize.width() < 1024 || screenSize.height() < 768 || app.arguments().contains("-fs"))
-            && !app.arguments().contains("-nofs"))
-    {
+    if (!app.arguments().contains("-nofs")) {
         view.showFullScreen();
-    } else
+    } else {
+        QSize screenSize = QGuiApplication::primaryScreen()->size();
+        view.setWidth(screenSize.width() / 2);
+        view.setHeight(screenSize.height() / 2);
         view.show();
+    }
 
     PtyIFace ptyiface(pid, socketM, &term,
                        settings->value("terminal/charset").toString());
