@@ -29,8 +29,8 @@ TextRender::TextRender(QQuickItem *parent) :
 {
     setFlag(ItemHasContents);
 
-    connect(this,SIGNAL(myWidthChanged(int)),this,SLOT(updateTermSize()));
-    connect(this,SIGNAL(myHeightChanged(int)),this,SLOT(updateTermSize()));
+    connect(this,SIGNAL(widthChanged()),this,SLOT(updateTermSize()));
+    connect(this,SIGNAL(heightChanged()),this,SLOT(updateTermSize()));
     connect(this,SIGNAL(fontSizeChanged()),this,SLOT(updateTermSize()));
 
     //normal
@@ -288,8 +288,8 @@ void TextRender::updateTermSize()
     if (!iTerm)
         return;
 
-    QSize s((iWidth-4)/iFontWidth, (iHeight-4)/iFontHeight);
-    iTerm->setTermSize(s);
+    QSize size((width() - 4) / iFontWidth, (height() - 4) / iFontHeight);
+    iTerm->setTermSize(size);
 }
 
 void TextRender::setFontPointSize(int psize)

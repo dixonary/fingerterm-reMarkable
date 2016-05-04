@@ -286,8 +286,6 @@ Item {
             objectName: "textrender"
             height: parent.height
             width: parent.width
-            myWidth: width
-            myHeight: height
             z: 10
 
             Behavior on opacity {
