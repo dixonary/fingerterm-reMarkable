@@ -1,24 +1,21 @@
-QT = core gui qml quick dbus 
+QT = core gui qml quick dbus
 
 CONFIG += link_pkgconfig
 
 enable-feedback {
-    QT += feedback  
-    DEFINES += HAVE_FEEDBACK  
+    QT += feedback
+    DEFINES += HAVE_FEEDBACK
 }
 
 enable-nemonotifications {
-    PKGCONFIG += nemonotifications-qt5  
+    PKGCONFIG += nemonotifications-qt5
 }
 
 isEmpty(DEFAULT_FONT) {
-    DEFINES += DEFAULT_FONTFAMILY=\\\"monospace\\\"  
+    DEFAULT_FONT = monospace
 }
 
-defined(DEFAULT_FONT)
-{
-	DEFINES += DEFAULT_FONTFAMILY=\\\"$$DEFAULT_FONT\\\"
-}
+DEFINES += DEFAULT_FONTFAMILY=\\\"$$DEFAULT_FONT\\\"
 
 TEMPLATE = app
 TARGET = fingerterm
@@ -34,7 +31,8 @@ HEADERS += \
     version.h \
     util.h \
     keyloader.h \
-    mainwindow.h 
+    mainwindow.h
+
 SOURCES += \
     main.cpp \
     terminal.cpp \

@@ -166,10 +166,6 @@ int main(int argc, char *argv[])
     } else
         view.show();
 
-#ifdef RESIZE_ROOT_QML_TO_VIEW
-    view.setResizeMode(QQuickView::SizeRootObjectToView);
-#endif
-
     PtyIFace ptyiface(pid, socketM, &term,
                        settings->value("terminal/charset").toString());
 
