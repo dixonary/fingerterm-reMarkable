@@ -72,8 +72,7 @@ int main(int argc, char *argv[])
             execCmd.append(" --login");
         }
 
-        if(settings)
-            delete settings; // don't need 'em here
+        delete settings; // don't need 'em here
 
         QStringList execParts = execCmd.split(' ', QString::SkipEmptyParts);
         if(execParts.length()==0)
@@ -94,11 +93,11 @@ int main(int argc, char *argv[])
 
     QScreen* sc = app.primaryScreen();
     if(sc){
-    sc->setOrientationUpdateMask(Qt::PrimaryOrientation
-                                 | Qt::LandscapeOrientation
-                                 | Qt::PortraitOrientation
-                                 | Qt::InvertedLandscapeOrientation
-                                 | Qt::InvertedPortraitOrientation);
+        sc->setOrientationUpdateMask(Qt::PrimaryOrientation
+                                     | Qt::LandscapeOrientation
+                                     | Qt::PortraitOrientation
+                                     | Qt::InvertedLandscapeOrientation
+                                     | Qt::InvertedPortraitOrientation);
     }
 
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");

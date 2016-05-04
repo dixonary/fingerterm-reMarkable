@@ -29,9 +29,12 @@ class QQuickView;
 class Util : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
+
 public:
     explicit Util(QSettings* settings, QObject *parent = 0);
     virtual ~Util();
+
     void setWindow(QQuickView* win);
     void setWindowTitle(QString title);
     Q_INVOKABLE QString currentWindowTitle();
@@ -60,8 +63,6 @@ public:
 
     bool allowGestures() { return iAllowGestures; }
     void setAllowGestures(bool a) { if(iAllowGestures!=a) { iAllowGestures=a; emit allowGesturesChanged(); } }
-
-    Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
 
     static bool charIsHexDigit(QChar ch);
 

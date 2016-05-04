@@ -22,27 +22,29 @@ import QtQuick.XmlListModel 2.0
 
 Rectangle {
     id: menuWin
-    color: "transparent"
-    z: 30
-    width: window.width
-    height: window.height
-    visible: false
-    property bool showing: false
-    property bool enableCopy: false
-    property bool enablePaste: false
+
+    property bool showing
+    property bool enableCopy
+    property bool enablePaste
     property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
     property string currentDragMode: util.settingsValue("ui/dragMode")
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
+    color: "transparent"
+    z: 30
+    width: window.width
+    height: window.height
+    visible: false
+
     Rectangle {
         id: fader
+
         color: "#000000"
         opacity: 0
-        y: 0
-        x: 0
         width: menuWin.width
         height: menuWin.height
+
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -58,8 +60,8 @@ Rectangle {
     }
     Rectangle {
         id: rect
+
         color: "#e0e0e0"
-        y: 0
         x: menuWin.width+1;
         width: flickableContent.width + 22*window.pixelRatio;
         height: menuWin.height
@@ -174,6 +176,7 @@ Rectangle {
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
+
                             Column {
                                 Text {
                                     width: window.buttonWidthLarge
@@ -214,6 +217,7 @@ Rectangle {
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
+
                             Column {
                                 Text {
                                     width: window.buttonWidthLarge
@@ -264,6 +268,7 @@ Rectangle {
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
+
                             Column {
                                 Text {
                                     width: window.buttonWidthLarge
@@ -319,6 +324,7 @@ Rectangle {
                             color: "#606060"
                             border.color: "#000000"
                             border.width: 1
+
                             Column {
                                 Text {
                                     width: window.buttonWidthLarge
@@ -404,12 +410,14 @@ Rectangle {
                 // VKB delay slider
                 Rectangle {
                     id: vkbDelaySliderArea
+
                     width: menuBlocksRow.width
                     height: window.buttonHeightLarge
                     radius: window.radiusSmall
                     color: "#606060"
                     border.color: "#000000"
                     border.width: 1
+
                     Text {
                         width: parent.width
                         height: window.headerHeight
@@ -429,7 +437,9 @@ Rectangle {
                     }
                     Rectangle {
                         id: vkbDelaySlider
+
                         property int keyboardFadeOutDelayLabel: keyboardFadeOutDelay
+
                         x: (keyboardFadeOutDelay-1000)/9000 * (vkbDelaySliderArea.width - vkbDelaySlider.width)
                         y: window.headerHeight
                         width: window.buttonWidthSmall
