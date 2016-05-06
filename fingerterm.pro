@@ -1,4 +1,4 @@
-QT = core gui qml quick dbus
+QT = core gui qml quick
 
 CONFIG += link_pkgconfig
 
@@ -30,8 +30,7 @@ HEADERS += \
     textrender.h \
     version.h \
     util.h \
-    keyloader.h \
-    mainwindow.h
+    keyloader.h
 
 SOURCES += \
     main.cpp \
@@ -39,8 +38,7 @@ SOURCES += \
     textrender.cpp \
     ptyiface.cpp \
     util.cpp \
-    keyloader.cpp \
-    mainwindow.cpp
+    keyloader.cpp
 
 OTHER_FILES += \
     qml/Main.qml \

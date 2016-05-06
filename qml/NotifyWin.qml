@@ -22,7 +22,9 @@ import QtQuick 2.0
 Rectangle {
     id: notifyWin
 
-    property string text: ""
+    property string text
+
+    signal dismissed();
 
     width: window.width-1
     height: window.height-1
@@ -33,8 +35,6 @@ Rectangle {
     border.color: "#c0c0c0"
     border.width: 1
     radius: window.radiusMedium
-
-    signal dismissed();
 
     MouseArea {
         // event eater

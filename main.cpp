@@ -21,6 +21,7 @@
 
 #include <QtGui>
 #include <QtQml>
+#include <QQuickView>
 
 extern "C" {
 #include <pty.h>
@@ -30,7 +31,6 @@ extern "C" {
 #include <sys/types.h>
 }
 
-#include "mainwindow.h"
 #include "ptyiface.h"
 #include "terminal.h"
 #include "textrender.h"
@@ -72,8 +72,7 @@ int main(int argc, char *argv[])
             execCmd.append(" --login");
         }
 
-        if(settings)
-            delete settings; // don't need 'em here
+        delete settings; // don't need 'em here
 
         QStringList execParts = execCmd.split(' ', QString::SkipEmptyParts);
         if(execParts.length()==0)
@@ -94,15 +93,15 @@ int main(int argc, char *argv[])
 
     QScreen* sc = app.primaryScreen();
     if(sc){
-    sc->setOrientationUpdateMask(Qt::PrimaryOrientation
-                                 | Qt::LandscapeOrientation
-                                 | Qt::PortraitOrientation
-                                 | Qt::InvertedLandscapeOrientation
-                                 | Qt::InvertedPortraitOrientation);
+        sc->setOrientationUpdateMask(Qt::PrimaryOrientation
+                                     | Qt::LandscapeOrientation
+                                     | Qt::PortraitOrientation
+                                     | Qt::InvertedLandscapeOrientation
+                                     | Qt::InvertedPortraitOrientation);
     }
 
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
-    MainWindow view;
+    QQuickView view;
 
     Terminal term;
     Util util(settings);
@@ -158,13 +157,14 @@ int main(int argc, char *argv[])
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
-    QSize screenSize = QGuiApplication::primaryScreen()->size();
-    if ((screenSize.width() < 1024 || screenSize.height() < 768 || app.arguments().contains("-fs"))
-            && !app.arguments().contains("-nofs"))
-    {
+    if (!app.arguments().contains("-nofs")) {
         view.showFullScreen();
-    } else
+    } else {
+        QSize screenSize = QGuiApplication::primaryScreen()->size();
+        view.setWidth(screenSize.width() / 2);
+        view.setHeight(screenSize.height() / 2);
         view.show();
+    }
 
     PtyIFace ptyiface(pid, socketM, &term,
                        settings->value("terminal/charset").toString());
@@ -201,8 +201,6 @@ void defaultSettings(QSettings* settings)
         settings->setValue("ui/fontSize", 11);
     if(!settings->contains("ui/keyboardMargins"))
         settings->setValue("ui/keyboardMargins", 10);
-    if(!settings->contains("ui/allowSwipe"))
-        settings->setValue("ui/allowSwipe", "auto");   // "true", "false", "auto"
     if(!settings->contains("ui/keyboardFadeOutDelay"))
         settings->setValue("ui/keyboardFadeOutDelay", 4000);
     if(!settings->contains("ui/showExtraLinesFromCursor"))

@@ -64,6 +64,8 @@ Item {
         }
 
         Rectangle {
+        id: window
+
         property string fgcolor: "black"
         property string bgcolor: "#000000"
         property int fontSize: 14*pixelRatio
@@ -97,15 +99,15 @@ Item {
         property int scrollBarWidth: 6*window.pixelRatio
 
         anchors.fill: parent
-
-        id: window
         objectName: "window"
         color: bgcolor
 
         NotifyWin {
             id: aboutDialog
-            property int termW: 0
-            property int termH: 0
+
+            property int termW
+            property int termH
+
             text: {
                 var str = "<font size=\"+3\">FingerTerm " + util.versionString() + "</font><br>\n" +
                         "<font size=\"+1\">" +
@@ -131,7 +133,7 @@ Item {
 
         NotifyWin {
             id: errorDialog
-            text: ""
+
             z: 1002
         }
 
@@ -148,10 +150,11 @@ Item {
 
         Lineview {
             id: lineView
-            x: 0
+
+            property int duration
+
             y: -(height+1)
             z: 20
-            property int duration: 0;
             onFontPointSizeChanged: {
                 lineView.setPosition(vkb.active)
             }
@@ -159,10 +162,11 @@ Item {
 
         Keyboard {
             id: vkb
+
             property bool visibleSetting: true
-            x: 0
+
             y: parent.height-vkb.height
-            visible: windowHasFocus && visibleSetting
+            visible: page.activeFocus && visibleSetting
         }
 
         // area that handles gestures/select/scroll modes and vkb-keypresses
@@ -237,7 +241,6 @@ Item {
         Rectangle {
             //top right corner menu button
             x: window.width - width
-            y: 0
             z: 1
             width: menuImg.width + 60*window.pixelRatio
             height: menuImg.height + 30*window.pixelRatio
@@ -272,21 +275,20 @@ Item {
         MenuFingerterm {
             id: menu
             x: window.width-width
-            y: 0
         }
 
         TextRender {
             id: textrender
+
+            property int duration
+            property int cutAfter: height
+
             objectName: "textrender"
-            x: 0
-            y: 0
             height: parent.height
             width: parent.width
             myWidth: width
             myHeight: height
-            opacity: 1.0
-            property int duration: 0;
-            property int cutAfter: height
+            z: 10
 
             Behavior on opacity {
                 NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
@@ -304,8 +306,6 @@ Item {
                 // painted with the updated value (might not otherwise happen because of caching)
                 textrender.redraw();
             }
-
-            z: 10
         }
 
         Timer {
@@ -348,12 +348,14 @@ Item {
         Text {
             // shows large text notification in the middle of the screen (for gestures)
             id: textNotify
+
             anchors.centerIn: parent
             color: "#ffffff"
             z: 100
             opacity: 0
             text: ""
             font.pointSize: 40*window.pixelRatio
+
             Behavior on opacity {
                 id: textNotifyAnim
                 NumberAnimation { duration: 500; }
@@ -364,15 +366,14 @@ Item {
             // visual key press feedback...
             // easier to work with the coordinates if it's here and not under keyboard element
             id: visualKeyFeedbackRect
+
+            property string label
+
             visible: false
-            x: 0
-            y: 0
             z: 200
-            width: 0
-            height: 0
             radius: window.radiusSmall
             color: "#ffffff"
-            property string label: ""
+
             Text {
                 color: "#000000"
                 font.pointSize: 34*window.pixelRatio
@@ -396,7 +397,6 @@ Item {
             fadeTimer.restart();
             vkb.active = true;
             lineView.setPosition(vkb.active);
-            util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
         }
@@ -407,7 +407,6 @@ Item {
             lineView.duration = window.fadeInTime;
             vkb.active = false;
             lineView.setPosition(vkb.active);
-            util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
         }
@@ -461,7 +460,6 @@ Item {
         }
 
         Component.onCompleted: {
-            util.updateSwipeLock(vkb.active)
             if( util.settingsValue("state/showWelcomeScreen") === true )
                 aboutDialog.state = "visible";
         }

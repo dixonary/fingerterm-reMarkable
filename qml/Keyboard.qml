@@ -21,12 +21,8 @@ import QtQuick 2.0
 
 Rectangle {
     id: keyboard
-    color: "transparent"
 
-    width: parent.width
-    height: childrenRect.height + outmargins
-
-    property int keyModifiers: 0
+    property int keyModifiers
     property variant resetSticky: 0
     property variant currentStickyPressed: null
     property variant currentKeyPressed: 0
@@ -36,21 +32,29 @@ Rectangle {
     property string keyHilightBgColor: "#ffffff"
     property string keyBorderColor: "#303030"
 
-    property bool active: false
+    property bool active
 
     property int outmargins: util.settingsValue("ui/keyboardMargins")
     property int keyspacing: 6
     property int keysPerRow: keyLoader.vkbColumns()
     property real keywidth: (keyboard.width - keyspacing*keysPerRow - outmargins*2)/keysPerRow;
 
+    color: "transparent"
+    width: parent.width
+    height: childrenRect.height + outmargins
+
     Component {
         id: keyboardContents
+
         Column {
             id: col
+
             x: (keyboard.width-width)/2
             spacing: keyboard.keyspacing
+
             Repeater {
                 id: rowRepeater
+
                 model: keyLoader.vkbRows()
                 delegate: Row {
                     spacing: keyboard.keyspacing

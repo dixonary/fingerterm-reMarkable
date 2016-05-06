@@ -21,12 +21,10 @@
 
 #include <QtCore>
 #include <QtGui>
-#include <QDBusInterface>
 #include <QGuiApplication>
 #include <QQuickView>
 #include <QDebug>
 
-#include "mainwindow.h"
 #include "terminal.h"
 #include "util.h"
 #include "textrender.h"
@@ -44,24 +42,18 @@ Util::Util(QSettings *settings, QObject *parent) :
     iWindow(0),
     iRenderer(0)
 {
-    swipeModeSet = false;
-    swipeAllowed = true;
-
     connect(QGuiApplication::clipboard(), SIGNAL(dataChanged()), this, SIGNAL(clipboardOrSelectionChanged()));
 }
 
 Util::~Util()
 {
-    // clear the notifications on quit
-    clearNotifications();
 }
 
 void Util::setWindow(QQuickView* win)
 {
-    iWindow = dynamic_cast<MainWindow*>(win);
+    iWindow = win;
     if(!iWindow)
         qFatal("invalid main window");
-    connect(iWindow, SIGNAL(focusChanged(bool)), this, SLOT(onMainWinFocusChanged(bool)));
 }
 
 void Util::setWindowTitle(QString title)
@@ -76,30 +68,9 @@ QString Util::currentWindowTitle()
     return iCurrentWinTitle;
 }
 
-void Util::onMainWinFocusChanged(bool in)
-{
-    if (in) {
-        clearNotifications();
-
-        //disable & re-enable swiping when window gains focus (workaround for an "auto mode" bug)
-        updateSwipeLock(false);
-        updateSwipeLock(true);
-    }
-}
-
-void Util::windowMinimize()
-{
-    iWindow->minimize();
-}
-
 void Util::openNewWindow()
 {
     QProcess::startDetached("/usr/bin/fingerterm");
-}
-
-void Util::updateSwipeLock(bool suggestedState)
-{
-    Q_UNUSED(suggestedState)
 }
 
 QString Util::configPath()
@@ -164,10 +135,6 @@ void Util::bellAlert()
     if( settingsValue("general/visualBell").toBool() ) {
         emit visualBell();
     }
-}
-
-void Util::clearNotifications()
-{
 }
 
 void Util::mousePress(float eventX, float eventY) {

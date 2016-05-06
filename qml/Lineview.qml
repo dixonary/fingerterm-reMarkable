@@ -21,6 +21,7 @@ import QtQuick 2.0
 
 Rectangle {
     id: lineView
+
     property variant lines: [""]
     property int fontPointSize: util.settingsValue("ui/fontSize")*window.pixelRatio;
     property int cursorX: 1
@@ -32,7 +33,6 @@ Rectangle {
     border.width: 2
     border.color: "#909090"
     radius: window.radiusSmall
-    height: 0
     width: parent.width
 
     Text {

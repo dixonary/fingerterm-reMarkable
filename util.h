@@ -23,25 +23,25 @@
 #include <QtCore>
 
 class Terminal;
-class MainWindow;
 class TextRender;
 class QQuickView;
 
 class Util : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
+
 public:
     explicit Util(QSettings* settings, QObject *parent = 0);
     virtual ~Util();
+
     void setWindow(QQuickView* win);
     void setWindowTitle(QString title);
     Q_INVOKABLE QString currentWindowTitle();
     void setTerm(Terminal* term) { iTerm = term; }
     void setRenderer(TextRender* r) { iRenderer = r; }
 
-    Q_INVOKABLE void windowMinimize();
     Q_INVOKABLE void openNewWindow();
-    Q_INVOKABLE void updateSwipeLock(bool suggestedState);
 
     Q_INVOKABLE QString versionString();
     Q_INVOKABLE QString configPath();
@@ -64,12 +64,9 @@ public:
     bool allowGestures() { return iAllowGestures; }
     void setAllowGestures(bool a) { if(iAllowGestures!=a) { iAllowGestures=a; emit allowGesturesChanged(); } }
 
-    Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
-
     static bool charIsHexDigit(QChar ch);
 
 public slots:
-    void onMainWinFocusChanged(bool in);
     void mousePress(float eventX, float eventY);
     void mouseMove(float eventX, float eventY);
     void mouseRelease(float eventX, float eventY);
@@ -85,9 +82,6 @@ private:
     Q_DISABLE_COPY(Util)
     enum PanGesture { PanNone, PanLeft, PanRight, PanUp, PanDown };
 
-    bool swipeModeSet;
-    bool swipeAllowed;
-
     /**
      * Scroll the back buffer on drag.
      *
@@ -97,7 +91,6 @@ private:
      **/
     QPointF scrollBackBuffer(QPointF now, QPointF last);
     void doGesture(PanGesture gesture);
-    void clearNotifications();
     void selectionHelper(QPointF scenePos);
 
     QPointF dragOrigin;
@@ -108,7 +101,7 @@ private:
     QString iCurrentWinTitle;
 
     QSettings* iSettings;
-    MainWindow* iWindow;
+    QQuickView* iWindow;
     Terminal* iTerm;
     TextRender* iRenderer;
 };

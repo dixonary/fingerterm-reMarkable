@@ -21,22 +21,24 @@ import QtQuick 2.0
 
 Rectangle {
     id: key
-    property string label: ""
-    property string label_alt: ""
-    property int code: 0
-    property int code_alt: 0
+
+    property string label
+    property string label_alt
+    property int code
+    property int code_alt
     property int currentCode: (shiftActive && label_alt != '') ? code_alt : code
     property string currentLabel: (shiftActive && label_alt != '') ? label_alt : label
-    property bool sticky: false     // can key be stickied?
-    property bool becomesSticky: false // will this become sticky after release?
-    property int stickiness: 0      // current stickiness status
+    property bool sticky        // can key be stickied?
+    property bool becomesSticky // will this become sticky after release?
+    property int stickiness     // current stickiness status
     property real labelOpacity: keyboard.active ? 1.0 : 0.3
 
     // mouse input handling
     property int clickThreshold: 20
-    property bool isClick: false
-    property int pressMouseY: 0
-    property int pressMouseX: 0
+    property bool isClick
+    property int pressMouseY
+    property int pressMouseX
+    property bool shiftActive: (keyboard.keyModifiers & Qt.ShiftModifier) && !sticky
 
     width: window.width/12   // some default
     height: window.height/8 < 55*window.pixelRatio ? window.height/8 : 55*window.pixelRatio
@@ -44,8 +46,6 @@ Rectangle {
     border.color: label=="" ? "transparent" : keyboard.keyBorderColor
     border.width: 1
     radius: window.radiusSmall
-
-    property bool shiftActive: (keyboard.keyModifiers & Qt.ShiftModifier) && !sticky
 
     Image {
         id: keyImage
