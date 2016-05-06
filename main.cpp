@@ -154,7 +154,6 @@ int main(int argc, char *argv[])
     util.setTerm(&term);
     util.setRenderer(tr);
 
-    QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
     if (!app.arguments().contains("-nofs")) {

@@ -380,6 +380,11 @@ Item {
             }
         }
 
+        Connections {
+            target: term
+            onDisplayBufferChanged: window.displayBufferChanged()
+        }
+
         function vkbKeypress(key,modifiers) {
             wakeVKB();
             term.keyPress(key,modifiers);
