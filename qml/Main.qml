@@ -24,6 +24,9 @@ import QtQuick.Window 2.0
 Item {
     id: root
 
+    width: 540
+    height: 960
+
     property string windowTitle: util.currentWindowTitle();
 
     Item {
