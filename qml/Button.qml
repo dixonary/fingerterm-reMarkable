@@ -61,7 +61,8 @@ Rectangle {
         text: button.text
         color: button.enabled ? button.textColor : "#606060"
         anchors.centerIn: parent
-        font.pointSize: window.uiFontSize
+        // avoid warnings on startup by protection against 0 size
+        font.pointSize: window.uiFontSize > 0 ? window.uiFontSize : 12
     }
 
     MouseArea {
