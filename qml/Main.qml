@@ -308,8 +308,7 @@ Item {
 
         Timer {
             id: fadeTimer
-            running: false
-            repeat: false
+
             interval: menu.keyboardFadeOutDelay
             onTriggered: {
                 window.sleepVKB();
@@ -318,8 +317,7 @@ Item {
 
         Timer {
             id: bellTimer
-            running: false
-            repeat: false
+
             interval: 80
             onTriggered: {
                 window.color = window.bgcolor;

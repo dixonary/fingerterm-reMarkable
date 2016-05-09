@@ -321,5 +321,5 @@ QPoint TextRender::charsToPixels(QPoint pos)
 
 QSize TextRender::cursorPixelSize()
 {
-    return (QSize(iFontWidth, iFontHeight));
+    return QSize(iFontWidth, iFontHeight);
 }

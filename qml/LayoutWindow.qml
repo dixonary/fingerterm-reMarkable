@@ -21,13 +21,14 @@ import QtQuick 2.0
 
 Rectangle {
     id: layoutWindow
+
     property string currentLayout: util.settingsValue("ui/keyboardLayout");
+    property variant layouts: [""]
 
     width: window.width-1
     height: window.height-1
     color: "#000000"
     z: 100
-    property variant layouts: [""]
     state: ""
     y: -(height+1)
     border.color: "#c0c0c0"

@@ -21,20 +21,21 @@ import QtQuick 2.0
 
 Rectangle {
     id: button
-    property string text: ""
+
+    property string text
     property string textColor: "#ffffff"
     property bool enabled: true
-    property bool highlighted: false
-    signal clicked();
+    property bool highlighted
 
     // for custom user menu actions
-    property bool isShellCommand: false
+    property bool isShellCommand
+
+    signal clicked();
 
     color: highlighted ? "#606060" : "#202020"
     border.color: "#303030"
     border.width: 1
     radius: window.radiusSmall
-    z: 0
     clip: true
 
     width: window.buttonWidthLarge

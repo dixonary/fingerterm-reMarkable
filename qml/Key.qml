@@ -186,10 +186,7 @@ Rectangle {
 
     Timer {
         id: keyRepeatStarter
-        running: false
-        repeat: false
         interval: 400
-        triggeredOnStart: false
         onTriggered: {
             keyRepeatTimer.start();
         }
@@ -197,7 +194,6 @@ Rectangle {
 
     Timer {
         id: keyRepeatTimer
-        running: false
         repeat: true
         triggeredOnStart: true
         interval: 80
