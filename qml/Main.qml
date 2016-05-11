@@ -24,6 +24,9 @@ import QtQuick.Window 2.0
 Item {
     id: root
 
+    width: 540
+    height: 960
+
     property string windowTitle: util.currentWindowTitle();
 
     Item {
@@ -286,8 +289,6 @@ Item {
             objectName: "textrender"
             height: parent.height
             width: parent.width
-            myWidth: width
-            myHeight: height
             z: 10
 
             Behavior on opacity {
@@ -310,8 +311,7 @@ Item {
 
         Timer {
             id: fadeTimer
-            running: false
-            repeat: false
+
             interval: menu.keyboardFadeOutDelay
             onTriggered: {
                 window.sleepVKB();
@@ -320,8 +320,7 @@ Item {
 
         Timer {
             id: bellTimer
-            running: false
-            repeat: false
+
             interval: 80
             onTriggered: {
                 window.color = window.bgcolor;
@@ -380,6 +379,11 @@ Item {
                 anchors.centerIn: parent
                 text: visualKeyFeedbackRect.label
             }
+        }
+
+        Connections {
+            target: term
+            onDisplayBufferChanged: window.displayBufferChanged()
         }
 
         function vkbKeypress(key,modifiers) {

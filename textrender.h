@@ -29,8 +29,6 @@ class Util;
 
 class TextRender : public QQuickPaintedItem
 {
-    Q_PROPERTY(int myWidth READ myWidth WRITE setMyWidth NOTIFY myWidthChanged)
-    Q_PROPERTY(int myHeight READ myHeight WRITE setMyHeight NOTIFY myHeightChanged)
     Q_PROPERTY(int fontWidth READ fontWidth NOTIFY fontSizeChanged)
     Q_PROPERTY(int fontHeight READ fontHeight NOTIFY fontSizeChanged)
     Q_PROPERTY(int fontPointSize READ fontPointSize WRITE setFontPointSize NOTIFY fontSizeChanged)
@@ -45,10 +43,6 @@ public:
     void setTerminal(Terminal* term);
     void setUtil(Util* util) { iUtil = util; }
 
-    int myWidth() { return iWidth; }
-    int myHeight() { return iHeight; }
-    void setMyWidth(int w) { if(iWidth!=w) { iWidth=w; emit myWidthChanged(w); } }
-    void setMyHeight(int h) { if(iHeight!=h) { iHeight=h; emit myHeightChanged(h); } }
     int fontWidth() { return iFontWidth; }
     int fontHeight() { return iFontHeight; }
     int fontDescent() { return iFontDescent; }
@@ -61,8 +55,6 @@ public:
     Q_INVOKABLE QSize cursorPixelSize();
 
 signals:
-    void myWidthChanged(int newWidth);
-    void myHeightChanged(int newHeight);
     void fontSizeChanged();
     void showBufferScrollIndicatorChanged();
 
@@ -78,8 +70,6 @@ private:
     void drawTextFragment(QPainter* painter, int x, int y, QString text, TermChar style);
     QPoint charsToPixels(QPoint pos);
 
-    int iWidth;
-    int iHeight;
     QFont iFont;
     int iFontWidth;
     int iFontHeight;
