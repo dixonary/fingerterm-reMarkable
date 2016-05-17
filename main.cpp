@@ -103,6 +103,17 @@ int main(int argc, char *argv[])
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
     QQuickView view;
 
+    bool fullscreen = !app.arguments().contains("-nofs");
+    QSize screenSize = QGuiApplication::primaryScreen()->size();
+
+    if (fullscreen) {
+        view.setWidth(screenSize.width());
+        view.setHeight(screenSize.height());
+    } else {
+        view.setWidth(screenSize.width() / 2);
+        view.setHeight(screenSize.height() / 2);
+    }
+
     Terminal term;
     Util util(settings);
     term.setUtil(&util);
@@ -133,8 +144,8 @@ int main(int argc, char *argv[])
     context->setContextProperty( "util", &util );
     context->setContextProperty( "keyLoader", &keyLoader );
 
-    view.setSource(QUrl("qrc:/qml/Main.qml"));
     view.setResizeMode(QQuickView::SizeRootObjectToView);
+    view.setSource(QUrl("qrc:/qml/Main.qml"));
 
     QObject *root = view.rootObject();
     if(!root)
@@ -156,12 +167,9 @@ int main(int argc, char *argv[])
 
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
-    if (!app.arguments().contains("-nofs")) {
+    if (fullscreen) {
         view.showFullScreen();
     } else {
-        QSize screenSize = QGuiApplication::primaryScreen()->size();
-        view.setWidth(screenSize.width() / 2);
-        view.setHeight(screenSize.height() / 2);
         view.show();
     }
 
