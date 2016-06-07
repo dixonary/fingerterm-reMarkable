@@ -110,59 +110,12 @@ Item {
         objectName: "window"
         color: bellTimer.running ? "#ffffff" : bgcolor
 
-        NotifyWin {
-            id: aboutDialog
-
-            property int termW
-            property int termH
-
-            text: {
-                var str = "<font size=\"+3\">FingerTerm " + util.versionString() + "</font><br>\n" +
-                        "<font size=\"+1\">" +
-                        "by Heikki Holstila &lt;<a href=\"mailto:heikki.holstila@gmail.com?subject=FingerTerm\">heikki.holstila@gmail.com</a>&gt;<br><br>\n\n" +
-                        "Config files for adjusting settings are at:<br>\n" +
-                        util.configPath() + "/<br><br>\n" +
-                        "Documentation:<br>\n<a href=\"http://hqh.unlink.org/harmattan\">http://hqh.unlink.org/harmattan</a>"
-                if (termH != 0 && termW != 0) {
-                    str += "<br><br>Current window title: <font color=\"gray\">" + util.windowTitle.substring(0,40) + "</font>"; //cut long window title
-                    if(util.windowTitle.length>40)
-                        str += "...";
-                    str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
-                    str += "<br>Charset: <font color=\"gray\">" + util.settingsValue("terminal/charset") + "</font>";
-                }
-                str += "</font>";
-                return str;
-            }
-            onDismissed: {
-                util.setSettingsValue("state/showWelcomeScreen", false);
-            }
-            z: 1001
-        }
-
-        NotifyWin {
-            id: errorDialog
-
-            z: 1002
-        }
-
-        UrlWindow {
-            id: urlWindow
-            z: 1000
-        }
-
-        LayoutWindow {
-            id: layoutWindow
-            z: 1000
-        }
-
-
         Lineview {
             id: lineView
 
             property int duration
 
             y: -(height+1)
-            z: 20
             onFontPointSizeChanged: {
                 lineView.setPosition(vkb.active)
             }
@@ -249,7 +202,6 @@ Item {
         Rectangle {
             //top right corner menu button
             x: window.width - width
-            z: 1
             width: menuImg.width + 60*window.pixelRatio
             height: menuImg.height + 30*window.pixelRatio
             color: "transparent"
@@ -276,13 +228,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             visible: textrender.showBufferScrollIndicator
-            z: 5
             scale: window.pixelRatio
-        }
-
-        MenuFingerterm {
-            id: menu
-            anchors.fill: parent
         }
 
         TextRender {
@@ -294,7 +240,6 @@ Item {
             objectName: "textrender"
             height: parent.height
             width: parent.width
-            z: 10
 
             Behavior on opacity {
                 NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
@@ -341,13 +286,17 @@ Item {
             }
         }
 
+        MenuFingerterm {
+            id: menu
+            anchors.fill: parent
+        }
+
         Text {
             // shows large text notification in the middle of the screen (for gestures)
             id: textNotify
 
             anchors.centerIn: parent
             color: "#ffffff"
-            z: 100
             opacity: 0
             font.pointSize: 40*window.pixelRatio
 
@@ -365,7 +314,6 @@ Item {
             property string label
 
             visible: false
-            z: 200
             radius: window.radiusSmall
             color: "#ffffff"
 
@@ -375,6 +323,46 @@ Item {
                 anchors.centerIn: parent
                 text: visualKeyFeedbackRect.label
             }
+        }
+
+        NotifyWin {
+            id: aboutDialog
+
+            property int termW
+            property int termH
+
+            text: {
+                var str = "<font size=\"+3\">FingerTerm " + util.versionString() + "</font><br>\n" +
+                        "<font size=\"+1\">" +
+                        "by Heikki Holstila &lt;<a href=\"mailto:heikki.holstila@gmail.com?subject=FingerTerm\">heikki.holstila@gmail.com</a>&gt;<br><br>\n\n" +
+                        "Config files for adjusting settings are at:<br>\n" +
+                        util.configPath() + "/<br><br>\n" +
+                        "Documentation:<br>\n<a href=\"http://hqh.unlink.org/harmattan\">http://hqh.unlink.org/harmattan</a>"
+                if (termH != 0 && termW != 0) {
+                    str += "<br><br>Current window title: <font color=\"gray\">" + util.windowTitle.substring(0,40) + "</font>"; //cut long window title
+                    if(util.windowTitle.length>40)
+                        str += "...";
+                    str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
+                    str += "<br>Charset: <font color=\"gray\">" + util.settingsValue("terminal/charset") + "</font>";
+                }
+                str += "</font>";
+                return str;
+            }
+            onDismissed: {
+                util.setSettingsValue("state/showWelcomeScreen", false);
+            }
+        }
+
+        NotifyWin {
+            id: errorDialog
+        }
+
+        UrlWindow {
+            id: urlWindow
+        }
+
+        LayoutWindow {
+            id: layoutWindow
         }
 
         Connections {

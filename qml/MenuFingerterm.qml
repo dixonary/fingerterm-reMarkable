@@ -29,7 +29,6 @@ Item {
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
-    z: 30
     visible: rect.x < menuWin.width
 
     Rectangle {
@@ -53,7 +52,6 @@ Item {
         x: menuWin.showing ? menuWin.width-rect.width : menuWin.width+1
         width: flickableContent.width + 22*window.pixelRatio;
         height: menuWin.height
-        z: 35
 
         MouseArea {
             // event eater
@@ -421,7 +419,6 @@ Item {
                         width: menuBlocksRow.width - window.paddingMedium
                         height: window.paddingMedium
                         radius: window.radiusSmall
-                        z: 1
                         color: "#909090"
                     }
                     Rectangle {
@@ -435,7 +432,6 @@ Item {
                         radius: window.radiusLarge
                         height: parent.height-window.headerHeight
                         color: "#202020"
-                        z: 2
                         onXChanged: {
                             if (vkbDelaySliderMA.drag.active)
                                 vkbDelaySlider.keyboardFadeOutDelayLabel =

@@ -27,8 +27,6 @@ Rectangle {
     width: window.width-1
     height: window.height-1
     color: "#000000"
-    z: 100
-    state: ""
     y: -(height+1)
     border.color: "#c0c0c0"
     border.width: 1

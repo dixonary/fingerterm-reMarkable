@@ -29,7 +29,6 @@ Rectangle {
     width: window.width-1
     height: window.height-1
     color: "#000000"
-    z: 100
     y: -(height+1)
     state: ""
     border.color: "#c0c0c0"
