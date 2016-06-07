@@ -24,7 +24,7 @@ Rectangle {
 
     property string text
 
-    signal dismissed();
+    signal dismissed()
 
     width: window.width-1
     height: window.height-1
@@ -40,8 +40,7 @@ Rectangle {
         // event eater
         anchors.fill: parent
     }
-    Rectangle {
-        color: "transparent"
+    Item {
         anchors.top: notifyWin.top
         anchors.left: notifyWin.left
         anchors.right: notifyWin.right
@@ -62,6 +61,7 @@ Rectangle {
 
     Button {
         id: okButton
+
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: window.paddingMedium

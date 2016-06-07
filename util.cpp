@@ -138,7 +138,8 @@ void Util::bellAlert()
     }
 }
 
-void Util::mousePress(float eventX, float eventY) {
+void Util::mousePress(float eventX, float eventY)
+{
     if(!iAllowGestures)
         return;
 
@@ -146,7 +147,8 @@ void Util::mousePress(float eventX, float eventY) {
     newSelection = true;
 }
 
-void Util::mouseMove(float eventX, float eventY) {
+void Util::mouseMove(float eventX, float eventY)
+{
     QPointF eventPos(eventX, eventY);
 
     if(!iAllowGestures)
@@ -160,7 +162,8 @@ void Util::mouseMove(float eventX, float eventY) {
     }
 }
 
-void Util::mouseRelease(float eventX, float eventY) {
+void Util::mouseRelease(float eventX, float eventY)
+{
     QPointF eventPos(eventX, eventY);
     const int reqDragLength = 140;
 
@@ -190,7 +193,7 @@ void Util::mouseRelease(float eventX, float eventY) {
 
 void Util::selectionHelper(QPointF scenePos)
 {
-    int yCorr =  iRenderer->fontDescent();
+    int yCorr = iRenderer->fontDescent();
 
     QPoint start(qRound((dragOrigin.x()+2)/iRenderer->fontWidth()),
                  qRound((dragOrigin.y()+yCorr)/iRenderer->fontHeight()));

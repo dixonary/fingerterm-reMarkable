@@ -20,7 +20,7 @@
 import QtQuick 2.0
 import QtQuick.XmlListModel 2.0
 
-Rectangle {
+Item {
     id: menuWin
 
     property bool showing
@@ -31,7 +31,6 @@ Rectangle {
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
-    color: "transparent"
     z: 30
     width: window.width
     height: window.height
@@ -42,8 +41,7 @@ Rectangle {
 
         color: "#000000"
         opacity: 0
-        width: menuWin.width
-        height: menuWin.height
+        anchors.fill: parent
 
         MouseArea {
             anchors.fill: parent

@@ -339,9 +339,6 @@ Item {
                 textNotifyAnim.enabled = true;
                 textNotify.opacity = 0;
             }
-            onWindowTitleChanged: {
-                windowTitle = util.currentWindowTitle();
-            }
         }
 
         Text {
@@ -352,7 +349,6 @@ Item {
             color: "#ffffff"
             z: 100
             opacity: 0
-            text: ""
             font.pointSize: 40*window.pixelRatio
 
             Behavior on opacity {
