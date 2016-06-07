@@ -107,7 +107,6 @@ Item {
         property int scrollBarWidth: 6*window.pixelRatio
 
         anchors.fill: parent
-        objectName: "window"
         color: bellTimer.running ? "#ffffff" : bgcolor
 
         Lineview {
@@ -448,6 +447,9 @@ Item {
         Component.onCompleted: {
             if( util.settingsValue("state/showWelcomeScreen") === true )
                 aboutDialog.state = "visible";
+            if (startupErrorMessage != "") {
+                showErrorMessage(startupErrorMessage)
+            }
         }
 
         function showErrorMessage(string)

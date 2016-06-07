@@ -143,6 +143,7 @@ int main(int argc, char *argv[])
     context->setContextProperty( "term", &term );
     context->setContextProperty( "util", &util );
     context->setContextProperty( "keyLoader", &keyLoader );
+    context->setContextProperty( "startupErrorMessage", startupErrorMsg);
 
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:/qml/Main.qml"));
@@ -150,11 +151,6 @@ int main(int argc, char *argv[])
     QObject *root = view.rootObject();
     if(!root)
         qFatal("no root object - qml error");
-
-    QObject* win = root->findChild<QObject*>("window");
-
-    if(!startupErrorMsg.isEmpty())
-        QMetaObject::invokeMethod(win, "showErrorMessage", Qt::QueuedConnection, Q_ARG(QVariant, startupErrorMsg));
 
     TextRender *tr = root->findChild<TextRender*>("textrender");
     tr->setUtil(&util);
