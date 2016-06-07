@@ -81,7 +81,7 @@ Item {
             Button {
                 text: title
                 isShellCommand: true
-                enabled: disableOn.length === 0 || windowTitle.search(disableOn) === -1
+                enabled: disableOn.length === 0 || util.windowTitle.search(disableOn) === -1
                 onClicked: {
                     menuWin.showing = false;
                     term.putString(command, true);

@@ -64,7 +64,7 @@ void Util::setWindowTitle(QString title)
     emit windowTitleChanged();
 }
 
-QString Util::currentWindowTitle()
+QString Util::windowTitle()
 {
     return iCurrentWinTitle;
 }

@@ -30,6 +30,7 @@ class Util : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
+    Q_PROPERTY(QString windowTitle READ windowTitle NOTIFY windowTitleChanged)
 
 public:
     explicit Util(QSettings* settings, QObject *parent = 0);
@@ -37,7 +38,7 @@ public:
 
     void setWindow(QQuickView* win);
     void setWindowTitle(QString title);
-    Q_INVOKABLE QString currentWindowTitle();
+    QString windowTitle();
     void setTerm(Terminal* term) { iTerm = term; }
     void setRenderer(TextRender* r) { iRenderer = r; }
 

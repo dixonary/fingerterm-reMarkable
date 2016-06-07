@@ -27,8 +27,6 @@ Item {
     width: 540
     height: 960
 
-    property string windowTitle: util.currentWindowTitle();
-
     Binding {
         target: util
         property: "allowGestures"
@@ -126,8 +124,8 @@ Item {
                         util.configPath() + "/<br><br>\n" +
                         "Documentation:<br>\n<a href=\"http://hqh.unlink.org/harmattan\">http://hqh.unlink.org/harmattan</a>"
                 if (termH != 0 && termW != 0) {
-                    str += "<br><br>Current window title: <font color=\"gray\">" + windowTitle.substring(0,40) + "</font>"; //cut long window title
-                    if(windowTitle.length>40)
+                    str += "<br><br>Current window title: <font color=\"gray\">" + util.windowTitle.substring(0,40) + "</font>"; //cut long window title
+                    if(util.windowTitle.length>40)
                         str += "...";
                     str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
                     str += "<br>Charset: <font color=\"gray\">" + util.settingsValue("terminal/charset") + "</font>";
