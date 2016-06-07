@@ -2,4 +2,4 @@
 Type=Application
 Name=Terminal
 Exec=fingerterm
-Icon=icon-l-terminal
+Icon=icon-launcher-shell
