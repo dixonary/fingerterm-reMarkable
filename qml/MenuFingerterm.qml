@@ -32,35 +32,27 @@ Item {
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
     z: 30
-    width: window.width
-    height: window.height
-    visible: false
+    visible: rect.x < menuWin.width
 
     Rectangle {
         id: fader
 
         color: "#000000"
-        opacity: 0
+        opacity: menuWin.showing ? 0.5 : 0.0
         anchors.fill: parent
+
+        Behavior on opacity { NumberAnimation { duration: 100; } }
 
         MouseArea {
             anchors.fill: parent
-            onClicked: {
-                hideMenu();
-            }
-        }
-        Behavior on opacity {
-            SequentialAnimation {
-                NumberAnimation { duration: 100; }
-                ScriptAction { script: menuWin.visible = menuWin.showing; }
-            }
+            onClicked: menuWin.showing = false
         }
     }
     Rectangle {
         id: rect
 
         color: "#e0e0e0"
-        x: menuWin.width+1;
+        x: menuWin.showing ? menuWin.width-rect.width : menuWin.width+1
         width: flickableContent.width + 22*window.pixelRatio;
         height: menuWin.height
         z: 35
@@ -91,14 +83,13 @@ Item {
                 isShellCommand: true
                 enabled: disableOn.length === 0 || windowTitle.search(disableOn) === -1
                 onClicked: {
-                    hideMenu();
+                    menuWin.showing = false;
                     term.putString(command, true);
                 }
             }
         }
 
         Rectangle {
-            id: scrollIndicator
             y: menuFlickArea.visibleArea.yPosition*menuFlickArea.height + window.scrollBarWidth
             x: parent.width-window.paddingMedium
             width: window.scrollBarWidth
@@ -109,6 +100,7 @@ Item {
 
         Flickable {
             id: menuFlickArea
+
             anchors.fill: parent
             anchors.topMargin: window.scrollBarWidth
             anchors.bottomMargin: window.scrollBarWidth
@@ -118,6 +110,7 @@ Item {
 
             Column {
                 id: flickableContent
+
                 spacing: 12*window.pixelRatio
 
                 Row {
@@ -139,7 +132,7 @@ Item {
                             Button {
                                 text: "Copy"
                                 onClicked: {
-                                    hideMenu();
+                                    menuWin.showing = false;
                                     term.copySelectionToClipboard();
                                 }
                                 width: window.buttonWidthHalf
@@ -149,7 +142,7 @@ Item {
                             Button {
                                 text: "Paste"
                                 onClicked: {
-                                    hideMenu();
+                                    menuWin.showing = false;
                                     term.pasteFromClipboard();
                                 }
                                 width: window.buttonWidthHalf
@@ -162,7 +155,7 @@ Item {
                             width: window.buttonWidthLarge
                             height: window.buttonHeightLarge
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 urlWindow.urls = term.grabURLsFromBuffer();
                                 urlWindow.state = "visible";
                             }
@@ -284,7 +277,7 @@ Item {
                                             util.setSettingsValue("ui/dragMode", "gestures");
                                             term.clearSelection();
                                             currentDragMode = "gestures";
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -296,7 +289,7 @@ Item {
                                             util.setSettingsValue("ui/dragMode", "scroll");
                                             currentDragMode = "scroll";
                                             term.clearSelection();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -307,7 +300,7 @@ Item {
                                         onClicked: {
                                             util.setSettingsValue("ui/dragMode", "select");
                                             currentDragMode = "select";
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -340,7 +333,7 @@ Item {
                                             util.setSettingsValue("ui/vkbShowMethod", "off");
                                             currentShowMethod = "off";
                                             window.setTextRenderAttributes();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -352,7 +345,7 @@ Item {
                                             util.setSettingsValue("ui/vkbShowMethod", "fade");
                                             currentShowMethod = "fade";
                                             window.setTextRenderAttributes();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -364,7 +357,7 @@ Item {
                                             util.setSettingsValue("ui/vkbShowMethod", "move");
                                             currentShowMethod = "move";
                                             window.setTextRenderAttributes();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -375,14 +368,14 @@ Item {
                         Button {
                             text: "New window"
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 util.openNewWindow();
                             }
                         }
                         Button {
                             text: "VKB layout..."
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 layoutWindow.layouts = keyLoader.availableLayouts();
                                 layoutWindow.state = "visible";
                             }
@@ -390,7 +383,7 @@ Item {
                         Button {
                             text: "About"
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 aboutDialog.termW = term.termSize().width
                                 aboutDialog.termH = term.termSize().height
                                 aboutDialog.state = "visible"
@@ -399,7 +392,7 @@ Item {
                         Button {
                             text: "Quit"
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 Qt.quit();
                             }
                         }
@@ -470,38 +463,11 @@ Item {
         }
     }
 
-    onWidthChanged: {
-        if(showing) {
-            showMenu();
-        } else {
-            hideMenu();
-        }
-    }
-
     Connections {
         target: util
         onClipboardOrSelectionChanged: {
             enableCopy = util.terminalHasSelection();
             enablePaste = util.canPaste();
         }
-    }
-
-    function showMenu()
-    {
-        showing = true;
-        visible = true;
-        fader.opacity = 0.5;
-        rect.x = menuWin.width-rect.width;
-        window.updateGesturesAllowed();
-        enableCopy = util.terminalHasSelection();
-        enablePaste = util.canPaste();
-    }
-
-    function hideMenu()
-    {
-        showing = false;
-        fader.opacity = 0;
-        rect.x = menuWin.width+1;
-        window.updateGesturesAllowed();
     }
 }

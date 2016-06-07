@@ -260,7 +260,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    menu.showMenu();
+                    menu.showing = true
                 }
             }
         }
@@ -277,7 +277,10 @@ Item {
 
         MenuFingerterm {
             id: menu
-            x: window.width-width
+            anchors.fill: parent
+            onShowingChanged: {
+                window.updateGesturesAllowed();
+            }
         }
 
         TextRender {
