@@ -266,12 +266,14 @@ void Util::copyTextToClipboard(QString str)
 
 bool Util::terminalHasSelection()
 {
+    if (!iTerm) {
+        return false;
+    }
     return !iTerm->selection().isNull();
 }
 
 bool Util::canPaste()
 {
-
     QClipboard *cb = QGuiApplication::clipboard();
 
     return !cb->text().isEmpty();

@@ -31,6 +31,8 @@ class Util : public QObject
     Q_OBJECT
     Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
     Q_PROPERTY(QString windowTitle READ windowTitle NOTIFY windowTitleChanged)
+    Q_PROPERTY(bool canPaste READ canPaste NOTIFY clipboardOrSelectionChanged)
+    Q_PROPERTY(bool terminalHasSelection READ terminalHasSelection NOTIFY clipboardOrSelectionChanged)
 
 public:
     explicit Util(QSettings* settings, QObject *parent = 0);
@@ -56,8 +58,9 @@ public:
     Q_INVOKABLE void notifyText(QString text);
 
     Q_INVOKABLE void copyTextToClipboard(QString str);
-    Q_INVOKABLE bool canPaste();
-    Q_INVOKABLE bool terminalHasSelection();
+
+    bool canPaste();
+    bool terminalHasSelection();
 
     void bellAlert();
     void selectionFinished();

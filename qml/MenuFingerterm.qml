@@ -24,8 +24,6 @@ Item {
     id: menuWin
 
     property bool showing
-    property bool enableCopy
-    property bool enablePaste
     property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
     property string currentDragMode: util.settingsValue("ui/dragMode")
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
@@ -137,7 +135,7 @@ Item {
                                 }
                                 width: window.buttonWidthHalf
                                 height: window.buttonHeightLarge
-                                enabled: menuWin.enableCopy
+                                enabled: util.terminalHasSelection
                             }
                             Button {
                                 text: "Paste"
@@ -147,7 +145,7 @@ Item {
                                 }
                                 width: window.buttonWidthHalf
                                 height: window.buttonHeightLarge
-                                enabled: menuWin.enablePaste
+                                enabled: util.canPaste
                             }
                         }
                         Button {
@@ -460,14 +458,6 @@ Item {
                     }
                 }
             }
-        }
-    }
-
-    Connections {
-        target: util
-        onClipboardOrSelectionChanged: {
-            enableCopy = util.terminalHasSelection();
-            enablePaste = util.canPaste();
         }
     }
 }
