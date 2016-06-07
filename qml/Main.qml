@@ -110,7 +110,7 @@ Item {
 
         anchors.fill: parent
         objectName: "window"
-        color: bgcolor
+        color: bellTimer.running ? "#ffffff" : bgcolor
 
         NotifyWin {
             id: aboutDialog
@@ -329,16 +329,11 @@ Item {
             id: bellTimer
 
             interval: 80
-            onTriggered: {
-                window.color = window.bgcolor;
-            }
         }
 
         Connections {
             target: util
-            onVisualBell: {
-                window.visualBell();
-            }
+            onVisualBell: bellTimer.start()
             onGestureNotify: {
                 textNotify.text = msg;
                 textNotifyAnim.enabled = false;
@@ -473,12 +468,6 @@ Item {
         {
             errorDialog.text = "<font size=\"+2\">" + string + "</font>";
             errorDialog.state = "visible"
-        }
-
-        function visualBell()
-        {
-            bellTimer.start();
-            window.color = "#ffffff"
         }
 
         function setOrientationLockMode(stringMode)
