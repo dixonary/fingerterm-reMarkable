@@ -86,10 +86,7 @@ Rectangle {
         Transition {
             from: "*"
             to: "*"
-            SequentialAnimation {
-                PropertyAnimation { target: notifyWin; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-                ScriptAction { script: window.updateGesturesAllowed(); }
-            }
+            PropertyAnimation { target: notifyWin; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
         }
     ]
 }

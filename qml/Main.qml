@@ -29,6 +29,13 @@ Item {
 
     property string windowTitle: util.currentWindowTitle();
 
+    Binding {
+        target: util
+        property: "allowGestures"
+        value: !vkb.active && !menu.showing && urlWindow.state != "visible" && aboutDialog.state != "visible"
+               && layoutWindow.state != "visible"
+    }
+
     Item {
         id: page
 
@@ -278,9 +285,6 @@ Item {
         MenuFingerterm {
             id: menu
             anchors.fill: parent
-            onShowingChanged: {
-                window.updateGesturesAllowed();
-            }
         }
 
         TextRender {
@@ -401,7 +405,6 @@ Item {
             vkb.active = true;
             lineView.setPosition(vkb.active);
             setTextRenderAttributes();
-            updateGesturesAllowed();
         }
 
         function sleepVKB()
@@ -411,7 +414,6 @@ Item {
             vkb.active = false;
             lineView.setPosition(vkb.active);
             setTextRenderAttributes();
-            updateGesturesAllowed();
         }
 
         function setTextRenderAttributes()
@@ -477,15 +479,6 @@ Item {
         {
             bellTimer.start();
             window.color = "#ffffff"
-        }
-
-        function updateGesturesAllowed()
-        {
-            if(vkb.active || menu.showing || urlWindow.state=="visible" ||
-                    aboutDialog.state=="visible" || layoutWindow.state=="visible")
-                util.allowGestures = false;
-            else
-                util.allowGestures = true;
         }
 
         function setOrientationLockMode(stringMode)

@@ -125,10 +125,7 @@ Rectangle {
         Transition {
             from: "*"
             to: "*"
-            SequentialAnimation {
-                PropertyAnimation { target: urlWindow; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-                ScriptAction { script: window.updateGesturesAllowed(); }
-            }
+            PropertyAnimation { target: urlWindow; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
         }
     ]
 }
