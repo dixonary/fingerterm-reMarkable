@@ -275,7 +275,7 @@ Item {
         Connections {
             target: util
             onVisualBell: bellTimer.start()
-            onGestureNotify: {
+            onNotify: {
                 textNotify.text = msg;
                 textNotifyAnim.enabled = false;
                 textNotify.opacity = 1.0;

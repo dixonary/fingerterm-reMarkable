@@ -147,7 +147,7 @@ void Util::bellAlert()
 
 void Util::notifyText(QString text)
 {
-    emit gestureNotify(text);
+    emit notify(text);
 }
 
 void Util::copyTextToClipboard(QString str)

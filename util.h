@@ -71,7 +71,7 @@ public:
 signals:
     void visualBell();
     void allowGesturesChanged();
-    void gestureNotify(QString msg);
+    void notify(QString msg);
     void clipboardOrSelectionChanged();
     void windowTitleChanged();
 
