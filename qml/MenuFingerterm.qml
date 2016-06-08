@@ -49,7 +49,8 @@ Item {
         id: rect
 
         color: "#e0e0e0"
-        x: menuWin.showing ? menuWin.width-rect.width : menuWin.width+1
+        anchors.left: parent.right
+        anchors.leftMargin: menuWin.showing ? -width : 1
         width: flickableContent.width + 22*window.pixelRatio;
         height: menuWin.height
 
@@ -58,7 +59,7 @@ Item {
             anchors.fill: parent
         }
 
-        Behavior on x {
+        Behavior on anchors.leftMargin {
             NumberAnimation { duration: 100; easing.type: Easing.InOutQuad; }
         }
 
