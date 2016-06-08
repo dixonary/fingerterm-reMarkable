@@ -40,8 +40,8 @@ public:
     virtual ~TextRender();
     void paint(QPainter*);
 
-    void setTerminal(Terminal* term);
-    void setUtil(Util* util) { iUtil = util; }
+    static void setUtil(Util *util);
+    static void setTerminal(Terminal *terminal);
 
     int fontWidth() { return iFontWidth; }
     int fontHeight() { return iFontHeight; }
@@ -62,6 +62,9 @@ public slots:
     void redraw();
     void updateTermSize();
 
+private slots:
+    void handleScrollBack(bool reset);
+
 private:
     Q_DISABLE_COPY(TextRender)
 
@@ -76,8 +79,8 @@ private:
     int iFontDescent;
     bool iShowBufferScrollIndicator;
 
-    Terminal *iTerm;
-    Util *iUtil;
+    static Terminal *sTerm;
+    static Util *sUtil;
 
     QList<QColor> iColorTable;
 };

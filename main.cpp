@@ -117,6 +117,9 @@ int main(int argc, char *argv[])
     Terminal term;
     Util util(settings);
     term.setUtil(&util);
+    TextRender::setUtil(&util);
+    TextRender::setTerminal(&term);
+
     QString startupErrorMsg;
 
     // copy the default config files to the config dir if they don't already exist
@@ -153,9 +156,6 @@ int main(int argc, char *argv[])
         qFatal("no root object - qml error");
 
     TextRender *tr = root->findChild<TextRender*>("textrender");
-    tr->setUtil(&util);
-    tr->setTerminal(&term);
-    term.setRenderer(tr);
     term.setWindow(&view);
     util.setWindow(&view);
     util.setTerm(&term);
