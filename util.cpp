@@ -37,11 +37,9 @@
 Util::Util(QSettings *settings, QObject *parent) :
     QObject(parent),
     iAllowGestures(false),
-    newSelection(true),
     iSettings(settings),
     iWindow(0),
-    iTerm(0),
-    iRenderer(0)
+    iTerm(0)
 {
     connect(QGuiApplication::clipboard(), SIGNAL(dataChanged()), this, SIGNAL(clipboardOrSelectionChanged()));
 }
@@ -67,6 +65,15 @@ void Util::setWindowTitle(QString title)
 QString Util::windowTitle()
 {
     return iCurrentWinTitle;
+}
+
+void Util::setTerm(Terminal *term)
+{
+    if (iTerm) {
+        qFatal("Should set terminal only once");
+    }
+    iTerm = term;
+    connect(iTerm, SIGNAL(selectionFinished()), this, SIGNAL(clipboardOrSelectionChanged()));
 }
 
 void Util::openNewWindow()
@@ -138,119 +145,6 @@ void Util::bellAlert()
     }
 }
 
-void Util::mousePress(float eventX, float eventY)
-{
-    if(!iAllowGestures)
-        return;
-
-    dragOrigin = QPointF(eventX, eventY);
-    newSelection = true;
-}
-
-void Util::mouseMove(float eventX, float eventY)
-{
-    QPointF eventPos(eventX, eventY);
-
-    if(!iAllowGestures)
-        return;
-
-    if(settingsValue("ui/dragMode")=="scroll") {
-        dragOrigin = scrollBackBuffer(eventPos, dragOrigin);
-    }
-    else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
-        selectionHelper(eventPos);
-    }
-}
-
-void Util::mouseRelease(float eventX, float eventY)
-{
-    QPointF eventPos(eventX, eventY);
-    const int reqDragLength = 140;
-
-    if(!iAllowGestures)
-        return;
-
-    if(settingsValue("ui/dragMode")=="gestures") {
-        int xdist = qAbs(eventPos.x() - dragOrigin.x());
-        int ydist = qAbs(eventPos.y() - dragOrigin.y());
-        if(eventPos.x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
-            doGesture(PanLeft);
-        else if(eventPos.x() > dragOrigin.x()+reqDragLength && xdist > ydist*2)
-            doGesture(PanRight);
-        else if(eventPos.y() > dragOrigin.y()+reqDragLength && ydist > xdist*2)
-            doGesture(PanDown);
-        else if(eventPos.y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
-            doGesture(PanUp);
-    }
-    else if(settingsValue("ui/dragMode")=="scroll") {
-        scrollBackBuffer(eventPos, dragOrigin);
-    }
-    else if(settingsValue("ui/dragMode")=="select" && iRenderer) {
-        selectionHelper(eventPos);
-        selectionFinished();
-    }
-}
-
-void Util::selectionHelper(QPointF scenePos)
-{
-    int yCorr = iRenderer->fontDescent();
-
-    QPoint start(qRound((dragOrigin.x()+2)/iRenderer->fontWidth()),
-                 qRound((dragOrigin.y()+yCorr)/iRenderer->fontHeight()));
-    QPoint end(qRound((scenePos.x()+2)/iRenderer->fontWidth()),
-               qRound((scenePos.y()+yCorr)/iRenderer->fontHeight()));
-
-    if (start != end) {
-        iTerm->setSelection(start, end);
-        newSelection = false;
-    }
-}
-
-QPointF Util::scrollBackBuffer(QPointF now, QPointF last)
-{
-    if(!iTerm)
-        return last;
-
-    int xdist = qAbs(now.x() - last.x());
-    int ydist = qAbs(now.y() - last.y());
-    int fontSize = settingsValue("ui/fontSize").toInt();
-
-    int lines = ydist / fontSize;
-
-    if(lines > 0 && now.y() < last.y() && xdist < ydist*2) {
-        iTerm->scrollBackBufferFwd(lines);
-        last = QPointF(now.x(), last.y() - lines * fontSize);
-    } else if(lines > 0 && now.y() > last.y() && xdist < ydist*2) {
-        iTerm->scrollBackBufferBack(lines);
-        last = QPointF(now.x(), last.y() + lines * fontSize);
-    }
-
-    return last;
-}
-
-void Util::doGesture(Util::PanGesture gesture)
-{
-    if(!iTerm)
-        return;
-
-    if( gesture==PanLeft ) {
-        emit gestureNotify(settingsValue("gestures/panLeftTitle").toString());
-        iTerm->putString(settingsValue("gestures/panLeftCommand").toString(), true);
-    }
-    else if( gesture==PanRight ) {
-        emit gestureNotify(settingsValue("gestures/panRightTitle").toString());
-        iTerm->putString(settingsValue("gestures/panRightCommand").toString(), true);
-    }
-    else if( gesture==PanDown ) {
-        emit gestureNotify(settingsValue("gestures/panDownTitle").toString());
-        iTerm->putString(settingsValue("gestures/panDownCommand").toString(), true);
-    }
-    else if( gesture==PanUp ) {
-        emit gestureNotify(settingsValue("gestures/panUpTitle").toString());
-        iTerm->putString(settingsValue("gestures/panUpCommand").toString(), true);
-    }
-}
-
 void Util::notifyText(QString text)
 {
     emit gestureNotify(text);
@@ -277,11 +171,6 @@ bool Util::canPaste()
     QClipboard *cb = QGuiApplication::clipboard();
 
     return !cb->text().isEmpty();
-}
-
-void Util::selectionFinished()
-{
-    emit clipboardOrSelectionChanged();
 }
 
 //static

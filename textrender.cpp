@@ -26,7 +26,8 @@ Terminal* TextRender::sTerm = 0;
 Util* TextRender::sUtil = 0;
 
 TextRender::TextRender(QQuickItem *parent) :
-    QQuickPaintedItem(parent)
+    QQuickPaintedItem(parent),
+    newSelection(true)
 {
     setFlag(ItemHasContents);
 
@@ -302,6 +303,73 @@ void TextRender::updateTermSize()
     sTerm->setTermSize(size);
 }
 
+void TextRender::mousePress(float eventX, float eventY)
+{
+    if(!sUtil->allowGestures())
+        return;
+
+    dragOrigin = QPointF(eventX, eventY);
+    newSelection = true;
+}
+
+void TextRender::mouseMove(float eventX, float eventY)
+{
+    QPointF eventPos(eventX, eventY);
+
+    if(!sUtil->allowGestures())
+        return;
+
+    if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+        dragOrigin = scrollBackBuffer(eventPos, dragOrigin);
+    }
+    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+        selectionHelper(eventPos, true);
+    }
+}
+
+void TextRender::mouseRelease(float eventX, float eventY)
+{
+    QPointF eventPos(eventX, eventY);
+    const int reqDragLength = 140;
+
+    if(!sUtil->allowGestures())
+        return;
+
+    if(sUtil->settingsValue("ui/dragMode")=="gestures") {
+        int xdist = qAbs(eventPos.x() - dragOrigin.x());
+        int ydist = qAbs(eventPos.y() - dragOrigin.y());
+        if(eventPos.x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
+            doGesture(PanLeft);
+        else if(eventPos.x() > dragOrigin.x()+reqDragLength && xdist > ydist*2)
+            doGesture(PanRight);
+        else if(eventPos.y() > dragOrigin.y()+reqDragLength && ydist > xdist*2)
+            doGesture(PanDown);
+        else if(eventPos.y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
+            doGesture(PanUp);
+    }
+    else if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+        scrollBackBuffer(eventPos, dragOrigin);
+    }
+    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+        selectionHelper(eventPos, false);
+    }
+}
+
+void TextRender::selectionHelper(QPointF scenePos, bool selectionOngoing)
+{
+    int yCorr = fontDescent();
+
+    QPoint start(qRound((dragOrigin.x()+2) / fontWidth()),
+                 qRound((dragOrigin.y()+yCorr) / fontHeight()));
+    QPoint end(qRound((scenePos.x()+2) / fontWidth()),
+               qRound((scenePos.y()+yCorr) / fontHeight()));
+
+    if (start != end) {
+        sTerm->setSelection(start, end, selectionOngoing);
+        newSelection = false;
+    }
+}
+
 void TextRender::handleScrollBack(bool reset)
 {
     if (reset) {
@@ -342,4 +410,49 @@ QPoint TextRender::charsToPixels(QPoint pos)
 QSize TextRender::cursorPixelSize()
 {
     return QSize(iFontWidth, iFontHeight);
+}
+
+QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
+{
+    if(!sTerm)
+        return last;
+
+    int xdist = qAbs(now.x() - last.x());
+    int ydist = qAbs(now.y() - last.y());
+    int fontSize = sUtil->settingsValue("ui/fontSize").toInt();
+
+    int lines = ydist / fontSize;
+
+    if(lines > 0 && now.y() < last.y() && xdist < ydist*2) {
+        sTerm->scrollBackBufferFwd(lines);
+        last = QPointF(now.x(), last.y() - lines * fontSize);
+    } else if(lines > 0 && now.y() > last.y() && xdist < ydist*2) {
+        sTerm->scrollBackBufferBack(lines);
+        last = QPointF(now.x(), last.y() + lines * fontSize);
+    }
+
+    return last;
+}
+
+void TextRender::doGesture(PanGesture gesture)
+{
+    if(!sTerm)
+        return;
+
+    if( gesture==PanLeft ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panLeftTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panLeftCommand").toString(), true);
+    }
+    else if( gesture==PanRight ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panRightTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panRightCommand").toString(), true);
+    }
+    else if( gesture==PanDown ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panDownTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panDownCommand").toString(), true);
+    }
+    else if( gesture==PanUp ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panUpTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panUpCommand").toString(), true);
+    }
 }

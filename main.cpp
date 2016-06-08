@@ -155,11 +155,9 @@ int main(int argc, char *argv[])
     if(!root)
         qFatal("no root object - qml error");
 
-    TextRender *tr = root->findChild<TextRender*>("textrender");
     term.setWindow(&view);
     util.setWindow(&view);
     util.setTerm(&term);
-    util.setRenderer(tr);
 
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 

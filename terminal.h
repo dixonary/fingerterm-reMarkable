@@ -93,7 +93,7 @@ public:
     int backBufferScrollPos() { return iBackBufferScrollPos; }
     void resetBackBufferScrollPos();
 
-    void setSelection(QPoint start, QPoint end);
+    void setSelection(QPoint start, QPoint end, bool selectionOngoing);
     QRect selection();
     Q_INVOKABLE void clearSelection();
     bool hasSelection();
@@ -106,6 +106,7 @@ signals:
     void displayBufferChanged();
     void selectionChanged();
     void scrollBackBufferAdjusted(bool reset);
+    void selectionFinished();
 
 private:
     Q_DISABLE_COPY(Terminal)

@@ -143,7 +143,7 @@ Item {
                         multiTouchArea.firstTouchId = touchPoint.pointId;
 
                         //gestures c++ handler
-                        util.mousePress(touchPoint.x, touchPoint.y);
+                        textrender.mousePress(touchPoint.x, touchPoint.y);
                     }
 
                     var key = vkb.keyAt(touchPoint.x, touchPoint.y);
@@ -157,7 +157,7 @@ Item {
                 touchPoints.forEach(function (touchPoint) {
                     if (multiTouchArea.firstTouchId == touchPoint.pointId) {
                         //gestures c++ handler
-                        util.mouseMove(touchPoint.x, touchPoint.y);
+                        textrender.mouseMove(touchPoint.x, touchPoint.y);
                     }
 
                     var key = multiTouchArea.pressedKeys[touchPoint.pointId];
@@ -185,7 +185,7 @@ Item {
                         }
 
                         //gestures c++ handler
-                        util.mouseRelease(touchPoint.x, touchPoint.y);
+                        textrender.mouseRelease(touchPoint.x, touchPoint.y);
                         multiTouchArea.firstTouchId = -1;
                     }
 
@@ -236,7 +236,6 @@ Item {
             property int duration
             property int cutAfter: height
 
-            objectName: "textrender"
             height: parent.height
             width: parent.width
 

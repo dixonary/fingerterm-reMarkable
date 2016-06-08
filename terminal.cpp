@@ -1450,7 +1450,7 @@ void Terminal::adjustSelectionPosition(int lines)
     emit selectionChanged();
 }
 
-void Terminal::setSelection(QPoint start, QPoint end)
+void Terminal::setSelection(QPoint start, QPoint end, bool selectionOngoing)
 {
     if (start.y() > end.y())
         qSwap(start, end);
@@ -1469,6 +1469,10 @@ void Terminal::setSelection(QPoint start, QPoint end)
     iSelection = QRect(start, end);
 
     emit selectionChanged();
+
+    if (!selectionOngoing) {
+        emit selectionFinished();
+    }
 }
 
 void Terminal::clearSelection()
@@ -1478,9 +1482,7 @@ void Terminal::clearSelection()
 
     iSelection = QRect();
 
-    if (iUtil)
-        iUtil->selectionFinished();
-
+    emit selectionFinished();
     emit selectionChanged();
 }
 
