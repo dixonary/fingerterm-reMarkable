@@ -82,6 +82,7 @@ TextRender::TextRender(QQuickItem *parent) :
     iFontWidth = fontMetrics.maxWidth();
     iFontDescent = fontMetrics.descent();
 
+    Q_ASSERT(sTerm);
     connect(sTerm, SIGNAL(displayBufferChanged()), this, SLOT(redraw()));
     connect(sTerm, SIGNAL(cursorPosChanged(QPoint)), this, SLOT(redraw()));
     connect(sTerm, SIGNAL(termSizeChanged(QSize)), this, SLOT(redraw()));
@@ -96,9 +97,6 @@ TextRender::~TextRender()
 
 void TextRender::paint(QPainter* painter)
 {
-    if (!sTerm)
-        return;
-
     painter->save();
     painter->setFont(iFont);
 
@@ -296,9 +294,6 @@ void TextRender::setTerminal(Terminal *terminal)
 
 void TextRender::updateTermSize()
 {
-    if (!sTerm)
-        return;
-
     QSize size((width() - 4) / iFontWidth, (height() - 4) / iFontHeight);
     sTerm->setTermSize(size);
 }
@@ -414,9 +409,6 @@ QSize TextRender::cursorPixelSize()
 
 QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
 {
-    if(!sTerm)
-        return last;
-
     int xdist = qAbs(now.x() - last.x());
     int ydist = qAbs(now.y() - last.y());
     int fontSize = sUtil->settingsValue("ui/fontSize").toInt();
@@ -436,9 +428,6 @@ QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
 
 void TextRender::doGesture(PanGesture gesture)
 {
-    if(!sTerm)
-        return;
-
     if( gesture==PanLeft ) {
         sUtil->notifyText(sUtil->settingsValue("gestures/panLeftTitle").toString());
         sTerm->putString(sUtil->settingsValue("gestures/panLeftCommand").toString(), true);
