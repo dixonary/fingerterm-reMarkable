@@ -127,6 +127,21 @@ int Util::uiFontSize()
     return 12;
 }
 
+int Util::fontSize()
+{
+    return settingsValue("ui/fontSize").toInt();
+}
+
+void Util::setFontSize(int size)
+{
+    if (size == fontSize()) {
+        return;
+    }
+
+    setSettingsValue("ui/fontSize", size);
+    emit fontSizeChanged();
+}
+
 void Util::keyPressFeedback()
 {
     if( !settingsValue("ui/keyPressFeedback").toBool() )
@@ -155,6 +170,182 @@ void Util::bellAlert()
 
     if( settingsValue("general/visualBell").toBool() ) {
         emit visualBell();
+    }
+}
+
+QString Util::fontFamily()
+{
+    return settingsValue("ui/fontFamily").toString();
+}
+
+int Util::dragMode()
+{
+    QString mode = settingsValue("ui/dragMode").toString();
+
+    if (mode == "gestures") {
+        return DragGestures;
+    } else if (mode == "scroll") {
+        return DragScroll;
+    } else if (mode == "select") {
+        return DragSelect;
+    } else {
+        return DragOff;
+    }
+}
+
+void Util::setDragMode(int mode)
+{
+    if (mode == dragMode()) {
+        return;
+    }
+
+    QString modeString;
+    switch(mode) {
+    case DragGestures:
+        modeString = "gestures";
+        break;
+    case DragScroll:
+        modeString = "scroll";
+        break;
+    case DragSelect:
+        modeString = "select";
+        break;
+    case DragOff:
+    default:
+        modeString = "off";
+    }
+
+    setSettingsValue("ui/dragMode", modeString);
+    emit dragModeChanged();
+}
+
+int Util::keyboardMode()
+{
+    QString mode = settingsValue("ui/vkbShowMethod").toString();
+
+    if (mode == "fade") {
+        return KeyboardFade;
+    } else if (mode == "move") {
+        return KeyboardMove;
+    } else {
+        return KeyboardOff;
+    }
+}
+
+void Util::setKeyboardMode(int mode)
+{
+    if (mode == keyboardMode()) {
+        return;
+    }
+
+    QString modeString;
+    switch(mode) {
+    case KeyboardFade:
+        modeString = "fade";
+        break;
+    case KeyboardMove:
+        modeString = "move";
+        break;
+    case KeyboardOff:
+    default:
+        modeString = "off";
+    }
+
+    setSettingsValue("ui/vkbShowMethod", modeString);
+    emit keyboardModeChanged();
+}
+
+int Util::keyboardFadeOutDelay()
+{
+    return settingsValue("ui/keyboardFadeOutDelay").toInt();
+}
+
+void Util::setKeyboardFadeOutDelay(int delay)
+{
+    if (delay == keyboardFadeOutDelay()) {
+        return;
+    }
+
+    setSettingsValue("ui/keyboardFadeOutDelay", delay);
+    emit keyboardFadeOutDelayChanged();
+}
+
+QString Util::keyboardLayout()
+{
+    return settingsValue("ui/keyboardLayout").toString();
+}
+
+void Util::setKeyboardLayout(const QString &layout)
+{
+    if (layout == keyboardLayout()) {
+        return;
+    }
+
+    setSettingsValue("ui/keyboardLayout", layout);
+    emit keyboardLayoutChanged();
+}
+
+int Util::extraLinesFromCursor()
+{
+    return settingsValue("ui/showExtraLinesFromCursor").toInt();
+}
+
+QString Util::charset()
+{
+    return settingsValue("terminal/charset").toString();
+}
+
+int Util::keyboardMargins()
+{
+    return settingsValue("ui/keyboardMargins").toInt();
+}
+
+int Util::orientationMode()
+{
+    QString mode = settingsValue("ui/orientationLockMode").toString();
+
+    if (mode == "auto") {
+        return OrientationAuto;
+    } else if (mode == "landscape") {
+        return OrientationLandscape;
+    } else {
+        return OrientationPortrait;
+    }
+}
+
+void Util::setOrientationMode(int mode)
+{
+    if (mode == orientationMode()) {
+        return;
+    }
+
+    QString modeString;
+    switch(mode) {
+    case OrientationAuto:
+        modeString = "auto";
+        break;
+    case OrientationLandscape:
+        modeString = "landscape";
+        break;
+    case OrientationPortrait:
+    default:
+        modeString = "portrait";
+    }
+
+    setSettingsValue("ui/orientationLockMode", modeString);
+    emit orientationModeChanged();
+}
+
+bool Util::showWelcomeScreen()
+{
+    return settingsValue("state/showWelcomeScreen").toBool();
+}
+
+void Util::setShowWelcomeScreen(bool value)
+{
+    if (value != showWelcomeScreen()) {
+        setSettingsValue("state/showWelcomeScreen", value);
+        emit showWelcomeScreenChanged();
     }
 }
 

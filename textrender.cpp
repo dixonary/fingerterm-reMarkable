@@ -74,8 +74,7 @@ TextRender::TextRender(QQuickItem *parent) :
 
     iShowBufferScrollIndicator = false;
 
-    iFont = QFont(sUtil->settingsValue("ui/fontFamily").toString(),
-                  sUtil->settingsValue("ui/fontSize").toInt());
+    iFont = QFont(sUtil->fontFamily(), sUtil->fontSize());
     iFont.setBold(false);
     QFontMetrics fontMetrics(iFont);
     iFontHeight = fontMetrics.height();
@@ -314,10 +313,10 @@ void TextRender::mouseMove(float eventX, float eventY)
     if(!sUtil->allowGestures())
         return;
 
-    if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+    if(sUtil->dragMode() == Util::DragScroll) {
         dragOrigin = scrollBackBuffer(eventPos, dragOrigin);
     }
-    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+    else if(sUtil->dragMode() == Util::DragSelect) {
         selectionHelper(eventPos, true);
     }
 }
@@ -330,7 +329,7 @@ void TextRender::mouseRelease(float eventX, float eventY)
     if(!sUtil->allowGestures())
         return;
 
-    if(sUtil->settingsValue("ui/dragMode")=="gestures") {
+    if(sUtil->dragMode() == Util::DragGestures) {
         int xdist = qAbs(eventPos.x() - dragOrigin.x());
         int ydist = qAbs(eventPos.y() - dragOrigin.y());
         if(eventPos.x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
@@ -342,10 +341,10 @@ void TextRender::mouseRelease(float eventX, float eventY)
         else if(eventPos.y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
             doGesture(PanUp);
     }
-    else if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+    else if(sUtil->dragMode() == Util::DragScroll) {
         scrollBackBuffer(eventPos, dragOrigin);
     }
-    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+    else if(sUtil->dragMode() == Util::DragSelect) {
         selectionHelper(eventPos, false);
     }
 }
@@ -384,9 +383,6 @@ void TextRender::setFontPointSize(int psize)
         iFontHeight = fontMetrics.height();
         iFontWidth = fontMetrics.maxWidth();
         iFontDescent = fontMetrics.descent();
-
-        sUtil->setSettingsValue("ui/fontSize", psize);
-
         emit fontSizeChanged();
     }
 }
@@ -411,7 +407,7 @@ QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
 {
     int xdist = qAbs(now.x() - last.x());
     int ydist = qAbs(now.y() - last.y());
-    int fontSize = sUtil->settingsValue("ui/fontSize").toInt();
+    int fontSize = fontPointSize();
 
     int lines = ydist / fontSize;
 

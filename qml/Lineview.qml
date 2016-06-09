@@ -18,16 +18,17 @@
 */
 
 import QtQuick 2.0
+import FingerTerm 1.0
 
 Rectangle {
     id: lineView
 
     property variant lines: [""]
-    property int fontPointSize: util.settingsValue("ui/fontSize")*window.pixelRatio;
+    property int fontPointSize: util.fontSize
     property int cursorX: 1
     property int cursorWidth: 10
     property int cursorHeight: 10
-    property int extraLines: 1
+    property int extraLines: util.extraLinesFromCursor
 
     color: "#404040"
     border.width: 2
@@ -39,7 +40,7 @@ Rectangle {
         id: fontHeightHack
         visible: false
         text: "X"
-        font.family: util.settingsValue("ui/fontFamily");
+        font.family: util.fontFamily
         font.pointSize: lineView.fontPointSize
     }
 
@@ -68,7 +69,7 @@ Rectangle {
                 width: lineTextCol.width
                 Text {
                     color: "#ffffff"
-                    font.family: util.settingsValue("ui/fontFamily");
+                    font.family: util.fontFamily
                     font.pointSize: lineView.fontPointSize
                     text: modelData
                     textFormat: Text.PlainText
@@ -85,19 +86,15 @@ Rectangle {
         }
     }
 
-    Component.onCompleted: {
-        extraLines = util.settingsValue("ui/showExtraLinesFromCursor");
-    }
-
     function setPosition(vkbActive)
     {
-        if( util.settingsValue("ui/vkbShowMethod")==="off" ) {
+        if (util.keyboardMode == Util.KeyboardOff) {
             lineView.visible = false;
             return;
         }
 
         lineView.visible = true;
-        if(vkbActive && util.settingsValue("ui/vkbShowMethod")!=="move") {
+        if (vkbActive && util.keyboardMode != Util.KeyboardMove) {
             y = 0;
         } else {
             y = -(height+window.paddingSmall)

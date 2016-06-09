@@ -18,7 +18,7 @@
 */
 
 import QtQuick 2.0
-import TextRender 1.0
+import FingerTerm 1.0
 import QtQuick.Window 2.0
 
 Item {
@@ -43,9 +43,10 @@ Item {
     Item {
         id: page
 
-        property bool forceOrientation
-        property int forcedOrientation
         property int orientation: forceOrientation ? forcedOrientation : Screen.orientation
+        property bool forceOrientation: util.orientationMode != Util.OrientationAuto
+        property int forcedOrientation: util.orientationMode == Util.OrientationLandscape ? Qt.LandscapeOrientation
+                                                                                          : Qt.PortraitOrientation
         property bool portrait: rotation % 180 == 0
 
         width: portrait ? root.width : root.height
@@ -55,26 +56,6 @@ Item {
         focus: true
         Keys.onPressed: {
             term.keyPress(event.key,event.modifiers,event.text);
-        }
-
-        Component.onCompleted: {
-            var stringMode = util.settingsValue("ui/orientationLockMode");
-            applyOrientationLock(stringMode)
-        }
-
-        function applyOrientationLock(stringMode) {
-            switch (stringMode) {
-            case "auto":
-                page.forceOrientation = false
-                break
-            case "landscape":
-                page.forceOrientation = true
-                page.forcedOrientation = Qt.LandscapeOrientation
-                break
-            case "portrait":
-                page.forceOrientation = true
-                page.forcedOrientation = Qt.PortraitOrientation
-            }
         }
 
         Rectangle {
@@ -108,7 +89,7 @@ Item {
             property int fontSizeSmall: 14*pixelRatio
             property int fontSizeLarge: 24*pixelRatio
 
-            property int uiFontSize: util.uiFontSize()*pixelRatio
+            property int uiFontSize: util.uiFontSize * pixelRatio
 
             property int scrollBarWidth: 6*window.pixelRatio
 
@@ -182,7 +163,7 @@ Item {
                             //   - not in select mode, as it would be hard to select text
                             if (touchPoint.y < vkb.y && touchPoint.startY < vkb.y &&
                                     Math.abs(touchPoint.y - touchPoint.startY) < 20 &&
-                                    util.settingsValue("ui/dragMode") !== "select") {
+                                    util.dragMode == Util.DragSelect) {
                                 if (vkb.active) {
                                     window.sleepVKB();
                                 } else {
@@ -244,16 +225,13 @@ Item {
 
                 height: parent.height
                 width: parent.width
+                fontPointSize: util.fontSize
 
                 Behavior on opacity {
                     NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
                 }
                 Behavior on y {
                     NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
-                }
-
-                onFontSizeChanged: {
-                    lineView.fontPointSize = textrender.fontPointSize;
                 }
 
                 onCutAfterChanged: {
@@ -266,7 +244,7 @@ Item {
             Timer {
                 id: fadeTimer
 
-                interval: menu.keyboardFadeOutDelay
+                interval: util.keyboardFadeOutDelay
                 onTriggered: {
                     window.sleepVKB();
                 }
@@ -347,14 +325,12 @@ Item {
                         if(util.windowTitle.length>40)
                             str += "...";
                         str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
-                        str += "<br>Charset: <font color=\"gray\">" + util.settingsValue("terminal/charset") + "</font>";
+                        str += "<br>Charset: <font color=\"gray\">" + util.charset + "</font>";
                     }
                     str += "</font>";
                     return str;
                 }
-                onDismissed: {
-                    util.setSettingsValue("state/showWelcomeScreen", false);
-                }
+                onDismissed: util.showWelcomeScreen = false
             }
 
             NotifyWin {
@@ -403,12 +379,13 @@ Item {
 
             function setTextRenderAttributes()
             {
-                if(util.settingsValue("ui/vkbShowMethod")==="move")
+                if (util.keyboardMode == Util.KeyboardMove)
                 {
                     vkb.visibleSetting = true;
                     textrender.opacity = 1.0;
                     if(vkb.active) {
-                        var move = textrender.cursorPixelPos().y + textrender.fontHeight/2 + textrender.fontHeight*util.settingsValue("ui/showExtraLinesFromCursor");
+                        var move = textrender.cursorPixelPos().y + textrender.fontHeight/2
+                                + textrender.fontHeight*util.extraLinesFromCursor
                         if(move < vkb.y) {
                             textrender.y = 0;
                             textrender.cutAfter = vkb.y;
@@ -421,7 +398,7 @@ Item {
                         textrender.y = 0;
                     }
                 }
-                else if(util.settingsValue("ui/vkbShowMethod")==="fade")
+                else if (util.keyboardMode == Util.KeyboardFade)
                 {
                     vkb.visibleSetting = true;
                     textrender.cutAfter = textrender.height;
@@ -442,7 +419,7 @@ Item {
 
             function displayBufferChanged()
             {
-                lineView.lines = term.printableLinesFromCursor(util.settingsValue("ui/showExtraLinesFromCursor"));
+                lineView.lines = term.printableLinesFromCursor(util.extraLinesFromCursor);
                 lineView.cursorX = textrender.cursorPixelPos().x;
                 lineView.cursorWidth = textrender.cursorPixelSize().width;
                 lineView.cursorHeight = textrender.cursorPixelSize().height;
@@ -450,8 +427,8 @@ Item {
             }
 
             Component.onCompleted: {
-                if( util.settingsValue("state/showWelcomeScreen") === true )
-                    aboutDialog.state = "visible";
+                if (util.showWelcomeScreen)
+                    aboutDialog.state = "visible"
                 if (startupErrorMessage != "") {
                     showErrorMessage(startupErrorMessage)
                 }
@@ -461,12 +438,6 @@ Item {
             {
                 errorDialog.text = "<font size=\"+2\">" + string + "</font>";
                 errorDialog.state = "visible"
-            }
-
-            function setOrientationLockMode(stringMode)
-            {
-                util.setSettingsValue("ui/orientationLockMode", stringMode);
-                page.applyOrientationLock(stringMode)
             }
         }
     }

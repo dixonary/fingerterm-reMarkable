@@ -22,7 +22,6 @@ import QtQuick 2.0
 Rectangle {
     id: layoutWindow
 
-    property string currentLayout: util.settingsValue("ui/keyboardLayout");
     property variant layouts: [""]
 
     width: window.width-1
@@ -41,7 +40,7 @@ Rectangle {
     Component {
         id: listDelegate
         Rectangle {
-            color: currentLayout === modelData ? "#909090" : "#404040"
+            color: util.keyboardLayout === modelData ? "#909090" : "#404040"
             width: parent.width
             height: selectButton.height+4*window.pixelRatio
             border.width: 1
@@ -66,8 +65,7 @@ Rectangle {
                 width: 70*window.pixelRatio
                 anchors.rightMargin: window.paddingSmall
                 onClicked: {
-                    util.setSettingsValue("ui/keyboardLayout", modelData);
-                    vkb.reloadLayout();
+                    util.keyboardLayout = modelData
                     layoutWindow.state = "";
                     util.notifyText(modelData);
                 }
@@ -110,10 +108,6 @@ Rectangle {
             PropertyChanges {
                 target: layoutWindow
                 y: 0
-            }
-            StateChangeScript {
-                script:
-                    currentLayout = util.settingsValue("ui/keyboardLayout");
             }
         }
     ]

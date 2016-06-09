@@ -34,7 +34,7 @@ Rectangle {
 
     property bool active
 
-    property int outmargins: util.settingsValue("ui/keyboardMargins")
+    property int outmargins: util.keyboardMargins
     property int keyspacing: 6
     property int keysPerRow: keyLoader.vkbColumns()
     property real keywidth: (keyboard.width - keyspacing*keysPerRow - outmargins*2)/keysPerRow;
@@ -99,21 +99,23 @@ Rectangle {
         }
     }
 
-    function reloadLayout()
-    {
-        var ret = keyLoader.loadLayout(util.settingsValue("ui/keyboardLayout"));
-        if (!ret) {
-            showErrorMessage("There was an error loading the keyboard layout.<br>\nUsing the default one instead.");
-            util.setSettingsValue("ui/keyboardLayout", "english");
-            ret = keyLoader.loadLayout(":/data/english.layout"); //try the default as a fallback (load from resources to ensure it will succeed)
+    Connections {
+        target: util
+        onKeyboardLayoutChanged: {
+            var ret = keyLoader.loadLayout(util.keyboardLayout)
             if (!ret) {
-                console.log("keyboard layout fail");
-                Qt.quit();
+                showErrorMessage("There was an error loading the keyboard layout.<br>\nUsing the default one instead.");
+                util.keyboardLayout = "english"
+                ret = keyLoader.loadLayout(":/data/english.layout"); //try the default as a fallback (load from resources to ensure it will succeed)
+                if (!ret) {
+                    console.log("keyboard layout fail");
+                    Qt.quit();
+                }
             }
+            // makes the keyboard component reload itself with new data
+            keyboardLoader.sourceComponent = undefined
+            keyboardLoader.sourceComponent = keyboardContents
         }
-        // makes the keyboard component reload itself with new data
-        keyboardLoader.sourceComponent = undefined
-        keyboardLoader.sourceComponent = keyboardContents
     }
 
     //borrowed from nemo-keyboard

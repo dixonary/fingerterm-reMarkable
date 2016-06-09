@@ -19,15 +19,12 @@
 
 import QtQuick 2.0
 import QtQuick.XmlListModel 2.0
+import FingerTerm 1.0
 
 Item {
     id: menuWin
 
     property bool showing
-    property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
-    property string currentDragMode: util.settingsValue("ui/dragMode")
-    property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
-    property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
     visible: rect.x < menuWin.width
 
@@ -178,8 +175,7 @@ Item {
                                     Button {
                                         text: "<font size=\"+3\">+</font>"
                                         onClicked: {
-                                            textrender.fontPointSize = textrender.fontPointSize + window.pixelRatio;
-                                            lineView.fontPointSize = textrender.fontPointSize;
+                                            util.fontSize = util.fontSize + window.pixelRatio
                                             util.notifyText(term.termSize().width+"x"+term.termSize().height);
                                         }
                                         width: window.buttonWidthHalf
@@ -188,8 +184,7 @@ Item {
                                     Button {
                                         text: "<font size=\"+3\">-</font>"
                                         onClicked: {
-                                            textrender.fontPointSize = textrender.fontPointSize - window.pixelRatio;
-                                            lineView.fontPointSize = textrender.fontPointSize;
+                                            util.fontSize = util.fontSize - window.pixelRatio
                                             util.notifyText(term.termSize().width+"x"+term.termSize().height);
                                         }
                                         width: window.buttonWidthHalf
@@ -218,31 +213,22 @@ Item {
                                 Row {
                                     Button {
                                         text: "<font size=\"-1\">Auto</font>"
-                                        highlighted: currentOrientationLockMode=="auto"
-                                        onClicked: {
-                                            currentOrientationLockMode = "auto";
-                                            window.setOrientationLockMode("auto");
-                                        }
+                                        highlighted: util.orientationMode == Util.OrientationAuto
+                                        onClicked: util.orientationMode = Util.OrientationAuto
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "<font size=\"-1\">L<font>"
-                                        highlighted: currentOrientationLockMode=="landscape"
-                                        onClicked: {
-                                            currentOrientationLockMode = "landscape";
-                                            window.setOrientationLockMode("landscape");
-                                        }
+                                        highlighted: util.orientationMode == Util.OrientationLandscape
+                                        onClicked: util.orientationMode = Util.OrientationLandscape
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
                                     }
                                     Button {
                                         text: "<font size=\"-1\">P</font>"
-                                        highlighted: currentOrientationLockMode=="portrait"
-                                        onClicked: {
-                                            currentOrientationLockMode = "portrait";
-                                            window.setOrientationLockMode("portrait");
-                                        }
+                                        highlighted: util.orientationMode == Util.OrientationPortrait
+                                        onClicked: util.orientationMode = Util.OrientationPortrait
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
                                     }
@@ -269,11 +255,10 @@ Item {
                                 Row {
                                     Button {
                                         text: "<font size=\"-1\">Gesture</font>"
-                                        highlighted: currentDragMode=="gestures"
+                                        highlighted: util.dragMode == Util.DragGestures
                                         onClicked: {
-                                            util.setSettingsValue("ui/dragMode", "gestures");
+                                            util.dragMode = Util.DragGestures
                                             term.clearSelection();
-                                            currentDragMode = "gestures";
                                             menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
@@ -281,10 +266,9 @@ Item {
                                     }
                                     Button {
                                         text: "<font size=\"-1\">Scroll</font>"
-                                        highlighted: currentDragMode=="scroll"
+                                        highlighted: util.dragMode == Util.DragScroll
                                         onClicked: {
-                                            util.setSettingsValue("ui/dragMode", "scroll");
-                                            currentDragMode = "scroll";
+                                            util.dragMode = Util.DragScroll
                                             term.clearSelection();
                                             menuWin.showing = false;
                                         }
@@ -293,10 +277,9 @@ Item {
                                     }
                                     Button {
                                         text: "<font size=\"-1\">Select</font>"
-                                        highlighted: currentDragMode=="select"
+                                        highlighted: util.dragMode == Util.DragSelect
                                         onClicked: {
-                                            util.setSettingsValue("ui/dragMode", "select");
-                                            currentDragMode = "select";
+                                            util.dragMode = Util.DragSelect
                                             menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
@@ -325,10 +308,9 @@ Item {
                                 Row {
                                     Button {
                                         text: "Off"
-                                        highlighted: currentShowMethod=="off"
+                                        highlighted: util.keyboardMode == Util.KeyboardOff
                                         onClicked: {
-                                            util.setSettingsValue("ui/vkbShowMethod", "off");
-                                            currentShowMethod = "off";
+                                            util.keyboardMode = Util.KeyboardOff
                                             window.setTextRenderAttributes();
                                             menuWin.showing = false;
                                         }
@@ -337,10 +319,9 @@ Item {
                                     }
                                     Button {
                                         text: "Fade"
-                                        highlighted: currentShowMethod=="fade"
+                                        highlighted: util.keyboardMode == Util.KeyboardFade
                                         onClicked: {
-                                            util.setSettingsValue("ui/vkbShowMethod", "fade");
-                                            currentShowMethod = "fade";
+                                            util.keyboardMode = Util.KeyboardFade
                                             window.setTextRenderAttributes();
                                             menuWin.showing = false;
                                         }
@@ -349,10 +330,9 @@ Item {
                                     }
                                     Button {
                                         text: "Move"
-                                        highlighted: currentShowMethod=="move"
+                                        highlighted: util.keyboardMode == Util.KeyboardMove
                                         onClicked: {
-                                            util.setSettingsValue("ui/vkbShowMethod", "move");
-                                            currentShowMethod = "move";
+                                            util.keyboardMode = Util.KeyboardMove
                                             window.setTextRenderAttributes();
                                             menuWin.showing = false;
                                         }
@@ -411,7 +391,7 @@ Item {
                         height: window.headerHeight
                         color: "#ffffff"
                         font.pointSize: window.uiFontSize-1
-                        text: "VKB delay: " + vkbDelaySlider.keyboardFadeOutDelayLabel + " ms"
+                        text: "VKB delay: " + vkbDelaySlider.keyboardFadeOutDelay + " ms"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Rectangle {
@@ -425,9 +405,8 @@ Item {
                     Rectangle {
                         id: vkbDelaySlider
 
-                        property int keyboardFadeOutDelayLabel: keyboardFadeOutDelay
+                        property int keyboardFadeOutDelay: util.keyboardFadeOutDelay
 
-                        x: (keyboardFadeOutDelay-1000)/9000 * (vkbDelaySliderArea.width - vkbDelaySlider.width)
                         y: window.headerHeight
                         width: window.buttonWidthSmall
                         radius: window.radiusLarge
@@ -435,9 +414,13 @@ Item {
                         color: "#202020"
                         onXChanged: {
                             if (vkbDelaySliderMA.drag.active)
-                                vkbDelaySlider.keyboardFadeOutDelayLabel =
+                                vkbDelaySlider.keyboardFadeOutDelay =
                                         Math.floor((1000+vkbDelaySlider.x/vkbDelaySliderMA.drag.maximumX*9000)/250)*250;
                         }
+                        Component.onCompleted: {
+                            x = (keyboardFadeOutDelay-1000)/9000 * (vkbDelaySliderArea.width - vkbDelaySlider.width)
+                        }
+
                         MouseArea {
                             id: vkbDelaySliderMA
                             anchors.fill: parent
@@ -447,8 +430,7 @@ Item {
                             drag.maximumX: vkbDelaySliderArea.width - vkbDelaySlider.width
                             drag.onActiveChanged: {
                                 if (!drag.active) {
-                                    keyboardFadeOutDelay = vkbDelaySlider.keyboardFadeOutDelayLabel
-                                    util.setSettingsValue("ui/keyboardFadeOutDelay", keyboardFadeOutDelay);
+                                    util.keyboardFadeOutDelay = vkbDelaySlider.keyboardFadeOutDelay
                                 }
                             }
                         }

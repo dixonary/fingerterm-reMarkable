@@ -100,7 +100,8 @@ int main(int argc, char *argv[])
                                      | Qt::InvertedPortraitOrientation);
     }
 
-    qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
+    qmlRegisterType<TextRender>("FingerTerm", 1, 0, "TextRender");
+    qmlRegisterUncreatableType<Util>("FingerTerm", 1, 0, "Util", "Util is created by app");
     QQuickView view;
 
     bool fullscreen = !app.arguments().contains("-nofs");
