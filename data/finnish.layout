@@ -1,5 +1,5 @@
 ; use keycodes from:
-; http://doc.qt.nokia.com/4.7/qt.html#Key-enum
+; https://doc.qt.io/qt-5/qt.html#Key-enum
 ;
 ; - [] will leave an empty space in the keyboard
 ; - Recognized modifier keys are shift, alt, ctrl
