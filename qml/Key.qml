@@ -149,8 +149,9 @@ Rectangle {
 
         if (key.isClick) {
             if (Math.abs(x - key.pressMouseX) > key.clickThreshold
-                    || Math.abs(y - key.pressMouseY) > key.clickThreshold)
+                    || Math.abs(y - key.pressMouseY) > key.clickThreshold) {
                 key.isClick = false
+            }
         }
 
         return true;
