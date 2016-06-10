@@ -23,14 +23,17 @@ Rectangle {
     id: layoutWindow
 
     property variant layouts: [""]
+    property bool show
 
     width: window.width-1
     height: window.height-1
     color: "#000000"
-    y: -(height+1)
+    y: show ? 0 : -(height+1)
     border.color: "#c0c0c0"
     border.width: 1
     radius: window.radiusMedium
+
+    Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.InOutCubic } }
 
     MouseArea {
         // event eater
@@ -66,8 +69,8 @@ Rectangle {
                 anchors.rightMargin: window.paddingSmall
                 onClicked: {
                     util.keyboardLayout = modelData
-                    layoutWindow.state = "";
-                    util.notifyText(modelData);
+                    layoutWindow.show = false
+                    util.notifyText(modelData)
                 }
             }
         }
@@ -97,26 +100,6 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: window.paddingMedium
         text: "Back"
-        onClicked: {
-            layoutWindow.state = ""
-        }
+        onClicked: layoutWindow.show = false
     }
-
-    states: [
-        State {
-            name: "visible"
-            PropertyChanges {
-                target: layoutWindow
-                y: 0
-            }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            from: "*"
-            to: "*"
-            PropertyAnimation { target: layoutWindow; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-        }
-    ]
 }

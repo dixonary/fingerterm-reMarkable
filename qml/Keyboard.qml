@@ -19,7 +19,7 @@
 
 import QtQuick 2.0
 
-Rectangle {
+Item {
     id: keyboard
 
     property int keyModifiers
@@ -39,7 +39,6 @@ Rectangle {
     property int keysPerRow: keyLoader.vkbColumns()
     property real keywidth: (keyboard.width - keyspacing*keysPerRow - outmargins*2)/keysPerRow;
 
-    color: "transparent"
     width: parent.width
     height: childrenRect.height + outmargins
 

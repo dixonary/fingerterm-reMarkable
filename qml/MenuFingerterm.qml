@@ -151,7 +151,7 @@ Item {
                             onClicked: {
                                 menuWin.showing = false;
                                 urlWindow.urls = term.grabURLsFromBuffer();
-                                urlWindow.state = "visible";
+                                urlWindow.show = true
                             }
                         }
                         Rectangle {
@@ -354,7 +354,7 @@ Item {
                             onClicked: {
                                 menuWin.showing = false;
                                 layoutWindow.layouts = keyLoader.availableLayouts();
-                                layoutWindow.state = "visible";
+                                layoutWindow.show = true
                             }
                         }
                         Button {
@@ -363,7 +363,7 @@ Item {
                                 menuWin.showing = false;
                                 aboutDialog.termW = term.termSize().width
                                 aboutDialog.termH = term.termSize().height
-                                aboutDialog.state = "visible"
+                                aboutDialog.show = true
                             }
                         }
                         Button {

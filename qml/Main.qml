@@ -36,8 +36,7 @@ Item {
     Binding {
         target: util
         property: "allowGestures"
-        value: !vkb.active && !menu.showing && urlWindow.state != "visible" && aboutDialog.state != "visible"
-               && layoutWindow.state != "visible"
+        value: !vkb.active && !menu.showing && !urlWindow.show && !aboutDialog.show && !layoutWindow.show
     }
 
     Item {
@@ -98,13 +97,7 @@ Item {
 
             Lineview {
                 id: lineView
-
-                property int duration
-
-                y: -(height+1)
-                onFontPointSizeChanged: {
-                    lineView.setPosition(vkb.active)
-                }
+                show: (util.keyboardMode == Util.KeyboardFade) && vkb.active
             }
 
             Keyboard {
@@ -185,26 +178,20 @@ Item {
                 }
             }
 
-            Rectangle {
+            MouseArea {
                 //top right corner menu button
                 x: window.width - width
                 width: menuImg.width + 60*window.pixelRatio
                 height: menuImg.height + 30*window.pixelRatio
-                color: "transparent"
                 opacity: 0.5
+                onClicked: menu.showing = true
+
                 Image {
-                    anchors.centerIn: parent
                     id: menuImg
+
+                    anchors.centerIn: parent
                     source: "qrc:/icons/menu.png"
-                    height: sourceSize.height
-                    width: sourceSize.width
                     scale: window.pixelRatio
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        menu.showing = true
-                    }
                 }
             }
 
@@ -226,6 +213,8 @@ Item {
                 height: parent.height
                 width: parent.width
                 fontPointSize: util.fontSize
+                opacity: (util.keyboardMode == Util.KeyboardFade && vkb.active) ? 0.3
+                                                                                : 1.0
 
                 Behavior on opacity {
                     NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
@@ -360,20 +349,16 @@ Item {
                 if(!vkb.visibleSetting)
                     return;
 
-                lineView.duration = window.fadeOutTime;
                 textrender.duration = window.fadeOutTime;
                 fadeTimer.restart();
                 vkb.active = true;
-                lineView.setPosition(vkb.active);
                 setTextRenderAttributes();
             }
 
             function sleepVKB()
             {
                 textrender.duration = window.fadeInTime;
-                lineView.duration = window.fadeInTime;
                 vkb.active = false;
-                lineView.setPosition(vkb.active);
                 setTextRenderAttributes();
             }
 
@@ -382,7 +367,6 @@ Item {
                 if (util.keyboardMode == Util.KeyboardMove)
                 {
                     vkb.visibleSetting = true;
-                    textrender.opacity = 1.0;
                     if(vkb.active) {
                         var move = textrender.cursorPixelPos().y + textrender.fontHeight/2
                                 + textrender.fontHeight*util.extraLinesFromCursor
@@ -403,17 +387,12 @@ Item {
                     vkb.visibleSetting = true;
                     textrender.cutAfter = textrender.height;
                     textrender.y = 0;
-                    if(vkb.active)
-                        textrender.opacity = 0.3;
-                    else
-                        textrender.opacity = 1.0;
                 }
                 else // "off" (vkb disabled)
                 {
                     vkb.visibleSetting = false;
                     textrender.cutAfter = textrender.height;
                     textrender.y = 0;
-                    textrender.opacity = 1.0;
                 }
             }
 
@@ -428,7 +407,7 @@ Item {
 
             Component.onCompleted: {
                 if (util.showWelcomeScreen)
-                    aboutDialog.state = "visible"
+                    aboutDialog.show = true
                 if (startupErrorMessage != "") {
                     showErrorMessage(startupErrorMessage)
                 }
@@ -437,7 +416,7 @@ Item {
             function showErrorMessage(string)
             {
                 errorDialog.text = "<font size=\"+2\">" + string + "</font>";
-                errorDialog.state = "visible"
+                errorDialog.show = true
             }
         }
     }

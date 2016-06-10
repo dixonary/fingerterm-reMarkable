@@ -23,17 +23,19 @@ Rectangle {
     id: notifyWin
 
     property string text
+    property bool show
 
     signal dismissed()
 
     width: window.width-1
     height: window.height-1
     color: "#000000"
-    y: -(height+1)
-    state: ""
+    y: show ? 0 : -(height+1)
     border.color: "#c0c0c0"
     border.width: 1
     radius: window.radiusMedium
+
+    Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.InOutCubic } }
 
     MouseArea {
         // event eater
@@ -66,26 +68,8 @@ Rectangle {
         anchors.bottomMargin: window.paddingMedium
         text: "OK"
         onClicked: {
-            notifyWin.state = ""
+            notifyWin.show = false
             notifyWin.dismissed();
         }
     }
-
-    states: [
-        State {
-            name: "visible"
-            PropertyChanges {
-                target: notifyWin
-                y: 0
-            }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            from: "*"
-            to: "*"
-            PropertyAnimation { target: notifyWin; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-        }
-    ]
 }
