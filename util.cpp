@@ -45,6 +45,7 @@ Util::Util(QSettings *settings, QObject *parent) :
 
 Util::~Util()
 {
+    delete iSettings;
 }
 
 void Util::setWindow(QQuickView* win)
@@ -102,12 +103,12 @@ QString Util::configPath()
     return f.path();
 }
 
-QVariant Util::settingsValue(QString key)
+QVariant Util::settingsValue(QString key, const QVariant &defaultValue)
 {
     if(!iSettings)
-        return QVariant();
+        return defaultValue;
 
-    return iSettings->value(key);
+    return iSettings->value(key, defaultValue);
 }
 
 void Util::setSettingsValue(QString key, QVariant value)
@@ -128,7 +129,7 @@ int Util::uiFontSize()
 
 int Util::fontSize()
 {
-    return settingsValue("ui/fontSize").toInt();
+    return settingsValue("ui/fontSize", 11).toInt();
 }
 
 void Util::setFontSize(int size)
@@ -143,7 +144,7 @@ void Util::setFontSize(int size)
 
 void Util::keyPressFeedback()
 {
-    if( !settingsValue("ui/keyPressFeedback").toBool() )
+    if( !settingsValue("ui/keyPressFeedback", true).toBool() )
         return;
 
 #ifdef HAVE_FEEDBACK
@@ -153,7 +154,7 @@ void Util::keyPressFeedback()
 
 void Util::keyReleaseFeedback()
 {
-    if( !settingsValue("ui/keyPressFeedback").toBool() )
+    if( !settingsValue("ui/keyPressFeedback", true).toBool() )
         return;
 
     // TODO: check what's more comfortable, only press, or press and release
@@ -167,19 +168,19 @@ void Util::bellAlert()
     if(!iWindow)
         return;
 
-    if( settingsValue("general/visualBell").toBool() ) {
+    if( settingsValue("general/visualBell", true).toBool() ) {
         emit visualBell();
     }
 }
 
 QString Util::fontFamily()
 {
-    return settingsValue("ui/fontFamily").toString();
+    return settingsValue("ui/fontFamily", DEFAULT_FONTFAMILY).toString();
 }
 
 int Util::dragMode()
 {
-    QString mode = settingsValue("ui/dragMode").toString();
+    QString mode = settingsValue("ui/dragMode", "scroll").toString();
 
     if (mode == "gestures") {
         return DragGestures;
@@ -220,7 +221,7 @@ void Util::setDragMode(int mode)
 
 int Util::keyboardMode()
 {
-    QString mode = settingsValue("ui/vkbShowMethod").toString();
+    QString mode = settingsValue("ui/vkbShowMethod", "move").toString();
 
     if (mode == "fade") {
         return KeyboardFade;
@@ -256,7 +257,7 @@ void Util::setKeyboardMode(int mode)
 
 int Util::keyboardFadeOutDelay()
 {
-    return settingsValue("ui/keyboardFadeOutDelay").toInt();
+    return settingsValue("ui/keyboardFadeOutDelay", 4000).toInt();
 }
 
 void Util::setKeyboardFadeOutDelay(int delay)
@@ -271,7 +272,7 @@ void Util::setKeyboardFadeOutDelay(int delay)
 
 QString Util::keyboardLayout()
 {
-    return settingsValue("ui/keyboardLayout").toString();
+    return settingsValue("ui/keyboardLayout", "english").toString();
 }
 
 void Util::setKeyboardLayout(const QString &layout)
@@ -286,22 +287,22 @@ void Util::setKeyboardLayout(const QString &layout)
 
 int Util::extraLinesFromCursor()
 {
-    return settingsValue("ui/showExtraLinesFromCursor").toInt();
+    return settingsValue("ui/showExtraLinesFromCursor", 1).toInt();
 }
 
 QString Util::charset()
 {
-    return settingsValue("terminal/charset").toString();
+    return settingsValue("terminal/charset", "UTF-8").toString();
 }
 
 int Util::keyboardMargins()
 {
-    return settingsValue("ui/keyboardMargins").toInt();
+    return settingsValue("ui/keyboardMargins", 10).toInt();
 }
 
 int Util::orientationMode()
 {
-    QString mode = settingsValue("ui/orientationLockMode").toString();
+    QString mode = settingsValue("ui/orientationLockMode", "auto").toString();
 
     if (mode == "auto") {
         return OrientationAuto;
@@ -337,7 +338,7 @@ void Util::setOrientationMode(int mode)
 
 bool Util::showWelcomeScreen()
 {
-    return settingsValue("state/showWelcomeScreen").toBool();
+    return settingsValue("state/showWelcomeScreen", true).toBool();
 }
 
 void Util::setShowWelcomeScreen(bool value)

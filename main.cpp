@@ -38,13 +38,11 @@ extern "C" {
 #include "version.h"
 #include "keyloader.h"
 
-void defaultSettings(QSettings* settings);
 void copyFileFromResources(QString from, QString to);
 
 int main(int argc, char *argv[])
 {
     QSettings *settings = new QSettings(QDir::homePath()+"/.config/FingerTerm/settings.ini", QSettings::IniFormat);
-    defaultSettings(settings);
 
     QCoreApplication::setApplicationName("Fingerterm");
 
@@ -55,7 +53,7 @@ int main(int argc, char *argv[])
         qFatal("forkpty failed");
         exit(1);
     } else if( pid==0 ) {
-        setenv("TERM", settings->value("terminal/envVarTERM").toByteArray(), 1);
+        setenv("TERM", settings->value("terminal/envVarTERM", "xterm").toByteArray(), 1);
 
         QString execCmd;
         for(int i=0; i<argc-1; i++) {
@@ -116,7 +114,7 @@ int main(int argc, char *argv[])
     }
 
     Terminal term;
-    Util util(settings);
+    Util util(settings); // takes ownership
     term.setUtil(&util);
     TextRender::setUtil(&util);
     TextRender::setTerminal(&term);
@@ -133,11 +131,11 @@ int main(int argc, char *argv[])
 
     KeyLoader keyLoader;
     keyLoader.setUtil(&util);
-    bool ret = keyLoader.loadLayout( settings->value("ui/keyboardLayout").toString() );
+    bool ret = keyLoader.loadLayout(util.keyboardLayout());
     if(!ret) {
         // on failure, try to load the default one (english) directly from resources
         startupErrorMsg = "There was an error loading the keyboard layout.<br>\nUsing the default one instead.";
-        settings->setValue("ui/keyboardLayout", "english");
+        util.setKeyboardLayout("english");
         ret = keyLoader.loadLayout(":/data/english.layout");
         if(!ret)
             qFatal("failure loading keyboard layout");
@@ -168,73 +166,12 @@ int main(int argc, char *argv[])
         view.show();
     }
 
-    PtyIFace ptyiface(pid, socketM, &term,
-                       settings->value("terminal/charset").toString());
+    PtyIFace ptyiface(pid, socketM, &term, util.charset());
 
     if( ptyiface.failed() )
         qFatal("pty failure");
 
     return app.exec();
-}
-
-void defaultSettings(QSettings* settings)
-{
-    if(!settings->contains("ui/orientationLockMode"))
-        settings->setValue("ui/orientationLockMode", "auto");
-    if(!settings->contains("general/execCmd"))
-        settings->setValue("general/execCmd", "");
-    if(!settings->contains("general/visualBell"))
-        settings->setValue("general/visualBell", true);
-    if(!settings->contains("general/backgroundBellNotify"))
-        settings->setValue("general/backgroundBellNotify", true);
-    if(!settings->contains("general/grabUrlsFromBackbuffer"))
-        settings->setValue("general/grabUrlsFromBackbuffer", false);
-
-    if(!settings->contains("terminal/envVarTERM"))
-        settings->setValue("terminal/envVarTERM", "xterm");
-    if(!settings->contains("terminal/charset"))
-        settings->setValue("terminal/charset", "UTF-8");
-
-    if(!settings->contains("ui/keyboardLayout"))
-        settings->setValue("ui/keyboardLayout", "english");
-    if(!settings->contains("ui/fontFamily"))
-        settings->setValue("ui/fontFamily", DEFAULT_FONTFAMILY);
-    if(!settings->contains("ui/fontSize"))
-        settings->setValue("ui/fontSize", 11);
-    if(!settings->contains("ui/keyboardMargins"))
-        settings->setValue("ui/keyboardMargins", 10);
-    if(!settings->contains("ui/keyboardFadeOutDelay"))
-        settings->setValue("ui/keyboardFadeOutDelay", 4000);
-    if(!settings->contains("ui/showExtraLinesFromCursor"))
-        settings->setValue("ui/showExtraLinesFromCursor", 1);
-    if(!settings->contains("ui/vkbShowMethod"))
-        settings->setValue("ui/vkbShowMethod", "move");  // "fade", "move", "off"
-    if(!settings->contains("ui/keyPressFeedback"))
-        settings->setValue("ui/keyPressFeedback", true);
-    if(!settings->contains("ui/dragMode"))
-        settings->setValue("ui/dragMode", "scroll");  // "gestures, "scroll", "select" ("off" would also be ok)
-
-    if(!settings->contains("state/showWelcomeScreen"))
-        settings->setValue("state/showWelcomeScreen", true);
-    if(!settings->contains("state/createdByVersion"))
-        settings->setValue("state/createdByVersion", PROGRAM_VERSION);
-
-    if(!settings->contains("gestures/panLeftTitle"))
-        settings->setValue("gestures/panLeftTitle", "Alt-Right");
-    if(!settings->contains("gestures/panLeftCommand"))
-        settings->setValue("gestures/panLeftCommand", "\\e\\e[C");
-    if(!settings->contains("gestures/panRightTitle"))
-        settings->setValue("gestures/panRightTitle", "Alt-Left");
-    if(!settings->contains("gestures/panRightCommand"))
-        settings->setValue("gestures/panRightCommand", "\\e\\e[D");
-    if(!settings->contains("gestures/panUpTitle"))
-        settings->setValue("gestures/panUpTitle", "Page Down");
-    if(!settings->contains("gestures/panUpCommand"))
-        settings->setValue("gestures/panUpCommand", "\\e[6~");
-    if(!settings->contains("gestures/panDownTitle"))
-        settings->setValue("gestures/panDownTitle", "Page Up");
-    if(!settings->contains("gestures/panDownCommand"))
-        settings->setValue("gestures/panDownCommand", "\\e[5~");
 }
 
 void copyFileFromResources(QString from, QString to)

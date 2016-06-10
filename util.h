@@ -83,7 +83,7 @@ public:
 
     Q_INVOKABLE QString versionString();
     Q_INVOKABLE QString configPath();
-    QVariant settingsValue(QString key);
+    QVariant settingsValue(QString key, const QVariant &defaultValue = QVariant());
     void setSettingsValue(QString key, QVariant value);
 
     int uiFontSize();

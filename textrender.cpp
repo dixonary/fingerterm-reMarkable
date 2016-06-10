@@ -439,19 +439,19 @@ QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
 void TextRender::doGesture(PanGesture gesture)
 {
     if( gesture==PanLeft ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panLeftTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panLeftCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panLeftTitle", "Alt-Right").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panLeftCommand", "\\e\\e[C").toString(), true);
     }
     else if( gesture==PanRight ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panRightTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panRightCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panRightTitle", "Alt-Left").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panRightCommand", "\\e\\e[D").toString(), true);
     }
     else if( gesture==PanDown ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panDownTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panDownCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panDownTitle", "Page Up").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panDownCommand", "\\e[5~").toString(), true);
     }
     else if( gesture==PanUp ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panUpTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panUpCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panUpTitle", "Page Down").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panUpCommand", "\\e[6~").toString(), true);
     }
 }
