@@ -22,7 +22,6 @@
 
 #include <QtCore>
 
-class TextRender;
 class PtyIFace;
 class Util;
 class QQuickView;
@@ -60,7 +59,7 @@ public:
 
     explicit Terminal(QObject *parent = 0);
     virtual ~Terminal() {}
-    void setRenderer(TextRender* tr);
+
     void setPtyIFace(PtyIFace* pty);
     void setWindow(QQuickView* win) { iWindow=win; }
     void setUtil(Util* util) { iUtil = util; }
@@ -94,7 +93,7 @@ public:
     int backBufferScrollPos() { return iBackBufferScrollPos; }
     void resetBackBufferScrollPos();
 
-    void setSelection(QPoint start, QPoint end);
+    void setSelection(QPoint start, QPoint end, bool selectionOngoing);
     QRect selection();
     Q_INVOKABLE void clearSelection();
     bool hasSelection();
@@ -105,6 +104,9 @@ signals:
     void cursorPosChanged(QPoint newPos);
     void termSizeChanged(QSize newSize);
     void displayBufferChanged();
+    void selectionChanged();
+    void scrollBackBufferAdjusted(bool reset);
+    void selectionFinished();
 
 private:
     Q_DISABLE_COPY(Terminal)
@@ -126,7 +128,6 @@ private:
     void resetTabs();
     void adjustSelectionPosition(int lines);
 
-    TextRender* iRenderer;
     PtyIFace* iPtyIFace;
     QQuickView* iWindow;
     Util* iUtil;

@@ -40,8 +40,8 @@ public:
     virtual ~TextRender();
     void paint(QPainter*);
 
-    void setTerminal(Terminal* term);
-    void setUtil(Util* util) { iUtil = util; }
+    static void setUtil(Util *util);
+    static void setTerminal(Terminal *terminal);
 
     int fontWidth() { return iFontWidth; }
     int fontHeight() { return iFontHeight; }
@@ -61,14 +61,36 @@ signals:
 public slots:
     void redraw();
     void updateTermSize();
+    void mousePress(float eventX, float eventY);
+    void mouseMove(float eventX, float eventY);
+    void mouseRelease(float eventX, float eventY);
+
+private slots:
+    void handleScrollBack(bool reset);
 
 private:
     Q_DISABLE_COPY(TextRender)
+
+    enum PanGesture { PanNone, PanLeft, PanRight, PanUp, PanDown };
 
     void paintFromBuffer(QPainter* painter, QList<QList<TermChar> >& buffer, int from, int to, int &y);
     void drawBgFragment(QPainter* painter, int x, int y, int width, TermChar style);
     void drawTextFragment(QPainter* painter, int x, int y, QString text, TermChar style);
     QPoint charsToPixels(QPoint pos);
+    void selectionHelper(QPointF scenePos, bool selectionOngoing);
+
+    /**
+     * Scroll the back buffer on drag.
+     *
+     * @param now The current position
+     * @param last The last position (or start position)
+     * @return The new value for last (modified by any consumed offset)
+     **/
+    QPointF scrollBackBuffer(QPointF now, QPointF last);
+    void doGesture(PanGesture gesture);
+
+    bool newSelection;
+    QPointF dragOrigin;
 
     QFont iFont;
     int iFontWidth;
@@ -76,8 +98,8 @@ private:
     int iFontDescent;
     bool iShowBufferScrollIndicator;
 
-    Terminal *iTerm;
-    Util *iUtil;
+    static Terminal *sTerm;
+    static Util *sUtil;
 
     QList<QColor> iColorTable;
 };

@@ -30,9 +30,10 @@ Rectangle {
     // for custom user menu actions
     property bool isShellCommand
 
-    signal clicked();
+    signal clicked()
 
-    color: highlighted ? "#606060" : "#202020"
+    color: btnMouseArea.pressed ? "#ffffff"
+                                : highlighted ? "#606060" : "#202020"
     border.color: "#303030"
     border.width: 1
     radius: window.radiusSmall
@@ -40,13 +41,6 @@ Rectangle {
 
     width: window.buttonWidthLarge
     height: window.buttonHeightLarge
-
-    onHighlightedChanged: {
-        if(highlighted)
-            button.color = "#606060"
-        else
-            button.color = "#202020"
-    }
 
     Text {
         // decoration for user-defined command buttons
@@ -67,21 +61,8 @@ Rectangle {
 
     MouseArea {
         id: btnMouseArea
-        enabled: button.enabled
-        anchors.fill: parent
-        onClicked: {
-            button.clicked();
-        }
-        onPressedChanged: {
-            if(pressed) {
-                button.color = "#ffffff"
-            } else {
-                if(highlighted)
-                    button.color = "#606060"
-                else
-                    button.color = "#202020"
-            }
-        }
-    }
 
+        anchors.fill: parent
+        onClicked: button.clicked()
+    }
 }

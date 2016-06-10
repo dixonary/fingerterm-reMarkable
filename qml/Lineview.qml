@@ -63,11 +63,9 @@ Rectangle {
         anchors.rightMargin: 2*window.pixelRatio
         Repeater {
             model: lines
-            delegate:
-                Rectangle {
+            delegate: Item {
                 height: fontHeightHack.height
                 width: lineTextCol.width
-                color: "transparent"
                 Text {
                     color: "#ffffff"
                     font.family: util.settingsValue("ui/fontFamily");

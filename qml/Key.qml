@@ -113,7 +113,6 @@ Rectangle {
         anchors.fill: parent
         radius: key.radius
         opacity: 0.5
-        z: 1
         anchors.topMargin: key.height/2
     }
 
@@ -149,9 +148,10 @@ Rectangle {
         }
 
         if (key.isClick) {
-            if (Math.abs(x - key.pressMouseX) > key.clickThreshold ||
-            Math.abs(y - key.pressMouseY) > key.clickThreshold )
-            key.isClick = false
+            if (Math.abs(x - key.pressMouseX) > key.clickThreshold
+                    || Math.abs(y - key.pressMouseY) > key.clickThreshold) {
+                key.isClick = false
+            }
         }
 
         return true;

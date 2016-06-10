@@ -117,6 +117,9 @@ int main(int argc, char *argv[])
     Terminal term;
     Util util(settings);
     term.setUtil(&util);
+    TextRender::setUtil(&util);
+    TextRender::setTerminal(&term);
+
     QString startupErrorMsg;
 
     // copy the default config files to the config dir if they don't already exist
@@ -143,6 +146,7 @@ int main(int argc, char *argv[])
     context->setContextProperty( "term", &term );
     context->setContextProperty( "util", &util );
     context->setContextProperty( "keyLoader", &keyLoader );
+    context->setContextProperty( "startupErrorMessage", startupErrorMsg);
 
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:/qml/Main.qml"));
@@ -151,19 +155,9 @@ int main(int argc, char *argv[])
     if(!root)
         qFatal("no root object - qml error");
 
-    QObject* win = root->findChild<QObject*>("window");
-
-    if(!startupErrorMsg.isEmpty())
-        QMetaObject::invokeMethod(win, "showErrorMessage", Qt::QueuedConnection, Q_ARG(QVariant, startupErrorMsg));
-
-    TextRender *tr = root->findChild<TextRender*>("textrender");
-    tr->setUtil(&util);
-    tr->setTerminal(&term);
-    term.setRenderer(tr);
     term.setWindow(&view);
     util.setWindow(&view);
     util.setTerm(&term);
-    util.setRenderer(tr);
 
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 

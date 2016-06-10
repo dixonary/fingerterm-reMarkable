@@ -20,59 +20,46 @@
 import QtQuick 2.0
 import QtQuick.XmlListModel 2.0
 
-Rectangle {
+Item {
     id: menuWin
 
     property bool showing
-    property bool enableCopy
-    property bool enablePaste
     property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
     property string currentDragMode: util.settingsValue("ui/dragMode")
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
-    color: "transparent"
-    z: 30
-    width: window.width
-    height: window.height
-    visible: false
+    visible: rect.x < menuWin.width
 
     Rectangle {
         id: fader
 
         color: "#000000"
-        opacity: 0
-        width: menuWin.width
-        height: menuWin.height
+        opacity: menuWin.showing ? 0.5 : 0.0
+        anchors.fill: parent
+
+        Behavior on opacity { NumberAnimation { duration: 100; } }
 
         MouseArea {
             anchors.fill: parent
-            onClicked: {
-                hideMenu();
-            }
-        }
-        Behavior on opacity {
-            SequentialAnimation {
-                NumberAnimation { duration: 100; }
-                ScriptAction { script: menuWin.visible = menuWin.showing; }
-            }
+            onClicked: menuWin.showing = false
         }
     }
     Rectangle {
         id: rect
 
         color: "#e0e0e0"
-        x: menuWin.width+1;
+        anchors.left: parent.right
+        anchors.leftMargin: menuWin.showing ? -width : 1
         width: flickableContent.width + 22*window.pixelRatio;
         height: menuWin.height
-        z: 35
 
         MouseArea {
             // event eater
             anchors.fill: parent
         }
 
-        Behavior on x {
+        Behavior on anchors.leftMargin {
             NumberAnimation { duration: 100; easing.type: Easing.InOutQuad; }
         }
 
@@ -91,16 +78,15 @@ Rectangle {
             Button {
                 text: title
                 isShellCommand: true
-                enabled: disableOn.length === 0 || windowTitle.search(disableOn) === -1
+                enabled: disableOn.length === 0 || util.windowTitle.search(disableOn) === -1
                 onClicked: {
-                    hideMenu();
+                    menuWin.showing = false;
                     term.putString(command, true);
                 }
             }
         }
 
         Rectangle {
-            id: scrollIndicator
             y: menuFlickArea.visibleArea.yPosition*menuFlickArea.height + window.scrollBarWidth
             x: parent.width-window.paddingMedium
             width: window.scrollBarWidth
@@ -111,6 +97,7 @@ Rectangle {
 
         Flickable {
             id: menuFlickArea
+
             anchors.fill: parent
             anchors.topMargin: window.scrollBarWidth
             anchors.bottomMargin: window.scrollBarWidth
@@ -120,6 +107,7 @@ Rectangle {
 
             Column {
                 id: flickableContent
+
                 spacing: 12*window.pixelRatio
 
                 Row {
@@ -141,22 +129,22 @@ Rectangle {
                             Button {
                                 text: "Copy"
                                 onClicked: {
-                                    hideMenu();
+                                    menuWin.showing = false;
                                     term.copySelectionToClipboard();
                                 }
                                 width: window.buttonWidthHalf
                                 height: window.buttonHeightLarge
-                                enabled: menuWin.enableCopy
+                                enabled: util.terminalHasSelection
                             }
                             Button {
                                 text: "Paste"
                                 onClicked: {
-                                    hideMenu();
+                                    menuWin.showing = false;
                                     term.pasteFromClipboard();
                                 }
                                 width: window.buttonWidthHalf
                                 height: window.buttonHeightLarge
-                                enabled: menuWin.enablePaste
+                                enabled: util.canPaste
                             }
                         }
                         Button {
@@ -164,7 +152,7 @@ Rectangle {
                             width: window.buttonWidthLarge
                             height: window.buttonHeightLarge
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 urlWindow.urls = term.grabURLsFromBuffer();
                                 urlWindow.state = "visible";
                             }
@@ -286,7 +274,7 @@ Rectangle {
                                             util.setSettingsValue("ui/dragMode", "gestures");
                                             term.clearSelection();
                                             currentDragMode = "gestures";
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -298,7 +286,7 @@ Rectangle {
                                             util.setSettingsValue("ui/dragMode", "scroll");
                                             currentDragMode = "scroll";
                                             term.clearSelection();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -309,7 +297,7 @@ Rectangle {
                                         onClicked: {
                                             util.setSettingsValue("ui/dragMode", "select");
                                             currentDragMode = "select";
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -342,7 +330,7 @@ Rectangle {
                                             util.setSettingsValue("ui/vkbShowMethod", "off");
                                             currentShowMethod = "off";
                                             window.setTextRenderAttributes();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -354,7 +342,7 @@ Rectangle {
                                             util.setSettingsValue("ui/vkbShowMethod", "fade");
                                             currentShowMethod = "fade";
                                             window.setTextRenderAttributes();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -366,7 +354,7 @@ Rectangle {
                                             util.setSettingsValue("ui/vkbShowMethod", "move");
                                             currentShowMethod = "move";
                                             window.setTextRenderAttributes();
-                                            hideMenu();
+                                            menuWin.showing = false;
                                         }
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
@@ -377,14 +365,14 @@ Rectangle {
                         Button {
                             text: "New window"
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 util.openNewWindow();
                             }
                         }
                         Button {
                             text: "VKB layout..."
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 layoutWindow.layouts = keyLoader.availableLayouts();
                                 layoutWindow.state = "visible";
                             }
@@ -392,7 +380,7 @@ Rectangle {
                         Button {
                             text: "About"
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 aboutDialog.termW = term.termSize().width
                                 aboutDialog.termH = term.termSize().height
                                 aboutDialog.state = "visible"
@@ -401,7 +389,7 @@ Rectangle {
                         Button {
                             text: "Quit"
                             onClicked: {
-                                hideMenu();
+                                menuWin.showing = false;
                                 Qt.quit();
                             }
                         }
@@ -432,7 +420,6 @@ Rectangle {
                         width: menuBlocksRow.width - window.paddingMedium
                         height: window.paddingMedium
                         radius: window.radiusSmall
-                        z: 1
                         color: "#909090"
                     }
                     Rectangle {
@@ -446,7 +433,6 @@ Rectangle {
                         radius: window.radiusLarge
                         height: parent.height-window.headerHeight
                         color: "#202020"
-                        z: 2
                         onXChanged: {
                             if (vkbDelaySliderMA.drag.active)
                                 vkbDelaySlider.keyboardFadeOutDelayLabel =
@@ -470,40 +456,5 @@ Rectangle {
                 }
             }
         }
-    }
-
-    onWidthChanged: {
-        if(showing) {
-            showMenu();
-        } else {
-            hideMenu();
-        }
-    }
-
-    Connections {
-        target: util
-        onClipboardOrSelectionChanged: {
-            enableCopy = util.terminalHasSelection();
-            enablePaste = util.canPaste();
-        }
-    }
-
-    function showMenu()
-    {
-        showing = true;
-        visible = true;
-        fader.opacity = 0.5;
-        rect.x = menuWin.width-rect.width;
-        window.updateGesturesAllowed();
-        enableCopy = util.terminalHasSelection();
-        enablePaste = util.canPaste();
-    }
-
-    function hideMenu()
-    {
-        showing = false;
-        fader.opacity = 0;
-        rect.x = menuWin.width+1;
-        window.updateGesturesAllowed();
     }
 }

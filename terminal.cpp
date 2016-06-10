@@ -27,7 +27,7 @@
 #include "util.h"
 
 Terminal::Terminal(QObject *parent) :
-    QObject(parent), iRenderer(0), iPtyIFace(0), iWindow(0), iUtil(0),
+    QObject(parent), iPtyIFace(0), iWindow(0), iUtil(0),
     iTermSize(0,0), iEmitCursorChangeSignal(true),
     iShowCursor(true), iUseAltScreenBuffer(false), iAppCursorKeys(false)
 {
@@ -51,20 +51,6 @@ Terminal::Terminal(QObject *parent) :
     iTermAttribs_saved_alt = iTermAttribs;
 
     resetTerminal();
-}
-
-void Terminal::setRenderer(TextRender* tr)
-{
-    iRenderer = tr;
-
-    if(tr) {
-        tr->updateTermSize();
-        connect(this, SIGNAL(displayBufferChanged()), tr, SLOT(redraw()));
-        connect(this, SIGNAL(cursorPosChanged(QPoint)), tr, SLOT(redraw()));
-        connect(this, SIGNAL(termSizeChanged(QSize)), tr, SLOT(redraw()));
-    } else {
-        qDebug() << "warning: null text renderer";
-    }
 }
 
 void Terminal::setPtyIFace(PtyIFace *pty)
@@ -1343,10 +1329,7 @@ void Terminal::scrollBackBufferFwd(int lines)
     if(iBackBufferScrollPos < 0)
         iBackBufferScrollPos = 0;
 
-    if (iRenderer) {
-        iRenderer->setShowBufferScrollIndicator(iBackBufferScrollPos != 0);
-        iRenderer->redraw();
-    }
+    emit scrollBackBufferAdjusted(false);
 }
 
 void Terminal::scrollBackBufferBack(int lines)
@@ -1360,10 +1343,7 @@ void Terminal::scrollBackBufferBack(int lines)
     if (iBackBufferScrollPos > iBackBuffer.size())
         iBackBufferScrollPos = iBackBuffer.size();
 
-    if (iRenderer) {
-        iRenderer->setShowBufferScrollIndicator(iBackBufferScrollPos != 0);
-        iRenderer->redraw();
-    }
+    emit scrollBackBufferAdjusted(false);
 }
 
 void Terminal::resetBackBufferScrollPos()
@@ -1374,10 +1354,7 @@ void Terminal::resetBackBufferScrollPos()
     iBackBufferScrollPos = 0;
     clearSelection();
 
-    if (iRenderer) {
-        iRenderer->setShowBufferScrollIndicator(false);
-        iRenderer->redraw();
-    }
+    emit scrollBackBufferAdjusted(true);
 }
 
 void Terminal::copySelectionToClipboard()
@@ -1470,11 +1447,10 @@ void Terminal::adjustSelectionPosition(int lines)
 
     iSelection = QRect(QPoint(tx,ty), QPoint(bx,by));
 
-    if (iRenderer)
-        iRenderer->redraw();
+    emit selectionChanged();
 }
 
-void Terminal::setSelection(QPoint start, QPoint end)
+void Terminal::setSelection(QPoint start, QPoint end, bool selectionOngoing)
 {
     if (start.y() > end.y())
         qSwap(start, end);
@@ -1492,8 +1468,11 @@ void Terminal::setSelection(QPoint start, QPoint end)
 
     iSelection = QRect(start, end);
 
-    if (iRenderer)
-        iRenderer->redraw();
+    emit selectionChanged();
+
+    if (!selectionOngoing) {
+        emit selectionFinished();
+    }
 }
 
 void Terminal::clearSelection()
@@ -1503,10 +1482,8 @@ void Terminal::clearSelection()
 
     iSelection = QRect();
 
-    if (iUtil)
-        iUtil->selectionFinished();
-    if (iRenderer)
-        iRenderer->redraw();
+    emit selectionFinished();
+    emit selectionChanged();
 }
 
 QRect Terminal::selection()

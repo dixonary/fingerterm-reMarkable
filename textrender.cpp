@@ -22,10 +22,12 @@
 #include "terminal.h"
 #include "util.h"
 
+Terminal* TextRender::sTerm = 0;
+Util* TextRender::sUtil = 0;
+
 TextRender::TextRender(QQuickItem *parent) :
     QQuickPaintedItem(parent),
-    iTerm(0),
-    iUtil(0)
+    newSelection(true)
 {
     setFlag(ItemHasContents);
 
@@ -71,6 +73,22 @@ TextRender::TextRender(QQuickItem *parent) :
         qFatal("invalid color table");
 
     iShowBufferScrollIndicator = false;
+
+    iFont = QFont(sUtil->settingsValue("ui/fontFamily").toString(),
+                  sUtil->settingsValue("ui/fontSize").toInt());
+    iFont.setBold(false);
+    QFontMetrics fontMetrics(iFont);
+    iFontHeight = fontMetrics.height();
+    iFontWidth = fontMetrics.maxWidth();
+    iFontDescent = fontMetrics.descent();
+
+    Q_ASSERT(sTerm);
+    connect(sTerm, SIGNAL(displayBufferChanged()), this, SLOT(redraw()));
+    connect(sTerm, SIGNAL(cursorPosChanged(QPoint)), this, SLOT(redraw()));
+    connect(sTerm, SIGNAL(termSizeChanged(QSize)), this, SLOT(redraw()));
+    connect(sTerm, SIGNAL(selectionChanged()), this, SLOT(redraw()));
+    connect(sTerm, SIGNAL(scrollBackBufferAdjusted(bool)), this, SLOT(handleScrollBack(bool)));
+    updateTermSize();
 }
 
 TextRender::~TextRender()
@@ -79,34 +97,31 @@ TextRender::~TextRender()
 
 void TextRender::paint(QPainter* painter)
 {
-    if (!iTerm)
-        return;
-
     painter->save();
     painter->setFont(iFont);
 
     int y=0;
-    if (iTerm->backBufferScrollPos() != 0 && iTerm->backBuffer().size()>0) {
-        int from = iTerm->backBuffer().size() - iTerm->backBufferScrollPos();
+    if (sTerm->backBufferScrollPos() != 0 && sTerm->backBuffer().size()>0) {
+        int from = sTerm->backBuffer().size() - sTerm->backBufferScrollPos();
         if(from<0)
             from=0;
-        int to = iTerm->backBuffer().size();
-        if(to-from > iTerm->termSize().height())
-            to = from + iTerm->termSize().height();
-        paintFromBuffer(painter, iTerm->backBuffer(), from, to, y);
-        if(to-from < iTerm->termSize().height() && iTerm->buffer().size()>0) {
-            int to2 = iTerm->termSize().height() - (to-from);
-            if(to2 > iTerm->buffer().size())
-                to2 = iTerm->buffer().size();
-            paintFromBuffer(painter, iTerm->buffer(), 0, to2, y);
+        int to = sTerm->backBuffer().size();
+        if(to-from > sTerm->termSize().height())
+            to = from + sTerm->termSize().height();
+        paintFromBuffer(painter, sTerm->backBuffer(), from, to, y);
+        if(to-from < sTerm->termSize().height() && sTerm->buffer().size()>0) {
+            int to2 = sTerm->termSize().height() - (to-from);
+            if(to2 > sTerm->buffer().size())
+                to2 = sTerm->buffer().size();
+            paintFromBuffer(painter, sTerm->buffer(), 0, to2, y);
         }
     } else {
-        int count = qMin(iTerm->termSize().height(), iTerm->buffer().size());
-        paintFromBuffer(painter, iTerm->buffer(), 0, count, y);
+        int count = qMin(sTerm->termSize().height(), sTerm->buffer().size());
+        paintFromBuffer(painter, sTerm->buffer(), 0, count, y);
     }
 
     // cursor
-    if (iTerm->showCursor()) {
+    if (sTerm->showCursor()) {
         painter->setOpacity(0.5);
         QPoint cursor = cursorPixelPos();
         QSize csize = cursorPixelSize();
@@ -116,7 +131,7 @@ void TextRender::paint(QPainter* painter)
     }
 
     // selection
-    QRect selection = iTerm->selection();
+    QRect selection = sTerm->selection();
     if (!selection.isNull()) {
         painter->setOpacity(0.5);
         painter->setPen(Qt::transparent);
@@ -130,12 +145,12 @@ void TextRender::paint(QPainter* painter)
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
         } else {
             start = charsToPixels(selection.topLeft());
-            end = charsToPixels(QPoint(iTerm->termSize().width(), selection.top()));
+            end = charsToPixels(QPoint(sTerm->termSize().width(), selection.top()));
             painter->drawRect(start.x(), start.y(),
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
 
             start = charsToPixels(QPoint(1, selection.top()+1));
-            end = charsToPixels(QPoint(iTerm->termSize().width(), selection.bottom()-1));
+            end = charsToPixels(QPoint(sTerm->termSize().width(), selection.bottom()-1));
             painter->drawRect(start.x(), start.y(),
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
 
@@ -154,9 +169,9 @@ void TextRender::paintFromBuffer(QPainter* painter, QList<QList<TermChar> >& buf
     const int leftmargin = 2;
     int cutAfter = property("cutAfter").toInt() + iFontDescent;
 
-    TermChar tmp = iTerm->zeroChar;
-    TermChar nextAttrib = iTerm->zeroChar;
-    TermChar currAttrib = iTerm->zeroChar;
+    TermChar tmp = sTerm->zeroChar;
+    TermChar nextAttrib = sTerm->zeroChar;
+    TermChar currAttrib = sTerm->zeroChar;
     int currentX = leftmargin;
     for(int i=from; i<to; i++) {
         y += iFontHeight;
@@ -166,7 +181,7 @@ void TextRender::paintFromBuffer(QPainter* painter, QList<QList<TermChar> >& buf
         else
             painter->setOpacity(1.0);
 
-        int xcount = qMin(buffer.at(i).count(), iTerm->termSize().width());
+        int xcount = qMin(buffer.at(i).count(), sTerm->termSize().width());
 
         // background for the current line
         currentX = leftmargin;
@@ -267,29 +282,97 @@ void TextRender::redraw()
     update();
 }
 
-void TextRender::setTerminal(Terminal *term)
+void TextRender::setUtil(Util *util)
 {
-    if (!iUtil)
-        qFatal("textrender: util class not set");
+    sUtil = util;
+}
 
-    iTerm = term;
-
-    iFont = QFont(iUtil->settingsValue("ui/fontFamily").toString(),
-                  iUtil->settingsValue("ui/fontSize").toInt());
-    iFont.setBold(false);
-    QFontMetrics fontMetrics(iFont);
-    iFontHeight = fontMetrics.height();
-    iFontWidth = fontMetrics.maxWidth();
-    iFontDescent = fontMetrics.descent();
+void TextRender::setTerminal(Terminal *terminal)
+{
+    sTerm = terminal;
 }
 
 void TextRender::updateTermSize()
 {
-    if (!iTerm)
+    QSize size((width() - 4) / iFontWidth, (height() - 4) / iFontHeight);
+    sTerm->setTermSize(size);
+}
+
+void TextRender::mousePress(float eventX, float eventY)
+{
+    if(!sUtil->allowGestures())
         return;
 
-    QSize size((width() - 4) / iFontWidth, (height() - 4) / iFontHeight);
-    iTerm->setTermSize(size);
+    dragOrigin = QPointF(eventX, eventY);
+    newSelection = true;
+}
+
+void TextRender::mouseMove(float eventX, float eventY)
+{
+    QPointF eventPos(eventX, eventY);
+
+    if(!sUtil->allowGestures())
+        return;
+
+    if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+        dragOrigin = scrollBackBuffer(eventPos, dragOrigin);
+    }
+    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+        selectionHelper(eventPos, true);
+    }
+}
+
+void TextRender::mouseRelease(float eventX, float eventY)
+{
+    QPointF eventPos(eventX, eventY);
+    const int reqDragLength = 140;
+
+    if(!sUtil->allowGestures())
+        return;
+
+    if(sUtil->settingsValue("ui/dragMode")=="gestures") {
+        int xdist = qAbs(eventPos.x() - dragOrigin.x());
+        int ydist = qAbs(eventPos.y() - dragOrigin.y());
+        if(eventPos.x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
+            doGesture(PanLeft);
+        else if(eventPos.x() > dragOrigin.x()+reqDragLength && xdist > ydist*2)
+            doGesture(PanRight);
+        else if(eventPos.y() > dragOrigin.y()+reqDragLength && ydist > xdist*2)
+            doGesture(PanDown);
+        else if(eventPos.y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
+            doGesture(PanUp);
+    }
+    else if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+        scrollBackBuffer(eventPos, dragOrigin);
+    }
+    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+        selectionHelper(eventPos, false);
+    }
+}
+
+void TextRender::selectionHelper(QPointF scenePos, bool selectionOngoing)
+{
+    int yCorr = fontDescent();
+
+    QPoint start(qRound((dragOrigin.x()+2) / fontWidth()),
+                 qRound((dragOrigin.y()+yCorr) / fontHeight()));
+    QPoint end(qRound((scenePos.x()+2) / fontWidth()),
+               qRound((scenePos.y()+yCorr) / fontHeight()));
+
+    if (start != end) {
+        sTerm->setSelection(start, end, selectionOngoing);
+        newSelection = false;
+    }
+}
+
+void TextRender::handleScrollBack(bool reset)
+{
+    if (reset) {
+        setShowBufferScrollIndicator(false);
+    } else {
+        setShowBufferScrollIndicator(sTerm->backBufferScrollPos() != 0);
+    }
+    redraw();
 }
 
 void TextRender::setFontPointSize(int psize)
@@ -302,7 +385,7 @@ void TextRender::setFontPointSize(int psize)
         iFontWidth = fontMetrics.maxWidth();
         iFontDescent = fontMetrics.descent();
 
-        iUtil->setSettingsValue("ui/fontSize", psize);
+        sUtil->setSettingsValue("ui/fontSize", psize);
 
         emit fontSizeChanged();
     }
@@ -310,7 +393,7 @@ void TextRender::setFontPointSize(int psize)
 
 QPoint TextRender::cursorPixelPos()
 {
-    return charsToPixels(iTerm->cursorPos());
+    return charsToPixels(sTerm->cursorPos());
 }
 
 QPoint TextRender::charsToPixels(QPoint pos)
@@ -322,4 +405,43 @@ QPoint TextRender::charsToPixels(QPoint pos)
 QSize TextRender::cursorPixelSize()
 {
     return QSize(iFontWidth, iFontHeight);
+}
+
+QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
+{
+    int xdist = qAbs(now.x() - last.x());
+    int ydist = qAbs(now.y() - last.y());
+    int fontSize = sUtil->settingsValue("ui/fontSize").toInt();
+
+    int lines = ydist / fontSize;
+
+    if(lines > 0 && now.y() < last.y() && xdist < ydist*2) {
+        sTerm->scrollBackBufferFwd(lines);
+        last = QPointF(now.x(), last.y() - lines * fontSize);
+    } else if(lines > 0 && now.y() > last.y() && xdist < ydist*2) {
+        sTerm->scrollBackBufferBack(lines);
+        last = QPointF(now.x(), last.y() + lines * fontSize);
+    }
+
+    return last;
+}
+
+void TextRender::doGesture(PanGesture gesture)
+{
+    if( gesture==PanLeft ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panLeftTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panLeftCommand").toString(), true);
+    }
+    else if( gesture==PanRight ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panRightTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panRightCommand").toString(), true);
+    }
+    else if( gesture==PanDown ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panDownTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panDownCommand").toString(), true);
+    }
+    else if( gesture==PanUp ) {
+        sUtil->notifyText(sUtil->settingsValue("gestures/panUpTitle").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panUpCommand").toString(), true);
+    }
 }

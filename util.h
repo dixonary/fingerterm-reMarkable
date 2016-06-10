@@ -30,6 +30,9 @@ class Util : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
+    Q_PROPERTY(QString windowTitle READ windowTitle NOTIFY windowTitleChanged)
+    Q_PROPERTY(bool canPaste READ canPaste NOTIFY clipboardOrSelectionChanged)
+    Q_PROPERTY(bool terminalHasSelection READ terminalHasSelection NOTIFY clipboardOrSelectionChanged)
 
 public:
     explicit Util(QSettings* settings, QObject *parent = 0);
@@ -37,9 +40,8 @@ public:
 
     void setWindow(QQuickView* win);
     void setWindowTitle(QString title);
-    Q_INVOKABLE QString currentWindowTitle();
-    void setTerm(Terminal* term) { iTerm = term; }
-    void setRenderer(TextRender* r) { iRenderer = r; }
+    QString windowTitle();
+    void setTerm(Terminal* term);
 
     Q_INVOKABLE void openNewWindow();
 
@@ -55,55 +57,34 @@ public:
     Q_INVOKABLE void notifyText(QString text);
 
     Q_INVOKABLE void copyTextToClipboard(QString str);
-    Q_INVOKABLE bool canPaste();
-    Q_INVOKABLE bool terminalHasSelection();
+
+    bool canPaste();
+    bool terminalHasSelection();
 
     void bellAlert();
-    void selectionFinished();
 
     bool allowGestures() { return iAllowGestures; }
     void setAllowGestures(bool a) { if(iAllowGestures!=a) { iAllowGestures=a; emit allowGesturesChanged(); } }
 
     static bool charIsHexDigit(QChar ch);
 
-public slots:
-    void mousePress(float eventX, float eventY);
-    void mouseMove(float eventX, float eventY);
-    void mouseRelease(float eventX, float eventY);
-
 signals:
     void visualBell();
     void allowGesturesChanged();
-    void gestureNotify(QString msg);
+    void notify(QString msg);
     void clipboardOrSelectionChanged();
     void windowTitleChanged();
 
 private:
     Q_DISABLE_COPY(Util)
-    enum PanGesture { PanNone, PanLeft, PanRight, PanUp, PanDown };
-
-    /**
-     * Scroll the back buffer on drag.
-     *
-     * @param now The current position
-     * @param last The last position (or start position)
-     * @return The new value for last (modified by any consumed offset)
-     **/
-    QPointF scrollBackBuffer(QPointF now, QPointF last);
-    void doGesture(PanGesture gesture);
-    void selectionHelper(QPointF scenePos);
-
-    QPointF dragOrigin;
 
     bool iAllowGestures;
-    bool newSelection;
 
     QString iCurrentWinTitle;
 
     QSettings* iSettings;
     QQuickView* iWindow;
     Terminal* iTerm;
-    TextRender* iRenderer;
 };
 
 #endif // UTIL_H
