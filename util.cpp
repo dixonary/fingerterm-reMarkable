@@ -36,7 +36,6 @@
 
 Util::Util(QSettings *settings, QObject *parent) :
     QObject(parent),
-    iAllowGestures(false),
     iSettings(settings),
     iWindow(0),
     iTerm(0)

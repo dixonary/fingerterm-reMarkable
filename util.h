@@ -29,7 +29,6 @@ class QQuickView;
 class Util : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
     Q_PROPERTY(QString windowTitle READ windowTitle NOTIFY windowTitleChanged)
     Q_PROPERTY(int windowOrientation READ windowOrientation WRITE setWindowOrientation NOTIFY windowOrientationChanged)
     Q_PROPERTY(bool canPaste READ canPaste NOTIFY clipboardOrSelectionChanged)
@@ -103,9 +102,6 @@ public:
 
     void bellAlert();
 
-    bool allowGestures() { return iAllowGestures; }
-    void setAllowGestures(bool a) { if(iAllowGestures!=a) { iAllowGestures=a; emit allowGesturesChanged(); } }
-
     QString fontFamily();
 
     int dragMode();
@@ -134,7 +130,6 @@ public:
 
 signals:
     void visualBell();
-    void allowGesturesChanged();
     void notify(QString msg);
     void clipboardOrSelectionChanged();
     void windowTitleChanged();
@@ -149,8 +144,6 @@ signals:
 
 private:
     Q_DISABLE_COPY(Util)
-
-    bool iAllowGestures;
 
     QString iCurrentWinTitle;
 

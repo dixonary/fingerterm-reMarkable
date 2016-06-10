@@ -33,12 +33,6 @@ Item {
         value: page.orientation
     }
 
-    Binding {
-        target: util
-        property: "allowGestures"
-        value: !vkb.active && !menu.showing && !urlWindow.show && !aboutDialog.show && !layoutWindow.show
-    }
-
     Item {
         id: page
 
@@ -215,6 +209,7 @@ Item {
                 fontPointSize: util.fontSize
                 opacity: (util.keyboardMode == Util.KeyboardFade && vkb.active) ? 0.3
                                                                                 : 1.0
+                allowGestures: !vkb.active && !menu.showing && !urlWindow.show && !aboutDialog.show && !layoutWindow.show
 
                 Behavior on opacity {
                     NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }

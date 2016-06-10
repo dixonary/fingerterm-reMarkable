@@ -27,7 +27,8 @@ Util* TextRender::sUtil = 0;
 
 TextRender::TextRender(QQuickItem *parent) :
     QQuickPaintedItem(parent),
-    newSelection(true)
+    newSelection(true),
+    iAllowGestures(true)
 {
     setFlag(ItemHasContents);
 
@@ -299,7 +300,7 @@ void TextRender::updateTermSize()
 
 void TextRender::mousePress(float eventX, float eventY)
 {
-    if(!sUtil->allowGestures())
+    if (!allowGestures())
         return;
 
     dragOrigin = QPointF(eventX, eventY);
@@ -310,7 +311,7 @@ void TextRender::mouseMove(float eventX, float eventY)
 {
     QPointF eventPos(eventX, eventY);
 
-    if(!sUtil->allowGestures())
+    if (!allowGestures())
         return;
 
     if(sUtil->dragMode() == Util::DragScroll) {
@@ -326,7 +327,7 @@ void TextRender::mouseRelease(float eventX, float eventY)
     QPointF eventPos(eventX, eventY);
     const int reqDragLength = 140;
 
-    if(!sUtil->allowGestures())
+    if (!allowGestures())
         return;
 
     if(sUtil->dragMode() == Util::DragGestures) {
@@ -401,6 +402,19 @@ QPoint TextRender::charsToPixels(QPoint pos)
 QSize TextRender::cursorPixelSize()
 {
     return QSize(iFontWidth, iFontHeight);
+}
+
+bool TextRender::allowGestures()
+{
+    return iAllowGestures;
+}
+
+void TextRender::setAllowGestures(bool allow)
+{
+    if (iAllowGestures != allow) {
+        iAllowGestures = allow;
+        emit allowGesturesChanged();
+    }
 }
 
 QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)

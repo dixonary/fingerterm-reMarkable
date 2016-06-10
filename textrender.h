@@ -33,6 +33,7 @@ class TextRender : public QQuickPaintedItem
     Q_PROPERTY(int fontHeight READ fontHeight NOTIFY fontSizeChanged)
     Q_PROPERTY(int fontPointSize READ fontPointSize WRITE setFontPointSize NOTIFY fontSizeChanged)
     Q_PROPERTY(bool showBufferScrollIndicator READ showBufferScrollIndicator WRITE setShowBufferScrollIndicator NOTIFY showBufferScrollIndicatorChanged)
+    Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
 
     Q_OBJECT
 public:
@@ -54,9 +55,13 @@ public:
     Q_INVOKABLE QPoint cursorPixelPos();
     Q_INVOKABLE QSize cursorPixelSize();
 
+    bool allowGestures();
+    void setAllowGestures(bool allow);
+
 signals:
     void fontSizeChanged();
     void showBufferScrollIndicatorChanged();
+    void allowGesturesChanged();
 
 public slots:
     void redraw();
@@ -97,6 +102,7 @@ private:
     int iFontHeight;
     int iFontDescent;
     bool iShowBufferScrollIndicator;
+    bool iAllowGestures;
 
     static Terminal *sTerm;
     static Util *sUtil;
