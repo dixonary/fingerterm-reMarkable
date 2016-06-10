@@ -26,6 +26,18 @@
 #include "textrender.h"
 #include "util.h"
 
+static bool charIsHexDigit(QChar ch)
+{
+    if (ch.isDigit()) // 0-9
+        return true;
+    else if (ch.toLatin1() >= 65 && ch.toLatin1() <= 70) // A-F
+        return true;
+    else if (ch.toLatin1() >= 97 && ch.toLatin1() <= 102) // a-f
+        return true;
+
+    return false;
+}
+
 Terminal::Terminal(QObject *parent) :
     QObject(parent), iPtyIFace(0), iWindow(0), iUtil(0),
     iTermSize(0,0), iEmitCursorChangeSignal(true),
@@ -133,7 +145,7 @@ void Terminal::putString(QString str, bool unEscape)
         while(str.indexOf("\\x") != -1) {
             int i = str.indexOf("\\x")+2;
             QString num;
-            while(num.length() < 2 && str.length()>i && Util::charIsHexDigit(str.at(i))) {
+            while(num.length() < 2 && str.length()>i && charIsHexDigit(str.at(i))) {
                 num.append(str.at(i));
                 i++;
             }

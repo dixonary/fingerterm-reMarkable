@@ -375,16 +375,3 @@ bool Util::canPaste()
 
     return !cb->text().isEmpty();
 }
-
-//static
-bool Util::charIsHexDigit(QChar ch)
-{
-    if (ch.isDigit()) // 0-9
-        return true;
-    else if (ch.toLatin1() >= 65 && ch.toLatin1() <= 70) // A-F
-        return true;
-    else if (ch.toLatin1() >= 97 && ch.toLatin1() <= 102) // a-f
-        return true;
-
-    return false;
-}

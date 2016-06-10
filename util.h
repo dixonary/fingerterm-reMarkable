@@ -126,8 +126,6 @@ public:
     bool showWelcomeScreen();
     void setShowWelcomeScreen(bool value);
 
-    static bool charIsHexDigit(QChar ch);
-
 signals:
     void visualBell();
     void notify(QString msg);
