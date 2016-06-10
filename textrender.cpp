@@ -106,17 +106,17 @@ void TextRender::paint(QPainter* painter)
         if(from<0)
             from=0;
         int to = sTerm->backBuffer().size();
-        if(to-from > sTerm->termSize().height())
-            to = from + sTerm->termSize().height();
+        if(to-from > sTerm->rows())
+            to = from + sTerm->rows();
         paintFromBuffer(painter, sTerm->backBuffer(), from, to, y);
-        if(to-from < sTerm->termSize().height() && sTerm->buffer().size()>0) {
-            int to2 = sTerm->termSize().height() - (to-from);
+        if(to-from < sTerm->rows() && sTerm->buffer().size()>0) {
+            int to2 = sTerm->rows() - (to-from);
             if(to2 > sTerm->buffer().size())
                 to2 = sTerm->buffer().size();
             paintFromBuffer(painter, sTerm->buffer(), 0, to2, y);
         }
     } else {
-        int count = qMin(sTerm->termSize().height(), sTerm->buffer().size());
+        int count = qMin(sTerm->rows(), sTerm->buffer().size());
         paintFromBuffer(painter, sTerm->buffer(), 0, count, y);
     }
 
@@ -145,12 +145,12 @@ void TextRender::paint(QPainter* painter)
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
         } else {
             start = charsToPixels(selection.topLeft());
-            end = charsToPixels(QPoint(sTerm->termSize().width(), selection.top()));
+            end = charsToPixels(QPoint(sTerm->columns(), selection.top()));
             painter->drawRect(start.x(), start.y(),
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
 
             start = charsToPixels(QPoint(1, selection.top()+1));
-            end = charsToPixels(QPoint(sTerm->termSize().width(), selection.bottom()-1));
+            end = charsToPixels(QPoint(sTerm->columns(), selection.bottom()-1));
             painter->drawRect(start.x(), start.y(),
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
 
@@ -181,7 +181,7 @@ void TextRender::paintFromBuffer(QPainter* painter, QList<QList<TermChar> >& buf
         else
             painter->setOpacity(1.0);
 
-        int xcount = qMin(buffer.at(i).count(), sTerm->termSize().width());
+        int xcount = qMin(buffer.at(i).count(), sTerm->columns());
 
         // background for the current line
         currentX = leftmargin;

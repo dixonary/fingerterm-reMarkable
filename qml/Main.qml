@@ -294,9 +294,6 @@ Item {
             NotifyWin {
                 id: aboutDialog
 
-                property int termW
-                property int termH
-
                 text: {
                     var str = "<font size=\"+3\">FingerTerm " + util.versionString() + "</font><br>\n" +
                             "<font size=\"+1\">" +
@@ -304,11 +301,11 @@ Item {
                             "Config files for adjusting settings are at:<br>\n" +
                             util.configPath() + "/<br><br>\n" +
                             "Source code:<br>\n<a href=\"https://git.merproject.org/mer-core/fingerterm/\">https://git.merproject.org/mer-core/fingerterm/</a>"
-                    if (termH != 0 && termW != 0) {
+                    if (term.rows != 0 && term.columns != 0) {
                         str += "<br><br>Current window title: <font color=\"gray\">" + util.windowTitle.substring(0,40) + "</font>"; //cut long window title
                         if(util.windowTitle.length>40)
                             str += "...";
-                        str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
+                        str += "<br>Current terminal size: <font color=\"gray\">" + term.columns + "×" + term.rows + "</font>";
                         str += "<br>Charset: <font color=\"gray\">" + util.charset + "</font>";
                     }
                     str += "</font>";

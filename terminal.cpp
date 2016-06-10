@@ -128,7 +128,7 @@ void Terminal::setTermSize(QSize size)
 
         resetTabs();
 
-        emit termSizeChanged(size);
+        emit termSizeChanged(size.height(), size.width());
     }
 }
 
@@ -349,7 +349,7 @@ void Terminal::insertInBuffer(const QString& chars)
                 if(iNewLineMode)
                     setCursorPos(QPoint(1,cursorPos().y()));
             }
-            else if(cursorPos().x() <= termSize().width()) // ignore newline after <termwidth> cols (terminfo: xenl)
+            else if(cursorPos().x() <= columns()) // ignore newline after <termwidth> cols (terminfo: xenl)
             {
                 if(iNewLineMode)
                     setCursorPos(QPoint(1,cursorPos().y()+1));
@@ -1046,9 +1046,9 @@ void Terminal::escControlChar(const QString& seq)
             return;
         if( seq.at(0) == '#' && seq.at(1)=='8' ) { // test mode, fill screen with 'E'
             clearAll(true);
-            for(int i=0; i<termSize().height(); i++) {
+            for (int i = 0; i < rows(); i++) {
                 QList<TermChar> line;
-                for(int j=0; j<termSize().width(); j++) {
+                for(int j = 0; j < columns(); j++) {
                     TermChar c = zeroChar;
                     c.c = 'E';
                     line.append(c);
@@ -1496,6 +1496,16 @@ void Terminal::clearSelection()
 
     emit selectionFinished();
     emit selectionChanged();
+}
+
+int Terminal::rows()
+{
+    return iTermSize.height();
+}
+
+int Terminal::columns()
+{
+    return iTermSize.width();
 }
 
 QRect Terminal::selection()

@@ -176,7 +176,7 @@ Item {
                                         text: "<font size=\"+3\">+</font>"
                                         onClicked: {
                                             util.fontSize = util.fontSize + window.pixelRatio
-                                            util.notifyText(term.termSize().width+"x"+term.termSize().height);
+                                            util.notifyText(term.columns + "×" + term.rows);
                                         }
                                         width: window.buttonWidthHalf
                                         height: window.buttonHeightSmall
@@ -185,7 +185,7 @@ Item {
                                         text: "<font size=\"+3\">-</font>"
                                         onClicked: {
                                             util.fontSize = util.fontSize - window.pixelRatio
-                                            util.notifyText(term.termSize().width+"x"+term.termSize().height);
+                                            util.notifyText(term.columns + "×" + term.rows);
                                         }
                                         width: window.buttonWidthHalf
                                         height: window.buttonHeightSmall
@@ -361,8 +361,6 @@ Item {
                             text: "About"
                             onClicked: {
                                 menuWin.showing = false;
-                                aboutDialog.termW = term.termSize().width
-                                aboutDialog.termH = term.termSize().height
                                 aboutDialog.show = true
                             }
                         }
