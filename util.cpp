@@ -50,9 +50,12 @@ Util::~Util()
 
 void Util::setWindow(QQuickView* win)
 {
+    if (iWindow)
+        qFatal("Should set window property only once");
     iWindow = win;
     if(!iWindow)
         qFatal("invalid main window");
+    connect(win, SIGNAL(contentOrientationChanged(Qt::ScreenOrientation)), this, SIGNAL(windowOrientationChanged()));
 }
 
 void Util::setWindowTitle(QString title)
@@ -65,6 +68,16 @@ void Util::setWindowTitle(QString title)
 QString Util::windowTitle()
 {
     return iCurrentWinTitle;
+}
+
+int Util::windowOrientation()
+{
+    return iWindow->contentOrientation();
+}
+
+void Util::setWindowOrientation(int orientation)
+{
+    iWindow->reportContentOrientationChange(static_cast<Qt::ScreenOrientation>(orientation));
 }
 
 void Util::setTerm(Terminal *term)

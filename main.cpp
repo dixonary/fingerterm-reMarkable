@@ -148,18 +148,18 @@ int main(int argc, char *argv[])
     context->setContextProperty( "keyLoader", &keyLoader );
     context->setContextProperty( "startupErrorMessage", startupErrorMsg);
 
+    term.setWindow(&view);
+    util.setWindow(&view);
+    util.setTerm(&term);
+
+    QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
+
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:/qml/Main.qml"));
 
     QObject *root = view.rootObject();
     if(!root)
         qFatal("no root object - qml error");
-
-    term.setWindow(&view);
-    util.setWindow(&view);
-    util.setTerm(&term);
-
-    QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
     if (fullscreen) {
         view.showFullScreen();
