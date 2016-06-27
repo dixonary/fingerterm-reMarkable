@@ -29,6 +29,12 @@ Item {
 
     Binding {
         target: util
+        property: "windowOrientation"
+        value: page.orientation
+    }
+
+    Binding {
+        target: util
         property: "allowGestures"
         value: !vkb.active && !menu.showing && urlWindow.state != "visible" && aboutDialog.state != "visible"
                && layoutWindow.state != "visible"
@@ -39,13 +45,13 @@ Item {
 
         property bool forceOrientation
         property int forcedOrientation
+        property int orientation: forceOrientation ? forcedOrientation : Screen.orientation
         property bool portrait: rotation % 180 == 0
 
         width: portrait ? root.width : root.height
         height: portrait ? root.height : root.width
         anchors.centerIn: parent
-        rotation: Screen.angleBetween((forceOrientation ? forcedOrientation : Screen.orientation),
-                                      Screen.primaryOrientation)
+        rotation: Screen.angleBetween(orientation, Screen.primaryOrientation)
         focus: true
         Keys.onPressed: {
             term.keyPress(event.key,event.modifiers,event.text);
