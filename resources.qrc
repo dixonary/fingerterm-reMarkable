@@ -7,6 +7,7 @@
         <file>qml/Button.qml</file>
         <file>qml/MenuFingerterm.qml</file>
         <file>qml/NotifyWin.qml</file>
+        <file>qml/PopupWindow.qml</file>
         <file>icons/backspace.png</file>
         <file>icons/down.png</file>
         <file>icons/enter.png</file>

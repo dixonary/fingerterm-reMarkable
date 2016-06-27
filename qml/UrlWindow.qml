@@ -19,26 +19,10 @@
 
 import QtQuick 2.0
 
-Rectangle {
+PopupWindow {
     id: urlWindow
 
     property variant urls: [""]
-    property bool show
-
-    width: window.width-1
-    height: window.height-1
-    color: "#000000"
-    y: show ? 0 : -(height+1)
-    border.color: "#c0c0c0"
-    border.width: 1
-    radius: window.radiusMedium
-
-    Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.InOutCubic } }
-
-    MouseArea {
-        // event eater
-        anchors.fill: parent
-    }
 
     Component {
         id: listDelegate
