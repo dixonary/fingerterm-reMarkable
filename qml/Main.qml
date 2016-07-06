@@ -18,7 +18,7 @@
 */
 
 import QtQuick 2.0
-import TextRender 1.0
+import FingerTerm 1.0
 import QtQuick.Window 2.0
 
 Item {
@@ -33,19 +33,13 @@ Item {
         value: page.orientation
     }
 
-    Binding {
-        target: util
-        property: "allowGestures"
-        value: !vkb.active && !menu.showing && urlWindow.state != "visible" && aboutDialog.state != "visible"
-               && layoutWindow.state != "visible"
-    }
-
     Item {
         id: page
 
-        property bool forceOrientation
-        property int forcedOrientation
         property int orientation: forceOrientation ? forcedOrientation : Screen.orientation
+        property bool forceOrientation: util.orientationMode != Util.OrientationAuto
+        property int forcedOrientation: util.orientationMode == Util.OrientationLandscape ? Qt.LandscapeOrientation
+                                                                                          : Qt.PortraitOrientation
         property bool portrait: rotation % 180 == 0
 
         width: portrait ? root.width : root.height
@@ -55,26 +49,6 @@ Item {
         focus: true
         Keys.onPressed: {
             term.keyPress(event.key,event.modifiers,event.text);
-        }
-
-        Component.onCompleted: {
-            var stringMode = util.settingsValue("ui/orientationLockMode");
-            applyOrientationLock(stringMode)
-        }
-
-        function applyOrientationLock(stringMode) {
-            switch (stringMode) {
-            case "auto":
-                page.forceOrientation = false
-                break
-            case "landscape":
-                page.forceOrientation = true
-                page.forcedOrientation = Qt.LandscapeOrientation
-                break
-            case "portrait":
-                page.forceOrientation = true
-                page.forcedOrientation = Qt.PortraitOrientation
-            }
         }
 
         Rectangle {
@@ -108,7 +82,7 @@ Item {
             property int fontSizeSmall: 14*pixelRatio
             property int fontSizeLarge: 24*pixelRatio
 
-            property int uiFontSize: util.uiFontSize()*pixelRatio
+            property int uiFontSize: util.uiFontSize * pixelRatio
 
             property int scrollBarWidth: 6*window.pixelRatio
 
@@ -117,13 +91,7 @@ Item {
 
             Lineview {
                 id: lineView
-
-                property int duration
-
-                y: -(height+1)
-                onFontPointSizeChanged: {
-                    lineView.setPosition(vkb.active)
-                }
+                show: (util.keyboardMode == Util.KeyboardFade) && vkb.active
             }
 
             Keyboard {
@@ -182,7 +150,7 @@ Item {
                             //   - not in select mode, as it would be hard to select text
                             if (touchPoint.y < vkb.y && touchPoint.startY < vkb.y &&
                                     Math.abs(touchPoint.y - touchPoint.startY) < 20 &&
-                                    util.settingsValue("ui/dragMode") !== "select") {
+                                    util.dragMode == Util.DragSelect) {
                                 if (vkb.active) {
                                     window.sleepVKB();
                                 } else {
@@ -204,26 +172,20 @@ Item {
                 }
             }
 
-            Rectangle {
+            MouseArea {
                 //top right corner menu button
                 x: window.width - width
                 width: menuImg.width + 60*window.pixelRatio
                 height: menuImg.height + 30*window.pixelRatio
-                color: "transparent"
                 opacity: 0.5
+                onClicked: menu.showing = true
+
                 Image {
-                    anchors.centerIn: parent
                     id: menuImg
+
+                    anchors.centerIn: parent
                     source: "qrc:/icons/menu.png"
-                    height: sourceSize.height
-                    width: sourceSize.width
                     scale: window.pixelRatio
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        menu.showing = true
-                    }
                 }
             }
 
@@ -244,16 +206,16 @@ Item {
 
                 height: parent.height
                 width: parent.width
+                fontPointSize: util.fontSize
+                opacity: (util.keyboardMode == Util.KeyboardFade && vkb.active) ? 0.3
+                                                                                : 1.0
+                allowGestures: !vkb.active && !menu.showing && !urlWindow.show && !aboutDialog.show && !layoutWindow.show
 
                 Behavior on opacity {
                     NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
                 }
                 Behavior on y {
                     NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
-                }
-
-                onFontSizeChanged: {
-                    lineView.fontPointSize = textrender.fontPointSize;
                 }
 
                 onCutAfterChanged: {
@@ -266,7 +228,7 @@ Item {
             Timer {
                 id: fadeTimer
 
-                interval: menu.keyboardFadeOutDelay
+                interval: util.keyboardFadeOutDelay
                 onTriggered: {
                     window.sleepVKB();
                 }
@@ -332,29 +294,24 @@ Item {
             NotifyWin {
                 id: aboutDialog
 
-                property int termW
-                property int termH
-
                 text: {
                     var str = "<font size=\"+3\">FingerTerm " + util.versionString() + "</font><br>\n" +
                             "<font size=\"+1\">" +
                             "by Heikki Holstila &lt;<a href=\"mailto:heikki.holstila@gmail.com?subject=FingerTerm\">heikki.holstila@gmail.com</a>&gt;<br><br>\n\n" +
                             "Config files for adjusting settings are at:<br>\n" +
                             util.configPath() + "/<br><br>\n" +
-                            "Documentation:<br>\n<a href=\"http://hqh.unlink.org/harmattan\">http://hqh.unlink.org/harmattan</a>"
-                    if (termH != 0 && termW != 0) {
+                            "Source code:<br>\n<a href=\"https://git.merproject.org/mer-core/fingerterm/\">https://git.merproject.org/mer-core/fingerterm/</a>"
+                    if (term.rows != 0 && term.columns != 0) {
                         str += "<br><br>Current window title: <font color=\"gray\">" + util.windowTitle.substring(0,40) + "</font>"; //cut long window title
                         if(util.windowTitle.length>40)
                             str += "...";
-                        str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
-                        str += "<br>Charset: <font color=\"gray\">" + util.settingsValue("terminal/charset") + "</font>";
+                        str += "<br>Current terminal size: <font color=\"gray\">" + term.columns + "×" + term.rows + "</font>";
+                        str += "<br>Charset: <font color=\"gray\">" + util.charset + "</font>";
                     }
                     str += "</font>";
                     return str;
                 }
-                onDismissed: {
-                    util.setSettingsValue("state/showWelcomeScreen", false);
-                }
+                onDismissed: util.showWelcomeScreen = false
             }
 
             NotifyWin {
@@ -384,31 +341,27 @@ Item {
                 if(!vkb.visibleSetting)
                     return;
 
-                lineView.duration = window.fadeOutTime;
                 textrender.duration = window.fadeOutTime;
                 fadeTimer.restart();
                 vkb.active = true;
-                lineView.setPosition(vkb.active);
                 setTextRenderAttributes();
             }
 
             function sleepVKB()
             {
                 textrender.duration = window.fadeInTime;
-                lineView.duration = window.fadeInTime;
                 vkb.active = false;
-                lineView.setPosition(vkb.active);
                 setTextRenderAttributes();
             }
 
             function setTextRenderAttributes()
             {
-                if(util.settingsValue("ui/vkbShowMethod")==="move")
+                if (util.keyboardMode == Util.KeyboardMove)
                 {
                     vkb.visibleSetting = true;
-                    textrender.opacity = 1.0;
                     if(vkb.active) {
-                        var move = textrender.cursorPixelPos().y + textrender.fontHeight/2 + textrender.fontHeight*util.settingsValue("ui/showExtraLinesFromCursor");
+                        var move = textrender.cursorPixelPos().y + textrender.fontHeight/2
+                                + textrender.fontHeight*util.extraLinesFromCursor
                         if(move < vkb.y) {
                             textrender.y = 0;
                             textrender.cutAfter = vkb.y;
@@ -421,28 +374,23 @@ Item {
                         textrender.y = 0;
                     }
                 }
-                else if(util.settingsValue("ui/vkbShowMethod")==="fade")
+                else if (util.keyboardMode == Util.KeyboardFade)
                 {
                     vkb.visibleSetting = true;
                     textrender.cutAfter = textrender.height;
                     textrender.y = 0;
-                    if(vkb.active)
-                        textrender.opacity = 0.3;
-                    else
-                        textrender.opacity = 1.0;
                 }
                 else // "off" (vkb disabled)
                 {
                     vkb.visibleSetting = false;
                     textrender.cutAfter = textrender.height;
                     textrender.y = 0;
-                    textrender.opacity = 1.0;
                 }
             }
 
             function displayBufferChanged()
             {
-                lineView.lines = term.printableLinesFromCursor(util.settingsValue("ui/showExtraLinesFromCursor"));
+                lineView.lines = term.printableLinesFromCursor(util.extraLinesFromCursor);
                 lineView.cursorX = textrender.cursorPixelPos().x;
                 lineView.cursorWidth = textrender.cursorPixelSize().width;
                 lineView.cursorHeight = textrender.cursorPixelSize().height;
@@ -450,8 +398,8 @@ Item {
             }
 
             Component.onCompleted: {
-                if( util.settingsValue("state/showWelcomeScreen") === true )
-                    aboutDialog.state = "visible";
+                if (util.showWelcomeScreen)
+                    aboutDialog.show = true
                 if (startupErrorMessage != "") {
                     showErrorMessage(startupErrorMessage)
                 }
@@ -460,13 +408,7 @@ Item {
             function showErrorMessage(string)
             {
                 errorDialog.text = "<font size=\"+2\">" + string + "</font>";
-                errorDialog.state = "visible"
-            }
-
-            function setOrientationLockMode(stringMode)
-            {
-                util.setSettingsValue("ui/orientationLockMode", stringMode);
-                page.applyOrientationLock(stringMode)
+                errorDialog.show = true
             }
         }
     }

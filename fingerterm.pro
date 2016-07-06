@@ -49,7 +49,8 @@ OTHER_FILES += \
     qml/MenuFingerterm.qml \
     qml/NotifyWin.qml \
     qml/UrlWindow.qml \
-    qml/LayoutWindow.qml
+    qml/LayoutWindow.qml \
+    qml/PopupWindow.qml
 
 RESOURCES += \
     resources.qrc

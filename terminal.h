@@ -53,6 +53,9 @@ struct TermAttribs {
 class Terminal : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(int rows READ rows NOTIFY termSizeChanged)
+    Q_PROPERTY(int columns READ columns NOTIFY termSizeChanged)
+
 public:
     static const int defaultFgColor = 7;
     static const int defaultBgColor = 0;
@@ -70,7 +73,7 @@ public:
     void setCursorPos(QPoint pos);
     bool showCursor();
 
-    Q_INVOKABLE QSize termSize() { return iTermSize; }
+    QSize termSize() { return iTermSize; }
     void setTermSize(QSize size);
 
     QList<QList<TermChar> >& buffer();
@@ -98,11 +101,14 @@ public:
     Q_INVOKABLE void clearSelection();
     bool hasSelection();
 
+    int rows();
+    int columns();
+
     TermChar zeroChar;
 
 signals:
     void cursorPosChanged(QPoint newPos);
-    void termSizeChanged(QSize newSize);
+    void termSizeChanged(int rows, int columns);
     void displayBufferChanged();
     void selectionChanged();
     void scrollBackBufferAdjusted(bool reset);

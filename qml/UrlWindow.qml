@@ -19,23 +19,10 @@
 
 import QtQuick 2.0
 
-Rectangle {
+PopupWindow {
     id: urlWindow
 
     property variant urls: [""]
-
-    width: window.width-1
-    height: window.height-1
-    color: "#000000"
-    y: -(height+1)
-    border.color: "#c0c0c0"
-    border.width: 1
-    radius: window.radiusMedium
-
-    MouseArea {
-        // event eater
-        anchors.fill: parent
-    }
 
     Component {
         id: listDelegate
@@ -104,26 +91,6 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: window.paddingMedium
         text: "Back"
-        onClicked: {
-            urlWindow.state = ""
-        }
+        onClicked: urlWindow.show = false
     }
-
-    states: [
-        State {
-            name: "visible"
-            PropertyChanges {
-                target: urlWindow
-                y: 0
-            }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            from: "*"
-            to: "*"
-            PropertyAnimation { target: urlWindow; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-        }
-    ]
 }

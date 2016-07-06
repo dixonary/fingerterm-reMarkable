@@ -38,10 +38,8 @@ public:
     void writeTerm(const QString &chars);
     bool failed() { return iFailed; }
 
-public slots:
-    void resize(QSize newSize);
-
 private slots:
+    void resize(int rows, int columns);
     void readActivated();
 
 private:

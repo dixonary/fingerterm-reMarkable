@@ -27,7 +27,8 @@ Util* TextRender::sUtil = 0;
 
 TextRender::TextRender(QQuickItem *parent) :
     QQuickPaintedItem(parent),
-    newSelection(true)
+    newSelection(true),
+    iAllowGestures(true)
 {
     setFlag(ItemHasContents);
 
@@ -74,8 +75,7 @@ TextRender::TextRender(QQuickItem *parent) :
 
     iShowBufferScrollIndicator = false;
 
-    iFont = QFont(sUtil->settingsValue("ui/fontFamily").toString(),
-                  sUtil->settingsValue("ui/fontSize").toInt());
+    iFont = QFont(sUtil->fontFamily(), sUtil->fontSize());
     iFont.setBold(false);
     QFontMetrics fontMetrics(iFont);
     iFontHeight = fontMetrics.height();
@@ -106,17 +106,17 @@ void TextRender::paint(QPainter* painter)
         if(from<0)
             from=0;
         int to = sTerm->backBuffer().size();
-        if(to-from > sTerm->termSize().height())
-            to = from + sTerm->termSize().height();
+        if(to-from > sTerm->rows())
+            to = from + sTerm->rows();
         paintFromBuffer(painter, sTerm->backBuffer(), from, to, y);
-        if(to-from < sTerm->termSize().height() && sTerm->buffer().size()>0) {
-            int to2 = sTerm->termSize().height() - (to-from);
+        if(to-from < sTerm->rows() && sTerm->buffer().size()>0) {
+            int to2 = sTerm->rows() - (to-from);
             if(to2 > sTerm->buffer().size())
                 to2 = sTerm->buffer().size();
             paintFromBuffer(painter, sTerm->buffer(), 0, to2, y);
         }
     } else {
-        int count = qMin(sTerm->termSize().height(), sTerm->buffer().size());
+        int count = qMin(sTerm->rows(), sTerm->buffer().size());
         paintFromBuffer(painter, sTerm->buffer(), 0, count, y);
     }
 
@@ -145,12 +145,12 @@ void TextRender::paint(QPainter* painter)
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
         } else {
             start = charsToPixels(selection.topLeft());
-            end = charsToPixels(QPoint(sTerm->termSize().width(), selection.top()));
+            end = charsToPixels(QPoint(sTerm->columns(), selection.top()));
             painter->drawRect(start.x(), start.y(),
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
 
             start = charsToPixels(QPoint(1, selection.top()+1));
-            end = charsToPixels(QPoint(sTerm->termSize().width(), selection.bottom()-1));
+            end = charsToPixels(QPoint(sTerm->columns(), selection.bottom()-1));
             painter->drawRect(start.x(), start.y(),
                               end.x()-start.x()+fontWidth(), end.y()-start.y()+fontHeight());
 
@@ -181,7 +181,7 @@ void TextRender::paintFromBuffer(QPainter* painter, QList<QList<TermChar> >& buf
         else
             painter->setOpacity(1.0);
 
-        int xcount = qMin(buffer.at(i).count(), sTerm->termSize().width());
+        int xcount = qMin(buffer.at(i).count(), sTerm->columns());
 
         // background for the current line
         currentX = leftmargin;
@@ -300,7 +300,7 @@ void TextRender::updateTermSize()
 
 void TextRender::mousePress(float eventX, float eventY)
 {
-    if(!sUtil->allowGestures())
+    if (!allowGestures())
         return;
 
     dragOrigin = QPointF(eventX, eventY);
@@ -311,13 +311,13 @@ void TextRender::mouseMove(float eventX, float eventY)
 {
     QPointF eventPos(eventX, eventY);
 
-    if(!sUtil->allowGestures())
+    if (!allowGestures())
         return;
 
-    if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+    if(sUtil->dragMode() == Util::DragScroll) {
         dragOrigin = scrollBackBuffer(eventPos, dragOrigin);
     }
-    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+    else if(sUtil->dragMode() == Util::DragSelect) {
         selectionHelper(eventPos, true);
     }
 }
@@ -327,10 +327,10 @@ void TextRender::mouseRelease(float eventX, float eventY)
     QPointF eventPos(eventX, eventY);
     const int reqDragLength = 140;
 
-    if(!sUtil->allowGestures())
+    if (!allowGestures())
         return;
 
-    if(sUtil->settingsValue("ui/dragMode")=="gestures") {
+    if(sUtil->dragMode() == Util::DragGestures) {
         int xdist = qAbs(eventPos.x() - dragOrigin.x());
         int ydist = qAbs(eventPos.y() - dragOrigin.y());
         if(eventPos.x() < dragOrigin.x()-reqDragLength && xdist > ydist*2)
@@ -342,10 +342,10 @@ void TextRender::mouseRelease(float eventX, float eventY)
         else if(eventPos.y() < dragOrigin.y()-reqDragLength && ydist > xdist*2)
             doGesture(PanUp);
     }
-    else if(sUtil->settingsValue("ui/dragMode")=="scroll") {
+    else if(sUtil->dragMode() == Util::DragScroll) {
         scrollBackBuffer(eventPos, dragOrigin);
     }
-    else if(sUtil->settingsValue("ui/dragMode")=="select") {
+    else if(sUtil->dragMode() == Util::DragSelect) {
         selectionHelper(eventPos, false);
     }
 }
@@ -384,9 +384,6 @@ void TextRender::setFontPointSize(int psize)
         iFontHeight = fontMetrics.height();
         iFontWidth = fontMetrics.maxWidth();
         iFontDescent = fontMetrics.descent();
-
-        sUtil->setSettingsValue("ui/fontSize", psize);
-
         emit fontSizeChanged();
     }
 }
@@ -407,11 +404,24 @@ QSize TextRender::cursorPixelSize()
     return QSize(iFontWidth, iFontHeight);
 }
 
+bool TextRender::allowGestures()
+{
+    return iAllowGestures;
+}
+
+void TextRender::setAllowGestures(bool allow)
+{
+    if (iAllowGestures != allow) {
+        iAllowGestures = allow;
+        emit allowGesturesChanged();
+    }
+}
+
 QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
 {
     int xdist = qAbs(now.x() - last.x());
     int ydist = qAbs(now.y() - last.y());
-    int fontSize = sUtil->settingsValue("ui/fontSize").toInt();
+    int fontSize = fontPointSize();
 
     int lines = ydist / fontSize;
 
@@ -429,19 +439,19 @@ QPointF TextRender::scrollBackBuffer(QPointF now, QPointF last)
 void TextRender::doGesture(PanGesture gesture)
 {
     if( gesture==PanLeft ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panLeftTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panLeftCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panLeftTitle", "Alt-Right").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panLeftCommand", "\\e\\e[C").toString(), true);
     }
     else if( gesture==PanRight ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panRightTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panRightCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panRightTitle", "Alt-Left").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panRightCommand", "\\e\\e[D").toString(), true);
     }
     else if( gesture==PanDown ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panDownTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panDownCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panDownTitle", "Page Up").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panDownCommand", "\\e[5~").toString(), true);
     }
     else if( gesture==PanUp ) {
-        sUtil->notifyText(sUtil->settingsValue("gestures/panUpTitle").toString());
-        sTerm->putString(sUtil->settingsValue("gestures/panUpCommand").toString(), true);
+        sUtil->notifyText(sUtil->settingsValue("gestures/panUpTitle", "Page Down").toString());
+        sTerm->putString(sUtil->settingsValue("gestures/panUpCommand", "\\e[6~").toString(), true);
     }
 }

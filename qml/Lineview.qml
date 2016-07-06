@@ -18,28 +18,32 @@
 */
 
 import QtQuick 2.0
+import FingerTerm 1.0
 
 Rectangle {
     id: lineView
 
     property variant lines: [""]
-    property int fontPointSize: util.settingsValue("ui/fontSize")*window.pixelRatio;
+    property int fontPointSize: util.fontSize
     property int cursorX: 1
     property int cursorWidth: 10
     property int cursorHeight: 10
-    property int extraLines: 1
+    property int extraLines: util.extraLinesFromCursor
+    property bool show
 
+    y: show ? 0 : -(height+window.paddingSmall)
     color: "#404040"
     border.width: 2
     border.color: "#909090"
     radius: window.radiusSmall
     width: parent.width
+    height: lineTextCol.height + 8*window.pixelRatio
 
     Text {
         id: fontHeightHack
         visible: false
         text: "X"
-        font.family: util.settingsValue("ui/fontFamily");
+        font.family: util.fontFamily
         font.pointSize: lineView.fontPointSize
     }
 
@@ -56,11 +60,13 @@ Rectangle {
 
     Column {
         id: lineTextCol
+
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: 2*window.pixelRatio
         anchors.rightMargin: 2*window.pixelRatio
+
         Repeater {
             model: lines
             delegate: Item {
@@ -68,7 +74,7 @@ Rectangle {
                 width: lineTextCol.width
                 Text {
                     color: "#ffffff"
-                    font.family: util.settingsValue("ui/fontFamily");
+                    font.family: util.fontFamily
                     font.pointSize: lineView.fontPointSize
                     text: modelData
                     textFormat: Text.PlainText
@@ -77,30 +83,6 @@ Rectangle {
                     maximumLineCount: 1
                 }
             }
-        }
-        onHeightChanged: {
-            if(lineView.visible)
-                lineView.height = height+8*window.pixelRatio
-            setPosition(vkb.active)
-        }
-    }
-
-    Component.onCompleted: {
-        extraLines = util.settingsValue("ui/showExtraLinesFromCursor");
-    }
-
-    function setPosition(vkbActive)
-    {
-        if( util.settingsValue("ui/vkbShowMethod")==="off" ) {
-            lineView.visible = false;
-            return;
-        }
-
-        lineView.visible = true;
-        if(vkbActive && util.settingsValue("ui/vkbShowMethod")!=="move") {
-            y = 0;
-        } else {
-            y = -(height+window.paddingSmall)
         }
     }
 }

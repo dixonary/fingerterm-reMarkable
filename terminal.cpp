@@ -26,6 +26,18 @@
 #include "textrender.h"
 #include "util.h"
 
+static bool charIsHexDigit(QChar ch)
+{
+    if (ch.isDigit()) // 0-9
+        return true;
+    else if (ch.toLatin1() >= 65 && ch.toLatin1() <= 70) // A-F
+        return true;
+    else if (ch.toLatin1() >= 97 && ch.toLatin1() <= 102) // a-f
+        return true;
+
+    return false;
+}
+
 Terminal::Terminal(QObject *parent) :
     QObject(parent), iPtyIFace(0), iWindow(0), iUtil(0),
     iTermSize(0,0), iEmitCursorChangeSignal(true),
@@ -116,7 +128,7 @@ void Terminal::setTermSize(QSize size)
 
         resetTabs();
 
-        emit termSizeChanged(size);
+        emit termSizeChanged(size.height(), size.width());
     }
 }
 
@@ -133,7 +145,7 @@ void Terminal::putString(QString str, bool unEscape)
         while(str.indexOf("\\x") != -1) {
             int i = str.indexOf("\\x")+2;
             QString num;
-            while(num.length() < 2 && str.length()>i && Util::charIsHexDigit(str.at(i))) {
+            while(num.length() < 2 && str.length()>i && charIsHexDigit(str.at(i))) {
                 num.append(str.at(i));
                 i++;
             }
@@ -337,7 +349,7 @@ void Terminal::insertInBuffer(const QString& chars)
                 if(iNewLineMode)
                     setCursorPos(QPoint(1,cursorPos().y()));
             }
-            else if(cursorPos().x() <= termSize().width()) // ignore newline after <termwidth> cols (terminfo: xenl)
+            else if(cursorPos().x() <= columns()) // ignore newline after <termwidth> cols (terminfo: xenl)
             {
                 if(iNewLineMode)
                     setCursorPos(QPoint(1,cursorPos().y()+1));
@@ -1034,9 +1046,9 @@ void Terminal::escControlChar(const QString& seq)
             return;
         if( seq.at(0) == '#' && seq.at(1)=='8' ) { // test mode, fill screen with 'E'
             clearAll(true);
-            for(int i=0; i<termSize().height(); i++) {
+            for (int i = 0; i < rows(); i++) {
                 QList<TermChar> line;
-                for(int j=0; j<termSize().width(); j++) {
+                for(int j = 0; j < columns(); j++) {
                     TermChar c = zeroChar;
                     c.c = 'E';
                     line.append(c);
@@ -1253,7 +1265,7 @@ const QStringList Terminal::grabURLsFromBuffer()
     QByteArray buf;
 
     //backbuffer
-    if ((iUtil->settingsValue("general/grabUrlsFromBackbuffer").toBool()
+    if ((iUtil->settingsValue("general/grabUrlsFromBackbuffer", false).toBool()
          && !iUseAltScreenBuffer)
         || backBufferScrollPos() > 0)  //a lazy workaround: just grab everything when the buffer is being scrolled (TODO: make a proper fix)
     {
@@ -1484,6 +1496,16 @@ void Terminal::clearSelection()
 
     emit selectionFinished();
     emit selectionChanged();
+}
+
+int Terminal::rows()
+{
+    return iTermSize.height();
+}
+
+int Terminal::columns()
+{
+    return iTermSize.width();
 }
 
 QRect Terminal::selection()

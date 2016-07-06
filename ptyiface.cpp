@@ -68,8 +68,8 @@ PtyIFace::PtyIFace(int pid, int masterFd, Terminal *term, QString charset, QObje
 
     iTerm->setPtyIFace(this);
 
-    resize(iTerm->termSize());
-    connect(iTerm,SIGNAL(termSizeChanged(QSize)),this,SLOT(resize(QSize)));
+    resize(iTerm->rows(), iTerm->columns());
+    connect(iTerm,SIGNAL(termSizeChanged(int,int)),this,SLOT(resize(int,int)));
 
     iReadNotifier = new QSocketNotifier(iMasterFd, QSocketNotifier::Read, this);
     connect(iReadNotifier,SIGNAL(activated(int)),this,SLOT(readActivated()));
@@ -104,14 +104,14 @@ void PtyIFace::readActivated()
         iTerm->insertInBuffer( iTextCodec->toUnicode(data) );
 }
 
-void PtyIFace::resize(QSize newSize)
+void PtyIFace::resize(int rows, int columns)
 {
     if(childProcessQuit)
         return;
 
     winsize winp;
-    winp.ws_col = newSize.width();
-    winp.ws_row = newSize.height();
+    winp.ws_col = columns;
+    winp.ws_row = rows;
 
     ioctl(iMasterFd, TIOCSWINSZ, &winp);
 }

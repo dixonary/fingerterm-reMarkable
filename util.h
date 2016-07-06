@@ -29,13 +29,46 @@ class QQuickView;
 class Util : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
     Q_PROPERTY(QString windowTitle READ windowTitle NOTIFY windowTitleChanged)
     Q_PROPERTY(int windowOrientation READ windowOrientation WRITE setWindowOrientation NOTIFY windowOrientationChanged)
     Q_PROPERTY(bool canPaste READ canPaste NOTIFY clipboardOrSelectionChanged)
     Q_PROPERTY(bool terminalHasSelection READ terminalHasSelection NOTIFY clipboardOrSelectionChanged)
+    Q_PROPERTY(QString fontFamily READ fontFamily CONSTANT)
+    Q_PROPERTY(int uiFontSize READ uiFontSize CONSTANT)
+    Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize NOTIFY fontSizeChanged)
+    Q_PROPERTY(int dragMode READ dragMode WRITE setDragMode NOTIFY dragModeChanged)
+    Q_PROPERTY(int keyboardMode READ keyboardMode WRITE setKeyboardMode NOTIFY keyboardModeChanged)
+    Q_PROPERTY(int keyboardFadeOutDelay READ keyboardFadeOutDelay WRITE setKeyboardFadeOutDelay NOTIFY keyboardFadeOutDelayChanged)
+    Q_PROPERTY(QString keyboardLayout READ keyboardLayout WRITE setKeyboardLayout NOTIFY keyboardLayoutChanged)
+    Q_PROPERTY(int extraLinesFromCursor READ extraLinesFromCursor CONSTANT)
+    Q_PROPERTY(QString charset READ charset CONSTANT)
+    Q_PROPERTY(int keyboardMargins READ keyboardMargins CONSTANT)
+    Q_PROPERTY(int orientationMode READ orientationMode WRITE setOrientationMode NOTIFY orientationModeChanged)
+    Q_PROPERTY(bool showWelcomeScreen READ showWelcomeScreen WRITE setShowWelcomeScreen NOTIFY showWelcomeScreenChanged)
+    Q_ENUMS(KeyboardMode)
+    Q_ENUMS(DragMode)
+    Q_ENUMS(OrientationMode)
 
 public:
+    enum KeyboardMode {
+        KeyboardOff,
+        KeyboardFade,
+        KeyboardMove
+    };
+
+    enum DragMode {
+        DragOff,
+        DragGestures,
+        DragScroll,
+        DragSelect
+    };
+
+    enum OrientationMode {
+        OrientationAuto,
+        OrientationLandscape,
+        OrientationPortrait
+    };
+
     explicit Util(QSettings* settings, QObject *parent = 0);
     virtual ~Util();
 
@@ -50,10 +83,13 @@ public:
 
     Q_INVOKABLE QString versionString();
     Q_INVOKABLE QString configPath();
-    Q_INVOKABLE QVariant settingsValue(QString key);
-    Q_INVOKABLE void setSettingsValue(QString key, QVariant value);
+    QVariant settingsValue(QString key, const QVariant &defaultValue = QVariant());
+    void setSettingsValue(QString key, QVariant value);
 
-    Q_INVOKABLE int uiFontSize();
+    int uiFontSize();
+
+    int fontSize();
+    void setFontSize(int size);
 
     Q_INVOKABLE void keyPressFeedback();
     Q_INVOKABLE void keyReleaseFeedback();
@@ -66,23 +102,46 @@ public:
 
     void bellAlert();
 
-    bool allowGestures() { return iAllowGestures; }
-    void setAllowGestures(bool a) { if(iAllowGestures!=a) { iAllowGestures=a; emit allowGesturesChanged(); } }
+    QString fontFamily();
 
-    static bool charIsHexDigit(QChar ch);
+    int dragMode();
+    void setDragMode(int mode);
+
+    int keyboardMode();
+    void setKeyboardMode(int mode);
+
+    int keyboardFadeOutDelay();
+    void setKeyboardFadeOutDelay(int delay);
+
+    QString keyboardLayout();
+    void setKeyboardLayout(const QString &layout);
+
+    int extraLinesFromCursor();
+    QString charset();
+    int keyboardMargins();
+
+    int orientationMode();
+    void setOrientationMode(int mode);
+
+    bool showWelcomeScreen();
+    void setShowWelcomeScreen(bool value);
 
 signals:
     void visualBell();
-    void allowGesturesChanged();
     void notify(QString msg);
     void clipboardOrSelectionChanged();
     void windowTitleChanged();
     void windowOrientationChanged();
+    void fontSizeChanged();
+    void dragModeChanged();
+    void keyboardModeChanged();
+    void keyboardFadeOutDelayChanged();
+    void keyboardLayoutChanged();
+    void orientationModeChanged();
+    void showWelcomeScreenChanged();
 
 private:
     Q_DISABLE_COPY(Util)
-
-    bool iAllowGestures;
 
     QString iCurrentWinTitle;
 

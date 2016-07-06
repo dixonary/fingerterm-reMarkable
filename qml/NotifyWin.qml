@@ -19,26 +19,13 @@
 
 import QtQuick 2.0
 
-Rectangle {
+PopupWindow {
     id: notifyWin
 
     property string text
 
     signal dismissed()
 
-    width: window.width-1
-    height: window.height-1
-    color: "#000000"
-    y: -(height+1)
-    state: ""
-    border.color: "#c0c0c0"
-    border.width: 1
-    radius: window.radiusMedium
-
-    MouseArea {
-        // event eater
-        anchors.fill: parent
-    }
     Item {
         anchors.top: notifyWin.top
         anchors.left: notifyWin.left
@@ -66,26 +53,8 @@ Rectangle {
         anchors.bottomMargin: window.paddingMedium
         text: "OK"
         onClicked: {
-            notifyWin.state = ""
+            notifyWin.show = false
             notifyWin.dismissed();
         }
     }
-
-    states: [
-        State {
-            name: "visible"
-            PropertyChanges {
-                target: notifyWin
-                y: 0
-            }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            from: "*"
-            to: "*"
-            PropertyAnimation { target: notifyWin; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-        }
-    ]
 }

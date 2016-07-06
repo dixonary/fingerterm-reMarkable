@@ -19,29 +19,15 @@
 
 import QtQuick 2.0
 
-Rectangle {
+PopupWindow {
     id: layoutWindow
 
-    property string currentLayout: util.settingsValue("ui/keyboardLayout");
     property variant layouts: [""]
-
-    width: window.width-1
-    height: window.height-1
-    color: "#000000"
-    y: -(height+1)
-    border.color: "#c0c0c0"
-    border.width: 1
-    radius: window.radiusMedium
-
-    MouseArea {
-        // event eater
-        anchors.fill: parent
-    }
 
     Component {
         id: listDelegate
         Rectangle {
-            color: currentLayout === modelData ? "#909090" : "#404040"
+            color: util.keyboardLayout === modelData ? "#909090" : "#404040"
             width: parent.width
             height: selectButton.height+4*window.pixelRatio
             border.width: 1
@@ -66,10 +52,9 @@ Rectangle {
                 width: 70*window.pixelRatio
                 anchors.rightMargin: window.paddingSmall
                 onClicked: {
-                    util.setSettingsValue("ui/keyboardLayout", modelData);
-                    vkb.reloadLayout();
-                    layoutWindow.state = "";
-                    util.notifyText(modelData);
+                    util.keyboardLayout = modelData
+                    layoutWindow.show = false
+                    util.notifyText(modelData)
                 }
             }
         }
@@ -99,30 +84,6 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: window.paddingMedium
         text: "Back"
-        onClicked: {
-            layoutWindow.state = ""
-        }
+        onClicked: layoutWindow.show = false
     }
-
-    states: [
-        State {
-            name: "visible"
-            PropertyChanges {
-                target: layoutWindow
-                y: 0
-            }
-            StateChangeScript {
-                script:
-                    currentLayout = util.settingsValue("ui/keyboardLayout");
-            }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            from: "*"
-            to: "*"
-            PropertyAnimation { target: layoutWindow; properties: "y"; duration: 200; easing.type: Easing.InOutCubic }
-        }
-    ]
 }
