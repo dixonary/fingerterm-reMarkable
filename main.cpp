@@ -22,6 +22,8 @@
 #include <QtGui>
 #include <QtQml>
 #include <QQuickView>
+#include <QDir>
+#include <QString>
 
 extern "C" {
 #include <pty.h>
@@ -38,11 +40,19 @@ extern "C" {
 #include "version.h"
 #include "keyloader.h"
 
-void copyFileFromResources(QString from, QString to);
+static void copyFileFromResources(QString from, QString to);
 
 int main(int argc, char *argv[])
 {
-    QSettings *settings = new QSettings(QDir::homePath()+"/.config/FingerTerm/settings.ini", QSettings::IniFormat);
+    QString settings_path(QDir::homePath() + "/.config/FingerTerm");
+    QDir dir;
+
+    if (!dir.exists(settings_path)) {
+        if (!dir.mkdir(settings_path))
+            qWarning() << "Could not create fingerterm settings path" << settings_path;
+    }
+
+    QSettings *settings = new QSettings(settings_path + "/settings.ini", QSettings::IniFormat);
 
     QCoreApplication::setApplicationName("Fingerterm");
 
@@ -174,7 +184,7 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-void copyFileFromResources(QString from, QString to)
+static void copyFileFromResources(QString from, QString to)
 {
     // copy a file from resources to the config dir if it does not exist there
     QFileInfo toFile(to);
@@ -185,7 +195,7 @@ void copyFileFromResources(QString from, QString to)
             newToFile.write( reinterpret_cast<const char*>(res.data()) );
             newToFile.close();
         } else {
-            qFatal("failed to copy default config from resources");
+            qWarning() << "Failed to copy default config from resources to" << toFile.filePath();
         }
     }
 }
