@@ -175,7 +175,13 @@ Rectangle {
                 setStickiness(-1);
             }
 
-            window.vkbKeypress(currentCode, keyboard.keyModifiers);
+            if (shiftActive && code_alt != 0 && code_alt != code) {
+                // Do not apply shift on alt code that are accessible
+                // only with shift.
+                window.vkbKeypress(currentCode, keyboard.keyModifiers & ~Qt.ShiftModifier);
+            } else {
+                window.vkbKeypress(currentCode, keyboard.keyModifiers);
+            }
 
             // first non-sticky press will cause the sticky to be released
             if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
