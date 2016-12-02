@@ -150,7 +150,7 @@ Item {
                             //   - not in select mode, as it would be hard to select text
                             if (touchPoint.y < vkb.y && touchPoint.startY < vkb.y &&
                                     Math.abs(touchPoint.y - touchPoint.startY) < 20 &&
-                                    util.dragMode == Util.DragSelect) {
+                                    util.dragMode !== Util.DragSelect) {
                                 if (vkb.active) {
                                     window.sleepVKB();
                                 } else {
