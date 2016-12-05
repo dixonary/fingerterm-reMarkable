@@ -85,7 +85,7 @@ TextRender::TextRender(QQuickItem *parent) :
     Q_ASSERT(sTerm);
     connect(sTerm, SIGNAL(displayBufferChanged()), this, SLOT(redraw()));
     connect(sTerm, SIGNAL(cursorPosChanged(QPoint)), this, SLOT(redraw()));
-    connect(sTerm, SIGNAL(termSizeChanged(QSize)), this, SLOT(redraw()));
+    connect(sTerm, SIGNAL(termSizeChanged(int,int)), this, SLOT(redraw()));
     connect(sTerm, SIGNAL(selectionChanged()), this, SLOT(redraw()));
     connect(sTerm, SIGNAL(scrollBackBufferAdjusted(bool)), this, SLOT(handleScrollBack(bool)));
     updateTermSize();
