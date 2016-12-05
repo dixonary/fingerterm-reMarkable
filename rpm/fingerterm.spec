@@ -1,11 +1,11 @@
 Name: fingerterm
-Version: 1.3.0
+Version: 1.3.2
 Release: 1
 Summary: A terminal emulator with a custom virtual keyboard
 Group: System/Base
 License: GPLv2
 Source0: %{name}-%{version}.tar.gz
-URL: https://github.com/nemomobile/fingerterm
+URL: https://git.merproject.org/mer-core/fingerterm
 BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: pkgconfig(Qt5Gui)
 BuildRequires: pkgconfig(Qt5Qml)
