@@ -112,6 +112,7 @@ Item {
                     Qt.quit();
                 }
             }
+            keyboard.keyModifiers = 0
             // makes the keyboard component reload itself with new data
             keyboardLoader.sourceComponent = undefined
             keyboardLoader.sourceComponent = keyboardContents
