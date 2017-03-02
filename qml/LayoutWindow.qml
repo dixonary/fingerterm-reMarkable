@@ -22,7 +22,7 @@ import QtQuick 2.0
 PopupWindow {
     id: layoutWindow
 
-    property variant layouts: [""]
+    property var layouts: [""]
 
     Component {
         id: listDelegate

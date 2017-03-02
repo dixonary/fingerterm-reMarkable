@@ -22,7 +22,7 @@ import QtQuick 2.0
 PopupWindow {
     id: urlWindow
 
-    property variant urls: [""]
+    property var urls: [""]
 
     Component {
         id: listDelegate

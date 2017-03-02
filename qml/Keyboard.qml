@@ -23,9 +23,9 @@ Item {
     id: keyboard
 
     property int keyModifiers
-    property variant resetSticky: 0
-    property variant currentStickyPressed: null
-    property variant currentKeyPressed: 0
+    property var resetSticky: 0
+    property var currentStickyPressed: null
+    property var currentKeyPressed: 0
 
     property string keyFgColor: "#ffffff"
     property string keyBgColor: "#202020"
@@ -59,10 +59,11 @@ Item {
                     spacing: keyboard.keyspacing
                     Repeater {
                         id: colRepeater
+
                         property int rowIndex: index
                         model: keyLoader.vkbColumns()
                         delegate: Key {
-                            property variant keydata: keyLoader.keyAt(colRepeater.rowIndex, index)
+                            property var keydata: keyLoader.keyAt(colRepeater.rowIndex, index)
                             label: keydata[0]
                             code: keydata[1]
                             label_alt: keydata[2]
