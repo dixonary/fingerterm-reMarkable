@@ -161,7 +161,7 @@ Rectangle {
         keyRepeatStarter.stop();
         keyRepeatTimer.stop();
         key.color = keyboard.keyBgColor;
-        keyboard.currentKeyPressed = 0;
+        keyboard.currentKeyPressed = null;
 
         if (sticky && !becomesSticky) {
             keyboard.keyModifiers &= ~code
@@ -184,7 +184,7 @@ Rectangle {
             }
 
             // first non-sticky press will cause the sticky to be released
-            if( !sticky && keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
+            if( !sticky && keyboard.resetSticky && keyboard.resetSticky !== key ) {
                 resetSticky.setStickiness(0);
             }
         }
@@ -211,7 +211,7 @@ Rectangle {
     function setStickiness(val)
     {
         if(sticky) {
-            if( keyboard.resetSticky != 0 && keyboard.resetSticky !== key ) {
+            if( keyboard.resetSticky && keyboard.resetSticky !== key ) {
                 resetSticky.setStickiness(0)
             }
 
@@ -230,7 +230,7 @@ Rectangle {
                 keyboard.keyModifiers &= ~code
             }
 
-            keyboard.resetSticky = 0
+            keyboard.resetSticky = null
 
             if(stickiness==1) {
                 stickIndicator.anchors.topMargin = key.height/2

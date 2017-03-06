@@ -23,9 +23,9 @@ Item {
     id: keyboard
 
     property int keyModifiers
-    property var resetSticky: 0
-    property var currentStickyPressed: null
-    property var currentKeyPressed: 0
+    property Key resetSticky
+    property Key currentStickyPressed
+    property Key currentKeyPressed
 
     property string keyFgColor: "#ffffff"
     property string keyBgColor: "#202020"
@@ -86,7 +86,7 @@ Item {
     }
 
     onCurrentKeyPressedChanged: {
-        if(currentKeyPressed != 0 && currentKeyPressed.currentLabel.length === 1 && currentKeyPressed.currentLabel !== " ") {
+        if(currentKeyPressed && currentKeyPressed.currentLabel.length === 1 && currentKeyPressed.currentLabel !== " ") {
             visualKeyFeedbackRect.label = currentKeyPressed.currentLabel
             visualKeyFeedbackRect.width = currentKeyPressed.width*1.5
             visualKeyFeedbackRect.height = currentKeyPressed.height*1.5
