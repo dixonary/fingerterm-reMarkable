@@ -23,7 +23,7 @@ import FingerTerm 1.0
 Rectangle {
     id: lineView
 
-    property variant lines: [""]
+    property var lines: [""]
     property int fontPointSize: util.fontSize
     property int cursorX: 1
     property int cursorWidth: 10

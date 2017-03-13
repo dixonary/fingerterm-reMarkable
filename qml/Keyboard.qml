@@ -23,9 +23,9 @@ Item {
     id: keyboard
 
     property int keyModifiers
-    property variant resetSticky: 0
-    property variant currentStickyPressed: null
-    property variant currentKeyPressed: 0
+    property Key resetSticky
+    property Key currentStickyPressed
+    property Key currentKeyPressed
 
     property string keyFgColor: "#ffffff"
     property string keyBgColor: "#202020"
@@ -59,10 +59,11 @@ Item {
                     spacing: keyboard.keyspacing
                     Repeater {
                         id: colRepeater
+
                         property int rowIndex: index
                         model: keyLoader.vkbColumns()
                         delegate: Key {
-                            property variant keydata: keyLoader.keyAt(colRepeater.rowIndex, index)
+                            property var keydata: keyLoader.keyAt(colRepeater.rowIndex, index)
                             label: keydata[0]
                             code: keydata[1]
                             label_alt: keydata[2]
@@ -85,7 +86,7 @@ Item {
     }
 
     onCurrentKeyPressedChanged: {
-        if(currentKeyPressed != 0 && currentKeyPressed.currentLabel.length === 1 && currentKeyPressed.currentLabel !== " ") {
+        if(currentKeyPressed && currentKeyPressed.currentLabel.length === 1 && currentKeyPressed.currentLabel !== " ") {
             visualKeyFeedbackRect.label = currentKeyPressed.currentLabel
             visualKeyFeedbackRect.width = currentKeyPressed.width*1.5
             visualKeyFeedbackRect.height = currentKeyPressed.height*1.5
@@ -111,6 +112,7 @@ Item {
                     Qt.quit();
                 }
             }
+            keyboard.keyModifiers = 0
             // makes the keyboard component reload itself with new data
             keyboardLoader.sourceComponent = undefined
             keyboardLoader.sourceComponent = keyboardContents
