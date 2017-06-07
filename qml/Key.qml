@@ -34,15 +34,12 @@ Rectangle {
     property real labelOpacity: keyboard.active ? 1.0 : 0.3
 
     // mouse input handling
-    property int clickThreshold: 20
     property bool isClick
-    property int pressMouseY
-    property int pressMouseX
     property bool shiftActive: (keyboard.keyModifiers & Qt.ShiftModifier) && !sticky
 
     width: window.width/12   // some default
     height: window.height/8 < 55*window.pixelRatio ? window.height/8 : 55*window.pixelRatio
-    color: label=="" ? "transparent" : keyboard.keyBgColor
+    color: label=="" ? "transparent" : (isClick || keyPressHighlight.running ? keyboard.keyHilightBgColor : keyboard.keyBgColor)
     border.color: label=="" ? "transparent" : keyboard.keyBorderColor
     border.width: 1
     radius: window.radiusSmall
@@ -118,14 +115,12 @@ Rectangle {
 
     function handlePress(touchArea, x, y) {
         isClick = true;
-        pressMouseX = x;
-        pressMouseY = y;
 
-        key.color = keyboard.keyHilightBgColor
         keyboard.currentKeyPressed = key;
         util.keyPressFeedback();
 
         keyRepeatStarter.start();
+        keyPressHighlight.restart()
 
         if (sticky) {
             keyboard.keyModifiers |= code;
@@ -147,20 +142,14 @@ Rectangle {
             return false;
         }
 
-        if (key.isClick) {
-            if (Math.abs(x - key.pressMouseX) > key.clickThreshold
-                    || Math.abs(y - key.pressMouseY) > key.clickThreshold) {
-                key.isClick = false
-            }
-        }
-
         return true;
     }
 
     function handleRelease(touchArea, x, y) {
+        key.isClick = false
         keyRepeatStarter.stop();
         keyRepeatTimer.stop();
-        key.color = keyboard.keyBgColor;
+
         keyboard.currentKeyPressed = null;
 
         if (sticky && !becomesSticky) {
@@ -206,6 +195,11 @@ Rectangle {
         onTriggered: {
             window.vkbKeypress(currentCode, keyboard.keyModifiers);
         }
+    }
+
+    Timer {
+        id: keyPressHighlight
+        interval: keyboard.feedbackDuration
     }
 
     function setStickiness(val)

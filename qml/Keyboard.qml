@@ -32,6 +32,8 @@ Item {
     property string keyHilightBgColor: "#ffffff"
     property string keyBorderColor: "#303030"
 
+    property int feedbackDuration: 150
+
     property bool active
 
     property int outmargins: util.keyboardMargins
@@ -40,7 +42,7 @@ Item {
     property real keywidth: (keyboard.width - keyspacing*keysPerRow - outmargins*2)/keysPerRow;
 
     width: parent.width
-    height: childrenRect.height + outmargins
+    height: keyboardLoader.height + outmargins
 
     Component {
         id: keyboardContents
@@ -85,17 +87,40 @@ Item {
         keyboardLoader.sourceComponent = keyboardContents;
     }
 
-    onCurrentKeyPressedChanged: {
-        if(currentKeyPressed && currentKeyPressed.currentLabel.length === 1 && currentKeyPressed.currentLabel !== " ") {
-            visualKeyFeedbackRect.label = currentKeyPressed.currentLabel
-            visualKeyFeedbackRect.width = currentKeyPressed.width*1.5
-            visualKeyFeedbackRect.height = currentKeyPressed.height*1.5
-            var mappedCoord = window.mapFromItem(currentKeyPressed, 0, 0);
-            visualKeyFeedbackRect.x = mappedCoord.x - (visualKeyFeedbackRect.width-currentKeyPressed.width)/2
-            visualKeyFeedbackRect.y = mappedCoord.y - currentKeyPressed.height*1.5
-            visualKeyFeedbackRect.visible = true;
-        } else {
-            visualKeyFeedbackRect.visible = false;
+    Rectangle {
+        // visual key press feedback...
+        id: visualKeyFeedbackRect
+
+        property alias label: label.text
+        property var _key: (currentKeyPressed
+                            && currentKeyPressed.currentLabel.length === 1
+                            && currentKeyPressed.currentLabel !== " ")
+                           ? currentKeyPressed : null
+
+        visible: _key || visualFeedbackDelay.running
+        radius: window.radiusSmall
+        color: keyFgColor
+
+        Text {
+            id: label
+            color: keyBgColor
+            font.pointSize: 34*window.pixelRatio
+            anchors.centerIn: parent
+        }
+        Timer {
+            id: visualFeedbackDelay
+            interval: feedbackDuration
+        }
+        on_KeyChanged: {
+            if (_key) {
+                visualKeyFeedbackRect.label = _key.currentLabel
+                visualKeyFeedbackRect.width = _key.width * 1.5
+                visualKeyFeedbackRect.height = _key.height * 1.5
+                var mappedCoord = keyboard.mapFromItem(_key, 0, 0);
+                visualKeyFeedbackRect.x = mappedCoord.x - (visualKeyFeedbackRect.width-_key.width)/2
+                visualKeyFeedbackRect.y = mappedCoord.y - _key.height*1.5
+                visualFeedbackDelay.restart()
+            }
         }
     }
 

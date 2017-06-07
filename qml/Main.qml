@@ -272,25 +272,6 @@ Item {
                 }
             }
 
-            Rectangle {
-                // visual key press feedback...
-                // easier to work with the coordinates if it's here and not under keyboard element
-                id: visualKeyFeedbackRect
-
-                property string label
-
-                visible: false
-                radius: window.radiusSmall
-                color: "#ffffff"
-
-                Text {
-                    color: "#000000"
-                    font.pointSize: 34*window.pixelRatio
-                    anchors.centerIn: parent
-                    text: visualKeyFeedbackRect.label
-                }
-            }
-
             NotifyWin {
                 id: aboutDialog
 
