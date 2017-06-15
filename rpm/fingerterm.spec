@@ -1,5 +1,5 @@
 Name: fingerterm
-Version: 1.3.2
+Version: 1.3.5
 Release: 1
 Summary: A terminal emulator with a custom virtual keyboard
 Group: System/Base
@@ -24,7 +24,9 @@ Provides: meego-terminal > 0.2.2
 %defattr(-,root,root,-)
 %{_bindir}/*
 %{_datadir}/applications/*.desktop
-
+%{_datadir}/%{name}/*.qml
+%{_datadir}/%{name}/data/*
+%{_datadir}/%{name}/icons/*
 
 %prep
 %setup -q -n %{name}-%{version}

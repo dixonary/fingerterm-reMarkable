@@ -40,7 +40,7 @@ extern "C" {
 #include "version.h"
 #include "keyloader.h"
 
-static void copyFileFromResources(QString from, QString to);
+static void copyFilesFromPath(QString from, QString to);
 
 int main(int argc, char *argv[])
 {
@@ -132,12 +132,7 @@ int main(int argc, char *argv[])
     QString startupErrorMsg;
 
     // copy the default config files to the config dir if they don't already exist
-    copyFileFromResources(":/data/menu.xml", util.configPath()+"/menu.xml");
-    copyFileFromResources(":/data/english.layout", util.configPath()+"/english.layout");
-    copyFileFromResources(":/data/finnish.layout", util.configPath()+"/finnish.layout");
-    copyFileFromResources(":/data/french.layout", util.configPath()+"/french.layout");
-    copyFileFromResources(":/data/german.layout", util.configPath()+"/german.layout");
-    copyFileFromResources(":/data/qwertz.layout", util.configPath()+"/qwertz.layout");
+    copyFilesFromPath(QStringLiteral(DEPLOYMENT_PATH) + QDir::separator() + QStringLiteral("data"), util.configPath());
 
     KeyLoader keyLoader;
     keyLoader.setUtil(&util);
@@ -164,7 +159,8 @@ int main(int argc, char *argv[])
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
     view.setResizeMode(QQuickView::SizeRootObjectToView);
-    view.setSource(QUrl("qrc:/qml/Main.qml"));
+    view.engine()->addImportPath(QStringLiteral(DEPLOYMENT_PATH));
+    view.setSource(QUrl::fromLocalFile(QStringLiteral(DEPLOYMENT_PATH) + QDir::separator() + QStringLiteral("Main.qml")));
 
     QObject *root = view.rootObject();
     if(!root)
@@ -184,18 +180,13 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-static void copyFileFromResources(QString from, QString to)
+static void copyFilesFromPath(QString from, QString to)
 {
-    // copy a file from resources to the config dir if it does not exist there
-    QFileInfo toFile(to);
-    if(!toFile.exists()) {
-        QFile newToFile(toFile.absoluteFilePath());
-        QResource res(from);
-        if (newToFile.open(QIODevice::WriteOnly)) {
-            newToFile.write( reinterpret_cast<const char*>(res.data()) );
-            newToFile.close();
-        } else {
-            qWarning() << "Failed to copy default config from resources to" << toFile.filePath();
-        }
+    QDir fromDir(from);
+    QDir toDir(to);
+
+    // Copy files from fromDir to toDir, but don't overwrite existing ones
+    foreach (const QString &filename, fromDir.entryList(QDir::Files)) {
+        QFile::copy(fromDir.filePath(filename), toDir.filePath(filename));
     }
 }
