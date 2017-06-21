@@ -40,8 +40,6 @@ extern "C" {
 #include "version.h"
 #include "keyloader.h"
 
-static void copyFileFromResources(QString from, QString to);
-
 int main(int argc, char *argv[])
 {
     QString settings_path(QDir::homePath() + "/.config/FingerTerm");
@@ -131,14 +129,6 @@ int main(int argc, char *argv[])
 
     QString startupErrorMsg;
 
-    // copy the default config files to the config dir if they don't already exist
-    copyFileFromResources(":/data/menu.xml", util.configPath()+"/menu.xml");
-    copyFileFromResources(":/data/english.layout", util.configPath()+"/english.layout");
-    copyFileFromResources(":/data/finnish.layout", util.configPath()+"/finnish.layout");
-    copyFileFromResources(":/data/french.layout", util.configPath()+"/french.layout");
-    copyFileFromResources(":/data/german.layout", util.configPath()+"/german.layout");
-    copyFileFromResources(":/data/qwertz.layout", util.configPath()+"/qwertz.layout");
-
     KeyLoader keyLoader;
     keyLoader.setUtil(&util);
     bool ret = keyLoader.loadLayout(util.keyboardLayout());
@@ -164,7 +154,8 @@ int main(int argc, char *argv[])
     QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
 
     view.setResizeMode(QQuickView::SizeRootObjectToView);
-    view.setSource(QUrl("qrc:/qml/Main.qml"));
+    view.engine()->addImportPath(QStringLiteral(DEPLOYMENT_PATH));
+    view.setSource(QUrl::fromLocalFile(QStringLiteral(DEPLOYMENT_PATH) + QDir::separator() + QStringLiteral("Main.qml")));
 
     QObject *root = view.rootObject();
     if(!root)
@@ -182,20 +173,4 @@ int main(int argc, char *argv[])
         qFatal("pty failure");
 
     return app.exec();
-}
-
-static void copyFileFromResources(QString from, QString to)
-{
-    // copy a file from resources to the config dir if it does not exist there
-    QFileInfo toFile(to);
-    if(!toFile.exists()) {
-        QFile newToFile(toFile.absoluteFilePath());
-        QResource res(from);
-        if (newToFile.open(QIODevice::WriteOnly)) {
-            newToFile.write( reinterpret_cast<const char*>(res.data()) );
-            newToFile.close();
-        } else {
-            qWarning() << "Failed to copy default config from resources to" << toFile.filePath();
-        }
-    }
 }

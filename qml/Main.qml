@@ -184,14 +184,14 @@ Item {
                     id: menuImg
 
                     anchors.centerIn: parent
-                    source: "qrc:/icons/menu.png"
+                    source: "icons/menu.png"
                     scale: window.pixelRatio
                 }
             }
 
             Image {
                 // terminal buffer scroll indicator
-                source: "qrc:/icons/scroll-indicator.png"
+                source: "icons/scroll-indicator.png"
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 visible: textrender.showBufferScrollIndicator
