@@ -40,8 +40,6 @@ extern "C" {
 #include "version.h"
 #include "keyloader.h"
 
-static void copyFilesFromPath(QString from, QString to);
-
 int main(int argc, char *argv[])
 {
     QString settings_path(QDir::homePath() + "/.config/FingerTerm");
@@ -131,9 +129,6 @@ int main(int argc, char *argv[])
 
     QString startupErrorMsg;
 
-    // copy the default config files to the config dir if they don't already exist
-    copyFilesFromPath(QStringLiteral(DEPLOYMENT_PATH) + QDir::separator() + QStringLiteral("data"), util.configPath());
-
     KeyLoader keyLoader;
     keyLoader.setUtil(&util);
     bool ret = keyLoader.loadLayout(util.keyboardLayout());
@@ -178,15 +173,4 @@ int main(int argc, char *argv[])
         qFatal("pty failure");
 
     return app.exec();
-}
-
-static void copyFilesFromPath(QString from, QString to)
-{
-    QDir fromDir(from);
-    QDir toDir(to);
-
-    // Copy files from fromDir to toDir, but don't overwrite existing ones
-    foreach (const QString &filename, fromDir.entryList(QDir::Files)) {
-        QFile::copy(fromDir.filePath(filename), toDir.filePath(filename));
-    }
 }

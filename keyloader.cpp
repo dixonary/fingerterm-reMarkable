@@ -49,6 +49,8 @@ bool KeyLoader::loadLayout(QString layout)
     }
     else { // load from file
         QFile f(iUtil->configPath() + "/" + layout + ".layout");
+        if (!f.exists()) // fallback to installation directory
+            f.setFileName(QStringLiteral(DEPLOYMENT_PATH) + "/data/" + layout + ".layout");
         ret = loadLayoutInternal(f);
     }
 
@@ -195,6 +197,15 @@ const QStringList KeyLoader::availableLayouts()
     QStringList ret;
     foreach(QString s, results) {
         ret << s.left(s.lastIndexOf('.'));
+    }
+
+    // Add also layouts from installation path.
+    QDir dataDir(QStringLiteral(DEPLOYMENT_PATH) + "/data");
+    results = dataDir.entryList(filter, QDir::Files|QDir::Readable, QDir::Name);
+    foreach(QString s, results) {
+        QString layout = s.left(s.lastIndexOf('.'));
+        if (!ret.contains(layout))
+            ret << layout;
     }
 
     return ret;
