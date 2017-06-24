@@ -13,7 +13,7 @@ enable-nemonotifications {
 }
 
 isEmpty(DEFAULT_FONT) {
-    DEFAULT_FONT = monospace
+    DEFAULT_FONT = NotoMono
 }
 
 DEPLOYMENT_PATH = /usr/share/$$TARGET
