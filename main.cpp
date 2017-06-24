@@ -40,8 +40,15 @@ extern "C" {
 #include "version.h"
 #include "keyloader.h"
 
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(QsgEpaperPlugin)
+
 int main(int argc, char *argv[])
 {
+    qputenv("QMLSCENE_DEVICE", "epaper");
+    qputenv("QT_QPA_PLATFORM", "epaper:enable_fonts");
+    qputenv("QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS", "rotate=180");
+
     QString settings_path(QDir::homePath() + "/.config/FingerTerm");
     QDir dir;
 

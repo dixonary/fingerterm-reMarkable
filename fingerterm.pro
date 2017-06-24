@@ -1,6 +1,7 @@
 QT = core gui qml quick
 
 CONFIG += link_pkgconfig
+LIBS += -lqsgepaper
 
 enable-feedback {
     QT += feedback
