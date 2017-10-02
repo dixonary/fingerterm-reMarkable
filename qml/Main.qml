@@ -100,7 +100,7 @@ Item {
                 property bool visibleSetting: true
 
                 y: parent.height-vkb.height
-                visible: page.activeFocus && visibleSetting
+                visible: page.activeFocus && visibleSetting && false
             }
 
             // area that handles gestures/select/scroll modes and vkb-keypresses

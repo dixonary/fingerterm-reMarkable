@@ -108,6 +108,7 @@ private:
     static Util *sUtil;
 
     QList<QColor> iColorTable;
+    QImage m_buffer;
 };
 
 #endif // TEXTRENDER_H

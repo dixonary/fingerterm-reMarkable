@@ -2,6 +2,8 @@ QT = core gui qml quick
 
 CONFIG += link_pkgconfig
 LIBS += -lqsgepaper
+#        LIBS += -L/home/sandsmark/src/qsgepaper/build-qsgepaper-ZG-Release/ -lfreetype -lz #-lbfd
+#        TARGETDEPS += /home/sandsmark/src/qsgepaper/build-qsgepaper-ZG-Release/libqsgepaper.a
 
 enable-feedback {
     QT += feedback

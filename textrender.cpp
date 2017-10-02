@@ -18,6 +18,7 @@
 */
 
 #include <QtGui>
+#include <epframebuffer.h>
 #include "textrender.h"
 #include "terminal.h"
 #include "util.h"
@@ -279,7 +280,17 @@ void TextRender::drawTextFragment(QPainter* painter, int x, int y, QString text,
 
 void TextRender::redraw()
 {
-    update();
+//    EPFrameBuffer::framebuffer()->fill(Qt::black);
+    QPainter painter(EPFrameBuffer::framebuffer());
+    const QRect rect(0, 0, width(), height());
+    QImage &buffer = m_buffer;
+    if (buffer.size() != rect.size()) {
+        buffer = QImage()
+    }
+    painter.fillRect(rect, Qt::black);
+    paint(&painter);
+    EPFrameBuffer::sendUpdate(rect, EPFrameBuffer::Grayscale, EPFrameBuffer::PartialUpdate, false);
+//    update();
 }
 
 void TextRender::setUtil(Util *util)
