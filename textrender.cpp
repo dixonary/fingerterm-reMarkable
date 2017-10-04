@@ -285,7 +285,7 @@ void TextRender::redraw()
     const QRect rect(0, 0, width(), height());
     QImage &buffer = m_buffer;
     if (buffer.size() != rect.size()) {
-        buffer = QImage()
+        buffer = QImage();
     }
     painter.fillRect(rect, Qt::black);
     paint(&painter);
