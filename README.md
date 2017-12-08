@@ -12,3 +12,5 @@ These include:
 * Keeping the virtual keyboard on screen at all times (except when the menu is open)
 * Reducing the text area to fit above the keyboard rather than overlapping, to reduce redraw
 * Adjusting the font and UI sizes to fit more comfortably on the screen.
+
+Note that Landscape mode doesn't seem to work - this was true when I downloaded the repo originally from https://github.com/reMarkable/fingerterm .
