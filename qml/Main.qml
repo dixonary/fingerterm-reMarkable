@@ -87,7 +87,7 @@ Item {
             property int scrollBarWidth: 6*window.pixelRatio
 
             anchors.fill: parent
-            color: bellTimer.running ? "#ffffff" : bgcolor
+            color: bgcolor
 
             Lineview {
                 id: lineView
@@ -96,6 +96,7 @@ Item {
 
             Keyboard {
                 id: vkb
+                property int mainHeight:vkb.height
 
                 property int vil:1
 
@@ -205,7 +206,7 @@ Item {
                 property int duration
                 property int cutAfter: height
 
-                height: vkb.y
+                height: parent.height-vkb.mainHeight
                 width: parent.width
                 fontPointSize: util.fontSize
                 opacity: (util.keyboardMode == Util.KeyboardFade && vkb.active) ? 0.3

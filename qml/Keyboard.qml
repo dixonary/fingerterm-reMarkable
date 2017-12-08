@@ -85,6 +85,7 @@ Item {
 
     Component.onCompleted: {
         keyboardLoader.sourceComponent = keyboardContents;
+        vkb.mainHeight = keyboard.height;
     }
 
     Rectangle {
