@@ -104,7 +104,7 @@ Item {
         Text {
             id: label
             color: keyBgColor
-            font.pointSize: 34*window.pixelRatio
+            font.pointSize: 8*window.pixelRatio
             anchors.centerIn: parent
         }
         Timer {

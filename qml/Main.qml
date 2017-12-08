@@ -24,8 +24,8 @@ import QtQuick.Window 2.0
 Item {
     id: root
 
-    width: 540
-    height: 960
+    width: 1404
+    height: 1872
 
     Binding {
         target: util
@@ -60,7 +60,7 @@ Item {
 
             property int fadeOutTime: 80
             property int fadeInTime: 350
-            property real pixelRatio: root.width / 540
+            property real pixelRatio: 1
 
             // layout constants
             property int buttonWidthSmall: 60*pixelRatio
@@ -79,10 +79,10 @@ Item {
             property int paddingSmall: 5*pixelRatio
             property int paddingMedium: 10*pixelRatio
 
-            property int fontSizeSmall: 14*pixelRatio
-            property int fontSizeLarge: 24*pixelRatio
+            property int fontSizeSmall: 8*pixelRatio
+            property int fontSizeLarge: 12*pixelRatio
 
-            property int uiFontSize: util.uiFontSize * pixelRatio
+            property int uiFontSize: 8 * pixelRatio
 
             property int scrollBarWidth: 6*window.pixelRatio
 
@@ -97,10 +97,12 @@ Item {
             Keyboard {
                 id: vkb
 
+                property int vil:1
+
                 property bool visibleSetting: true
 
                 y: parent.height-vkb.height
-                visible: page.activeFocus && visibleSetting && false
+                visible: page.activeFocus && visibleSetting
             }
 
             // area that handles gestures/select/scroll modes and vkb-keypresses
@@ -110,6 +112,7 @@ Item {
 
                 property int firstTouchId: -1
                 property var pressedKeys: ({})
+
 
                 onPressed: {
                     touchPoints.forEach(function (touchPoint) {
@@ -147,10 +150,8 @@ Item {
                         if (multiTouchArea.firstTouchId == touchPoint.pointId) {
                             // Toggle keyboard wake-up when tapping outside the keyboard, but:
                             //   - only when not scrolling (y-diff < 20 pixels)
-                            //   - not in select mode, as it would be hard to select text
                             if (touchPoint.y < vkb.y && touchPoint.startY < vkb.y &&
-                                    Math.abs(touchPoint.y - touchPoint.startY) < 20 &&
-                                    util.dragMode !== Util.DragSelect) {
+                                    Math.abs(touchPoint.y - touchPoint.startY) < 20) {
                                 if (vkb.active) {
                                     window.sleepVKB();
                                 } else {
@@ -204,7 +205,7 @@ Item {
                 property int duration
                 property int cutAfter: height
 
-                height: parent.height
+                height: vkb.y
                 width: parent.width
                 fontPointSize: util.fontSize
                 opacity: (util.keyboardMode == Util.KeyboardFade && vkb.active) ? 0.3
@@ -230,7 +231,7 @@ Item {
 
                 interval: util.keyboardFadeOutDelay
                 onTriggered: {
-                    window.sleepVKB();
+                    //window.sleepVKB();
                 }
             }
 

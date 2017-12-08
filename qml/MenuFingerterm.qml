@@ -57,7 +57,7 @@ Item {
         }
 
         Behavior on anchors.leftMargin {
-            NumberAnimation { duration: 100; easing.type: Easing.InOutQuad; }
+            NumberAnimation { duration: 0; easing.type: Easing.InOutQuad; }
         }
 
 //        XmlListModel {
