@@ -14,3 +14,7 @@ These include:
 * Adjusting the font and UI sizes to fit more comfortably on the screen.
 
 Note that Landscape mode doesn't seem to work - this was true when I downloaded the repo originally from https://github.com/reMarkable/fingerterm .
+
+## Build instructions
+
+To build and install fingerterm (as well as other projects like [draft](https://github.com/dixonary/draft-reMarkable), you'll first need to setup QT Creator. This is covered on the [reMarkable wiki](https://remarkablewiki.com/devel/qt_creator). After that, it's as simple as opening the project in QT Creator and running it with your reMarkable connected to your computer.
