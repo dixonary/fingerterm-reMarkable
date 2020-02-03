@@ -300,6 +300,11 @@ int Util::keyboardMargins()
     return settingsValue("ui/keyboardMargins", 10).toInt();
 }
 
+bool Util::showVisualKeyPressFeedback()
+{
+    return settingsValue("ui/showVisualKeyPressFeedback", true).toBool();
+}
+
 int Util::orientationMode()
 {
     QString mode = settingsValue("ui/orientationLockMode", "auto").toString();
