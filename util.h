@@ -43,6 +43,7 @@ class Util : public QObject
     Q_PROPERTY(int extraLinesFromCursor READ extraLinesFromCursor CONSTANT)
     Q_PROPERTY(QString charset READ charset CONSTANT)
     Q_PROPERTY(int keyboardMargins READ keyboardMargins CONSTANT)
+    Q_PROPERTY(bool showVisualKeyPressFeedback READ showVisualKeyPressFeedback CONSTANT)
     Q_PROPERTY(int orientationMode READ orientationMode WRITE setOrientationMode NOTIFY orientationModeChanged)
     Q_PROPERTY(bool showWelcomeScreen READ showWelcomeScreen WRITE setShowWelcomeScreen NOTIFY showWelcomeScreenChanged)
     Q_ENUMS(KeyboardMode)
@@ -119,6 +120,8 @@ public:
     int extraLinesFromCursor();
     QString charset();
     int keyboardMargins();
+
+    bool showVisualKeyPressFeedback();
 
     int orientationMode();
     void setOrientationMode(int mode);

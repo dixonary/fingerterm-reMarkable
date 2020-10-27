@@ -36,6 +36,8 @@ Item {
 
     property bool active
 
+    property bool showVisualKeyPressFeedback: util.showVisualKeyPressFeedback
+
     property int outmargins: util.keyboardMargins
     property int keyspacing: 6
     property int keysPerRow: keyLoader.vkbColumns()
@@ -98,7 +100,7 @@ Item {
                             && currentKeyPressed.currentLabel !== " ")
                            ? currentKeyPressed : null
 
-        visible: _key || visualFeedbackDelay.running
+        visible: (_key || visualFeedbackDelay.running) && showVisualKeyPressFeedback
         radius: window.radiusSmall
         color: keyFgColor
 
